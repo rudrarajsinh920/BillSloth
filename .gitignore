@@ -1,0 +1,12 @@
+node_modules/
+dist/
+*.tsbuildinfo
+vite.config.d.ts
+vite.config.js
+.DS_Store
+Thumbs.db
+
+# Keep data directory structure but ignore local uploads and database files
+data/*.db*
+data/uploads/*
+!data/uploads/.gitkeep
