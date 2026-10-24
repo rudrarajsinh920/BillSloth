@@ -37,11 +37,60 @@ Polished, calm finance productivity application using the Hacktoberfest "Slow an
 - **Frontend**: React 18, TypeScript, Vite, Tailwind CSS, Lucide React
 - **Backend API**: Node.js 24 ESM, Express, Multer
 - **Database**: Native Node 24 SQLite (`node:sqlite`) with persistent `./data/billsloth.db`
-- **AI Integration**: Modular local Ollama client (`http://127.0.0.1:11434`), supporting vision and text models (`llama3.2-vision`, `mistral`, `llama3`, `phi3`) with offline diagnostics.
+- **Local AI & Extraction**:
+  - **Inference Runtime**: Local Ollama (`http://127.0.0.1:11434`) running `gemma2:2b` (open-weight Gemma 2 model).
+  - **Local PDF Parser**: `pdf-parse` for deterministic embedded text extraction.
+  - **Local OCR Engine**: `tesseract.js` for on-device receipt/scanned image OCR.
+  - **Hashing**: `node:crypto` SHA-256 content hashing for duplicate protection.
 
 ---
 
-## 📦 Phase 1 Features
+## 📦 Phase 2 Completed Features & Verification
+
+Phase 2 implemented full-stack on-device document extraction and structured inference using **Gemma 2 2B**:
+
+### 1. Two-Stage Privacy-First Local Pipeline
+1. **Stage 1 (Local Text Extraction)**:
+   - **Digital PDFs**: Embedded text extracted directly via `pdf-parse` (95% advisory confidence).
+   - **Scanned Receipts & Images (PNG/JPG)**: Extracted on-device via local `tesseract.js` worker (measured engine confidence).
+   - **Zero Cloud Leaks**: 100% on-device processing; zero network packets sent to external AI APIs.
+2. **Stage 2 (Local LLM Structuring & Grounding)**:
+   - Formulates strict JSON extraction requests sent to local Ollama running `gemma2:2b`.
+   - Extracts: Vendor, Invoice Number, Amount, Currency, Issue Date, Due Date, Category, Payment Status.
+   - Non-hallucinatory: Missing fields return `null` and are flagged for human review.
+
+### 2. Validation & Advisory Confidence
+- **Grounding Heuristic**: Verifies extracted values against source text (0.92–0.95 if found verbatim, 0.65–0.70 if inferred, 0.0 if missing).
+- **Validation Flags**: Automatically flags `MISSING_DUE_DATE`, `MISSING_AMOUNT`, `MISSING_VENDOR`, `MISSING_INVOICE_NUMBER`, `INCONSISTENT_DATES`, and `UNVERIFIED`.
+- **Advisory Status**: Confidence values are documented as advisory cues to guide human attention, not proof of correctness.
+
+### 3. Duplicate Protection & Audit Trail
+- **SHA-256 Content Hashing**: Identical file imports return `HTTP 409 Conflict` with the matched document ID and upload timestamp.
+- **Controlled Force Re-import**: Bypassed only through explicit `?force=true` query parameter.
+- **Granular Human Audit Logging**: Editing fields generates `HUMAN_FIELD_CORRECTION` audit logs recording `{ original, corrected }` value pairs in SQLite.
+
+### 4. Verification Results (QA Matrix)
+| Check | Scope | Result |
+| :--- | :--- | :---: |
+| **Local Environment** | Ollama online at `127.0.0.1:11434`, `gemma2:2b` detected | **PASS** |
+| **Test A (Digital PDF)** | Acme Cloud Hosting, TEST-INV-001, $150.00, 2026-11-01, 2026-11-20 | **PASS** |
+| **Test B (Scanned Image)** | City Water and Power, SCAN-9021, $88.50, local OCR (94% conf) | **PASS** |
+| **Test C (Missing Fields)** | Missing due date & invoice number returned as null with flags | **PASS** |
+| **Test D (Duplicate Protection)** | Second upload blocked with HTTP 409; force bypass returns 201 | **PASS** |
+| **Test E (Human Review)** | Corrections recorded in audit log; requires human approval | **PASS** |
+| **Test F (Persistence)** | Documents, flags, and audit logs persist across server restart | **PASS** |
+| **Test G (Ollama Offline)** | Server handles offline Ollama gracefully; no cloud fallback | **PASS** |
+| **Type Check (`tsc --noEmit`)** | Full codebase TypeScript typecheck | **PASS (0 errors)** |
+| **Lint (`eslint .`)** | Full codebase ESLint inspection | **PASS (0 errors)** |
+| **Production Build (`vite build`)** | Production bundle compile & minify | **PASS (0 errors)** |
+
+### ⚠️ Known Limitation: Scanned Multi-Page PDFs
+- **Scanned Multi-Page Image PDFs**: Scanned image-only PDFs lacking native embedded text streams currently return empty text because rendering PDF pages to image tensors requires native rasterization libraries (e.g. `poppler` or `pdf2pic`), which were intentionally omitted to maintain a zero-native-dependency Windows environment.
+- **Workaround**: Users can upload individual scanned pages as PNG or JPG images, which are immediately processed by local Tesseract OCR and Gemma 2.
+
+---
+
+## 📦 Phase 1 Foundation Features
 
 ### 1. Dashboard
 - **Summary KPI Cards**: Total Outstanding balance, Overdue amount, Due in 7 Days, and Needs Review count.
@@ -92,7 +141,7 @@ Polished, calm finance productivity application using the Hacktoberfest "Slow an
 
 ### 7. Clear States & Local Model Controls
 - Live local AI status pill in navbar (Green = Ollama Connected, Amber = Ollama Offline).
-- Ollama Setup modal with CLI commands (`ollama serve`, `ollama pull llama3.2`).
+- Ollama Setup modal with CLI commands (`ollama serve`, `ollama pull gemma2:2b`).
 - Illustrative Sample Data toggle (*"Load Sample Data"* / *"Clear Sample Data"*).
 - Loading states and error banners.
 
@@ -126,10 +175,10 @@ npm run server:start
 
 ---
 
-## 🦥 Connect Local AI (Optional)
-To enable automatic local field extraction with Ollama:
+## 🦥 Connect Local AI (Ollama + Gemma 2)
+To enable automatic local field extraction with Ollama and Gemma 2:
 ```bash
 ollama serve
-ollama pull llama3.2
+ollama pull gemma2:2b
 ```
-*Note: If Ollama is not running, BillSloth will continue running with full manual review capabilities without falsely simulating AI extraction.*
+*Note: If Ollama is not running or Gemma is not installed, BillSloth will continue running with full manual review capabilities, clear offline indicators, and graceful degradation without falsely simulating AI extraction.*

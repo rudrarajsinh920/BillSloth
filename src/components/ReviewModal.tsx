@@ -10,9 +10,12 @@ import {
   ShieldCheck,
   History,
   Sparkles,
+  Eye,
+  EyeOff,
+  ExternalLink,
 } from 'lucide-react';
 import { DocumentItem, BillCategory, DocumentStatus } from '../types';
-import { StatusBadge, VerifiedBadge, SampleDataBadge } from './StatusBadge';
+import { StatusBadge, VerifiedBadge, SampleDataBadge, ExtractionTelemetryBadge } from './StatusBadge';
 import { updateDocument, deleteDocument, extractDocumentFields, fetchDocumentById } from '../api/client';
 import { format, parseISO } from 'date-fns';
 
@@ -68,6 +71,7 @@ export const ReviewModal: React.FC<ReviewModalProps> = ({
   const [paymentReference, setPaymentReference] = useState('');
   const [notes, setNotes] = useState('');
   const [rawText, setRawText] = useState('');
+  const [showPreview, setShowPreview] = useState(true);
 
   useEffect(() => {
     if (documentId && isOpen) {
@@ -77,6 +81,17 @@ export const ReviewModal: React.FC<ReviewModalProps> = ({
       setExtractionMsg(null);
     }
   }, [documentId, isOpen]);
+
+  // Keyboard accessibility: Close on Escape key
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape' && isOpen) {
+        onClose();
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [isOpen, onClose]);
 
   const loadDoc = async (id: string) => {
     setLoading(true);
@@ -204,8 +219,12 @@ export const ReviewModal: React.FC<ReviewModalProps> = ({
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-navy-900/60 backdrop-blur-sm p-4 animate-in fade-in duration-150">
-      <div className="bg-white rounded-2xl shadow-2xl border border-slate-border max-w-4xl w-full max-h-[92vh] flex flex-col overflow-hidden">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-navy-900/60 backdrop-blur-sm p-3 sm:p-4 animate-in fade-in duration-150">
+      <div
+        className={`bg-white rounded-2xl shadow-2xl border border-slate-border w-full max-h-[94vh] flex flex-col overflow-hidden transition-all duration-200 ${
+          showPreview ? 'max-w-6xl' : 'max-w-3xl'
+        }`}
+      >
         {/* Header */}
         <div className="px-6 py-4 border-b border-slate-border flex items-center justify-between bg-slate-light shrink-0">
           <div className="flex items-center gap-3">
@@ -226,12 +245,28 @@ export const ReviewModal: React.FC<ReviewModalProps> = ({
               </p>
             </div>
           </div>
-          <button
-            onClick={onClose}
-            className="text-slate-muted hover:text-navy-900 p-1.5 rounded-lg hover:bg-slate-200 transition-colors"
-          >
-            <X className="w-5 h-5" />
-          </button>
+          <div className="flex items-center gap-2">
+            <button
+              type="button"
+              onClick={() => setShowPreview(!showPreview)}
+              className={`px-2.5 py-1.5 rounded-lg border text-xs font-semibold flex items-center gap-1.5 transition-colors ${
+                showPreview
+                  ? 'border-brand-blue bg-brand-blue-light text-brand-blue hover:bg-brand-blue/10'
+                  : 'border-slate-border bg-white text-navy-800 hover:bg-slate-100'
+              }`}
+              title={showPreview ? 'Hide document preview' : 'View original document side-by-side'}
+            >
+              {showPreview ? <EyeOff className="w-3.5 h-3.5" /> : <Eye className="w-3.5 h-3.5" />}
+              <span className="hidden sm:inline">{showPreview ? 'Hide Preview' : 'Side-by-Side'}</span>
+            </button>
+            <button
+              onClick={onClose}
+              aria-label="Close review dialog"
+              className="text-slate-muted hover:text-navy-900 p-1.5 rounded-lg hover:bg-slate-200 transition-colors focus-visible:ring-2 focus-visible:ring-brand-blue focus-visible:outline-none"
+            >
+              <X className="w-5 h-5" />
+            </button>
+          </div>
         </div>
 
         {/* Status / Message Banner */}
@@ -254,8 +289,71 @@ export const ReviewModal: React.FC<ReviewModalProps> = ({
           </div>
         )}
 
-        {/* Scrollable Content */}
-        <div className="flex-1 overflow-y-auto p-6 space-y-6">
+        {/* Main Content Area: Side-by-Side Split or Single Column */}
+        <div className="flex-1 flex flex-col lg:flex-row overflow-hidden min-h-0">
+          {/* Left Column: Original Document Viewer */}
+          {showPreview && (
+            <div className="lg:w-1/2 flex flex-col bg-slate-100/70 border-b lg:border-b-0 lg:border-r border-slate-border p-4 overflow-hidden shrink-0 min-h-[320px] lg:min-h-0">
+              <div className="flex items-center justify-between pb-2 mb-2 border-b border-slate-200 text-xs">
+                <div className="flex items-center gap-1.5 font-semibold text-navy-900">
+                  <FileText className="w-4 h-4 text-brand-blue" />
+                  <span className="truncate max-w-[220px]" title={doc?.original_name}>
+                    {doc?.original_name || 'Original Document'}
+                  </span>
+                </div>
+                {doc?.filename ? (
+                  <a
+                    href={`/uploads/${doc.filename}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-brand-blue hover:text-brand-blue-hover hover:underline inline-flex items-center gap-1 text-[11px] font-semibold"
+                  >
+                    <span>Open In New Window</span>
+                    <ExternalLink className="w-3 h-3" />
+                  </a>
+                ) : (
+                  <span className="text-[10px] px-1.5 py-0.5 rounded bg-slate-200 text-slate-700 font-mono">
+                    Local Only
+                  </span>
+                )}
+              </div>
+
+              {/* Document Rendering */}
+              {doc?.filename && doc.filename.toLowerCase().endsWith('.pdf') ? (
+                <iframe
+                  src={`/uploads/${doc.filename}#toolbar=0`}
+                  className="w-full flex-1 rounded-xl border border-slate-200 bg-white shadow-inner"
+                  title="PDF Document Preview"
+                />
+              ) : doc?.filename && doc.filename.toLowerCase().match(/\.(png|jpg|jpeg|webp)$/) ? (
+                <div className="flex-1 overflow-auto flex items-center justify-center p-2 bg-slate-200/50 rounded-xl border border-slate-200">
+                  <img
+                    src={`/uploads/${doc.filename}`}
+                    alt={doc.original_name}
+                    className="max-w-full max-h-[560px] object-contain rounded shadow-sm"
+                  />
+                </div>
+              ) : (
+                <div className="flex-1 p-4 bg-white rounded-xl border border-slate-200 flex flex-col justify-between overflow-y-auto">
+                  <div className="space-y-3 font-mono text-xs">
+                    <div className="border-b pb-2">
+                      <h4 className="font-bold text-navy-900 text-sm">{doc?.vendor || 'Simulated Document'}</h4>
+                      <p className="text-[11px] text-slate-500">Invoice: {doc?.invoice_number || 'N/A'}</p>
+                    </div>
+                    <div className="p-3 bg-slate-50 rounded-lg border border-slate-200 text-xs whitespace-pre-wrap leading-relaxed text-slate-700">
+                      {doc?.raw_text || 'No text extracted for preview.'}
+                    </div>
+                  </div>
+                  <div className="text-[11px] text-slate-400 text-center pt-3 border-t">
+                    Illustrative document representation stored in local database.
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* Right Column: Editable Invoice Review Form */}
+          <div className="flex-1 overflow-y-auto p-6 space-y-6">
           {loading ? (
             <div className="py-16 text-center text-slate-muted text-xs">
               <div className="w-6 h-6 border-2 border-brand-blue border-t-transparent rounded-full animate-spin mx-auto mb-2" />
@@ -296,6 +394,93 @@ export const ReviewModal: React.FC<ReviewModalProps> = ({
                     />
                     <span className="text-xs font-bold text-navy-900">Mark as Verified</span>
                   </label>
+                </div>
+              )}
+
+              {/* Highlight Amount & Terms Box (Inspired by Reference Image 1 Details View) */}
+              <div className="financial-card p-4 bg-navy-900 text-white flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                <div>
+                  <span className="text-[11px] font-semibold text-slate-300 uppercase tracking-wider block">
+                    Billed Amount
+                  </span>
+                  <div className="text-2xl font-bold font-mono tabular-nums text-white mt-0.5">
+                    {amount ? `${currency} ${parseFloat(amount || '0').toFixed(2)}` : '<Amount Not Extracted>'}
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-4 text-xs border-t sm:border-t-0 sm:border-l border-navy-700 pt-2 sm:pt-0 sm:pl-4">
+                  <div>
+                    <span className="text-[10px] text-slate-400 block uppercase font-medium">Payment Due</span>
+                    <span className="font-semibold text-slate-100 tabular-nums">
+                      {dueDate || 'None specified'}
+                    </span>
+                  </div>
+                  <div>
+                    <span className="text-[10px] text-slate-400 block uppercase font-medium">Status</span>
+                    <span className="font-semibold text-emerald-400 capitalize">
+                      {isVerified ? 'Human Verified' : status.replace(/_/g, ' ')}
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Extraction Telemetry & Validation Flags */}
+              {doc && (
+                <div className="p-3.5 rounded-xl border border-slate-border bg-slate-light text-xs space-y-2">
+                  <div className="flex flex-wrap items-center justify-between gap-2">
+                    <div className="flex items-center gap-2">
+                      <span className="font-semibold text-navy-900 text-xs">Extraction Telemetry:</span>
+                      {(() => {
+                        let modelUsed: string | null = null;
+                        if (doc.extraction_metadata) {
+                          try {
+                            const meta = JSON.parse(doc.extraction_metadata);
+                            modelUsed = meta.modelUsed || meta.model || null;
+                          } catch {
+                            modelUsed = null;
+                          }
+                        }
+                        return (
+                          <ExtractionTelemetryBadge
+                            method={doc.extraction_method}
+                            ocrConfidence={doc.ocr_confidence}
+                            modelUsed={modelUsed}
+                          />
+                        );
+                      })()}
+                    </div>
+                    {doc.file_hash && (
+                      <span className="text-[10px] font-mono tabular-nums text-slate-muted truncate max-w-xs" title={`SHA-256: ${doc.file_hash}`}>
+                        SHA-256: {doc.file_hash.slice(0, 16)}...
+                      </span>
+                    )}
+                  </div>
+
+                  {(() => {
+                    let flags: string[] = [];
+                    try {
+                      if (doc.validation_flags) flags = JSON.parse(doc.validation_flags);
+                    } catch {
+                      flags = [];
+                    }
+                    if (flags.length === 0) return null;
+                    return (
+                      <div className="flex flex-wrap items-center gap-1.5 pt-1 border-t border-slate-200">
+                        <span className="text-[11px] font-semibold text-amber-warn flex items-center gap-1">
+                          <AlertTriangle className="w-3.5 h-3.5" />
+                          <span>Validation Flags:</span>
+                        </span>
+                        {flags.map((flag) => (
+                          <span
+                            key={flag}
+                            className="px-2 py-0.5 rounded text-[10px] font-mono font-medium bg-amber-warn-light text-amber-warn border border-amber-warn-border"
+                          >
+                            {flag.replace(/_/g, ' ')}
+                          </span>
+                        ))}
+                      </div>
+                    );
+                  })()}
                 </div>
               )}
 
@@ -351,13 +536,13 @@ export const ReviewModal: React.FC<ReviewModalProps> = ({
                         value={amount}
                         onChange={(e) => setAmount(e.target.value)}
                         placeholder="0.00"
-                        className="w-full pl-3 pr-8 py-2 text-xs rounded-lg border border-slate-border font-mono font-medium focus:border-brand-blue focus:ring-1 focus:ring-brand-blue"
+                        className="w-full pl-3 pr-8 py-2 text-xs rounded-lg border border-slate-border font-mono tabular-nums font-medium focus:border-brand-blue focus:ring-1 focus:ring-brand-blue"
                       />
                     </div>
                     <select
                       value={currency}
                       onChange={(e) => setCurrency(e.target.value)}
-                      className="px-2.5 py-2 text-xs rounded-lg border border-slate-border font-mono bg-white focus:border-brand-blue"
+                      className="px-2.5 py-2 text-xs rounded-lg border border-slate-border font-mono tabular-nums bg-white focus:border-brand-blue"
                     >
                       {CURRENCIES.map((c) => (
                         <option key={c} value={c}>
@@ -391,7 +576,7 @@ export const ReviewModal: React.FC<ReviewModalProps> = ({
                     type="date"
                     value={issueDate}
                     onChange={(e) => setIssueDate(e.target.value)}
-                    className="w-full px-3 py-2 text-xs rounded-lg border border-slate-border font-mono focus:border-brand-blue"
+                    className="w-full px-3 py-2 text-xs rounded-lg border border-slate-border font-mono tabular-nums focus:border-brand-blue"
                   />
                 </div>
 
@@ -405,7 +590,7 @@ export const ReviewModal: React.FC<ReviewModalProps> = ({
                     type="date"
                     value={dueDate}
                     onChange={(e) => setDueDate(e.target.value)}
-                    className="w-full px-3 py-2 text-xs rounded-lg border border-slate-border font-mono focus:border-brand-blue"
+                    className="w-full px-3 py-2 text-xs rounded-lg border border-slate-border font-mono tabular-nums focus:border-brand-blue"
                   />
                 </div>
 
@@ -513,7 +698,7 @@ export const ReviewModal: React.FC<ReviewModalProps> = ({
                             {log.details}
                           </span>
                         </div>
-                        <span className="text-[10px] text-slate-muted font-mono shrink-0">
+                        <span className="text-[10px] text-slate-muted font-mono tabular-nums shrink-0">
                           {format(parseISO(log.timestamp), 'MMM d, HH:mm')}
                         </span>
                       </div>
@@ -524,12 +709,13 @@ export const ReviewModal: React.FC<ReviewModalProps> = ({
             </>
           )}
         </div>
+      </div>
 
         {/* Footer */}
         <div className="px-6 py-4 bg-slate-light border-t border-slate-border flex items-center justify-between shrink-0">
           <button
             onClick={handleDelete}
-            className="px-3 py-1.5 rounded-lg border border-red-overdue-border text-red-overdue hover:bg-red-50 text-xs font-medium inline-flex items-center gap-1.5 transition-colors"
+            className="px-3 py-1.5 rounded-lg border border-red-overdue-border text-red-overdue hover:bg-red-50 text-xs font-medium inline-flex items-center gap-1.5 transition-colors focus-visible:ring-2 focus-visible:ring-red-overdue focus-visible:outline-none"
           >
             <Trash2 className="w-3.5 h-3.5" />
             <span>Archive Document</span>
@@ -538,14 +724,14 @@ export const ReviewModal: React.FC<ReviewModalProps> = ({
           <div className="flex items-center gap-2">
             <button
               onClick={onClose}
-              className="px-4 py-2 rounded-lg border border-slate-border bg-white hover:bg-slate-100 text-navy-800 text-xs font-medium transition-colors"
+              className="px-4 py-2 rounded-lg border border-slate-border bg-white hover:bg-slate-100 text-navy-800 text-xs font-medium transition-colors focus-visible:ring-2 focus-visible:ring-brand-blue focus-visible:outline-none"
             >
               Cancel
             </button>
             <button
               onClick={handleSave}
               disabled={saving || loading}
-              className="px-5 py-2 rounded-lg bg-brand-blue hover:bg-brand-blue-hover text-white text-xs font-bold shadow-sm inline-flex items-center gap-1.5 transition-colors disabled:opacity-50"
+              className="px-5 py-2 rounded-lg bg-brand-blue hover:bg-brand-blue-hover text-white text-xs font-bold shadow-sm inline-flex items-center gap-1.5 transition-colors disabled:opacity-50 focus-visible:ring-2 focus-visible:ring-brand-blue focus-visible:outline-none"
             >
               {saving ? (
                 <div className="w-3.5 h-3.5 border-2 border-white border-t-transparent rounded-full animate-spin" />

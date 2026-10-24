@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import {
   AlertCircle,
   Clock,
@@ -11,10 +11,14 @@ import {
   DollarSign,
   FileText,
   AlertTriangle,
+  ShieldCheck,
+  Cpu,
+  Layers,
+  ChevronRight,
 } from 'lucide-react';
 import { DocumentItem } from '../types';
 import { NavTab } from './Navbar';
-import { StatusBadge, VerifiedBadge, SampleDataBadge } from './StatusBadge';
+import { StatusBadge, VerifiedBadge, SampleDataBadge, ExtractionTelemetryBadge } from './StatusBadge';
 import { format, parseISO, differenceInDays } from 'date-fns';
 
 interface DashboardViewProps {
@@ -37,20 +41,83 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
   ollamaAvailable,
 }) => {
   // Categorize documents by computed status
-  const overdueDocs = documents.filter((d) => (d.computed_status || d.status) === 'overdue');
-  const dueSoonDocs = documents.filter((d) => (d.computed_status || d.status) === 'due_soon');
-  const needsReviewDocs = documents.filter(
-    (d) => (d.computed_status || d.status) === 'needs_review' || d.is_verified === 0
+  const overdueDocs = useMemo(
+    () => documents.filter((d) => (d.computed_status || d.status) === 'overdue'),
+    [documents]
   );
-  const paidDocs = documents.filter((d) => (d.computed_status || d.status) === 'paid');
+  const dueSoonDocs = useMemo(
+    () => documents.filter((d) => (d.computed_status || d.status) === 'due_soon'),
+    [documents]
+  );
+  const needsReviewDocs = useMemo(
+    () => documents.filter((d) => (d.computed_status || d.status) === 'needs_review' || d.is_verified === 0),
+    [documents]
+  );
+  const paidDocs = useMemo(
+    () => documents.filter((d) => (d.computed_status || d.status) === 'paid'),
+    [documents]
+  );
 
   // Compute metrics
-  const totalOutstanding = documents
-    .filter((d) => (d.computed_status || d.status) !== 'paid')
-    .reduce((sum, d) => sum + (d.amount || 0), 0);
+  const unpaidDocs = useMemo(
+    () => documents.filter((d) => (d.computed_status || d.status) !== 'paid'),
+    [documents]
+  );
+  const totalOutstanding = useMemo(
+    () => unpaidDocs.reduce((sum, d) => sum + (d.amount || 0), 0),
+    [unpaidDocs]
+  );
+  const overdueTotal = useMemo(
+    () => overdueDocs.reduce((sum, d) => sum + (d.amount || 0), 0),
+    [overdueDocs]
+  );
+  const dueSoonTotal = useMemo(
+    () => dueSoonDocs.reduce((sum, d) => sum + (d.amount || 0), 0),
+    [dueSoonDocs]
+  );
 
-  const overdueTotal = overdueDocs.reduce((sum, d) => sum + (d.amount || 0), 0);
-  const dueSoonTotal = dueSoonDocs.reduce((sum, d) => sum + (d.amount || 0), 0);
+  // Category Breakdown (Deterministic from stored data)
+  const categoryBreakdown = useMemo(() => {
+    const map = new Map<string, { total: number; count: number }>();
+    let totalAmount = 0;
+
+    unpaidDocs.forEach((d) => {
+      const cat = d.category || 'Other';
+      const amt = d.amount || 0;
+      const current = map.get(cat) || { total: 0, count: 0 };
+      map.set(cat, { total: current.total + amt, count: current.count + 1 });
+      totalAmount += amt;
+    });
+
+    const categoryColors: Record<string, string> = {
+      'Utilities': 'bg-sky-500',
+      'Software/SaaS': 'bg-brand-blue',
+      'Rent/Lease': 'bg-indigo-600',
+      'Telecom': 'bg-teal-500',
+      'Insurance': 'bg-amber-500',
+      'Supplies': 'bg-emerald-500',
+      'Professional Services': 'bg-purple-500',
+      'Taxes': 'bg-rose-500',
+      'Other': 'bg-slate-400',
+    };
+
+    return Array.from(map.entries())
+      .map(([category, info]) => ({
+        category,
+        amount: info.total,
+        count: info.count,
+        percentage: totalAmount > 0 ? Math.round((info.total / totalAmount) * 100) : 0,
+        color: categoryColors[category] || 'bg-slate-500',
+      }))
+      .sort((a, b) => b.amount - a.amount);
+  }, [unpaidDocs]);
+
+  // Recent 5 documents for activity table (Reference 2 / Reference 3 inspired)
+  const recentActivity = useMemo(() => {
+    return [...documents]
+      .sort((a, b) => new Date(b.created_at || 0).getTime() - new Date(a.created_at || 0).getTime())
+      .slice(0, 5);
+  }, [documents]);
 
   const formatCurrency = (val: number | null, curr = 'USD') => {
     if (val === null || val === undefined) return '—';
@@ -80,32 +147,38 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
   };
 
   return (
-    <div className="space-y-8 animate-in fade-in duration-150">
-      {/* Top Banner / Philosophy Callout */}
-      <div className="bg-white rounded-xl p-6 border border-slate-border shadow-card flex flex-col md:flex-row md:items-center justify-between gap-4">
+    <div className="space-y-6 animate-in fade-in duration-150">
+      {/* Welcoming Header Banner (Inspired by Reference Image 2 & 3) */}
+      <div className="financial-card p-6 flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-          <div className="flex items-center gap-2">
-            <h1 className="text-xl font-bold text-navy-900 tracking-tight">Slow and Steady Financial Clarity</h1>
+          <div className="flex items-center gap-2.5 flex-wrap">
+            <h1 className="text-xl font-bold text-navy-900 tracking-tight">
+              Welcome back to BillSloth
+            </h1>
             <span className="text-xs font-semibold px-2.5 py-0.5 rounded-full bg-slate-100 text-slate-700 border border-slate-200">
-              Week 3 Challenge
+              Slow & Steady
+            </span>
+            <span className="text-xs font-semibold px-2.5 py-0.5 rounded-full bg-green-paid-light text-green-paid border border-green-paid-border flex items-center gap-1">
+              <ShieldCheck className="w-3.5 h-3.5" />
+              <span>100% Local • Zero Cloud AI</span>
             </span>
           </div>
-          <p className="text-sm text-slate-muted mt-1 max-w-2xl">
-            BillSloth organizes your bills with local-first AI and tracks due dates without rushed automated payments.
-            Every extraction requires human approval.
+          <p className="text-xs text-slate-muted mt-1.5 max-w-2xl leading-relaxed">
+            "Stop chasing bills. Know what needs attention." Organized on-device with open-weight Gemma 2 2B models and calm human verification.
           </p>
         </div>
+
         <div className="flex items-center gap-2.5 shrink-0">
           <button
             onClick={() => onNavigate('import')}
-            className="px-4 py-2 rounded-lg bg-brand-blue hover:bg-brand-blue-hover text-white text-xs font-semibold shadow-sm inline-flex items-center gap-2 transition-colors"
+            className="px-4 py-2.5 rounded-lg bg-brand-blue hover:bg-brand-blue-hover text-white text-xs font-semibold shadow-sm inline-flex items-center gap-2 transition-colors focus-visible:ring-2 focus-visible:ring-brand-blue focus-visible:outline-none"
           >
             <UploadCloud className="w-4 h-4" />
             <span>Import Document</span>
           </button>
           <button
             onClick={() => onNavigate('digest')}
-            className="px-3.5 py-2 rounded-lg border border-slate-border bg-white hover:bg-slate-50 text-navy-800 text-xs font-medium inline-flex items-center gap-1.5 transition-colors"
+            className="px-3.5 py-2.5 rounded-lg border border-slate-border bg-white hover:bg-slate-50 text-navy-800 text-xs font-medium inline-flex items-center gap-1.5 transition-colors focus-visible:ring-2 focus-visible:ring-brand-blue focus-visible:outline-none"
           >
             <CalendarCheck2 className="w-4 h-4 text-brand-blue" />
             <span>Weekly Digest</span>
@@ -132,105 +205,296 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
         </div>
       )}
 
-      {/* 4 Summary Cards */}
+      {/* 4 Polished Status Summary Cards (Inspired by Reference 1, 2, and 3) */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         {/* Total Outstanding */}
-        <div className="bg-white rounded-xl p-5 border border-slate-border shadow-card flex flex-col justify-between">
+        <div
+          onClick={() => onNavigate('documents')}
+          className="financial-card-interactive p-5 flex flex-col justify-between cursor-pointer"
+        >
           <div className="flex items-center justify-between">
-            <span className="text-xs font-medium text-slate-muted uppercase tracking-wider">Total Outstanding</span>
-            <div className="p-2 rounded-lg bg-slate-light text-navy-700">
+            <span className="text-xs font-semibold text-slate-muted uppercase tracking-wider">
+              Total Outstanding
+            </span>
+            <div className="w-9 h-9 rounded-lg bg-blue-50 text-brand-blue flex items-center justify-center">
               <DollarSign className="w-4 h-4" />
             </div>
           </div>
           <div className="mt-3">
-            <div className="text-2xl font-bold text-navy-900 tabular-nums">
+            <div className="text-2xl font-bold text-navy-900 font-mono tabular-nums">
               {formatCurrency(totalOutstanding)}
             </div>
-            <p className="text-xs text-slate-muted mt-1">
-              Across {documents.filter((d) => (d.computed_status || d.status) !== 'paid').length} unpaid bills
+            <p className="text-xs text-slate-muted mt-1 tabular-nums font-medium">
+              {unpaidDocs.length} unpaid bill{unpaidDocs.length === 1 ? '' : 's'} across all categories
             </p>
           </div>
         </div>
 
-        {/* Overdue */}
-        <div className="bg-white rounded-xl p-5 border border-slate-border shadow-card flex flex-col justify-between">
+        {/* Critical Overdue */}
+        <div
+          onClick={() => onNavigate('documents')}
+          className={`financial-card-interactive p-5 flex flex-col justify-between cursor-pointer ${
+            overdueDocs.length > 0 ? '!border-red-overdue-border bg-red-overdue-light/10' : ''
+          }`}
+        >
           <div className="flex items-center justify-between">
-            <span className="text-xs font-medium text-red-overdue uppercase tracking-wider">Overdue</span>
-            <div className="p-2 rounded-lg bg-red-overdue-light text-red-overdue">
+            <span className="text-xs font-semibold text-red-overdue uppercase tracking-wider">
+              Critical Overdue
+            </span>
+            <div className="w-9 h-9 rounded-lg bg-red-overdue-light text-red-overdue flex items-center justify-center">
               <AlertCircle className="w-4 h-4" />
             </div>
           </div>
           <div className="mt-3">
-            <div className="text-2xl font-bold text-red-overdue tabular-nums">
+            <div className="text-2xl font-bold text-red-overdue font-mono tabular-nums">
               {formatCurrency(overdueTotal)}
             </div>
-            <p className="text-xs text-slate-muted mt-1">
-              {overdueDocs.length} bill{overdueDocs.length === 1 ? '' : 's'} require immediate attention
+            <p className="text-xs text-red-overdue mt-1 tabular-nums font-semibold">
+              {overdueDocs.length === 0 ? 'Zero overdue bills — all calm' : `${overdueDocs.length} bill${overdueDocs.length === 1 ? '' : 's'} require immediate action`}
             </p>
           </div>
         </div>
 
-        {/* Due Soon */}
-        <div className="bg-white rounded-xl p-5 border border-slate-border shadow-card flex flex-col justify-between">
+        {/* Due Soon (7 Days) */}
+        <div
+          onClick={() => onNavigate('documents')}
+          className="financial-card-interactive p-5 flex flex-col justify-between cursor-pointer"
+        >
           <div className="flex items-center justify-between">
-            <span className="text-xs font-medium text-amber-warn uppercase tracking-wider">Due Soon (7 Days)</span>
-            <div className="p-2 rounded-lg bg-amber-warn-light text-amber-warn">
+            <span className="text-xs font-semibold text-amber-warn uppercase tracking-wider">
+              Due Soon (7 Days)
+            </span>
+            <div className="w-9 h-9 rounded-lg bg-amber-warn-light text-amber-warn flex items-center justify-center">
               <Clock className="w-4 h-4" />
             </div>
           </div>
           <div className="mt-3">
-            <div className="text-2xl font-bold text-navy-900 tabular-nums">
+            <div className="text-2xl font-bold text-navy-900 font-mono tabular-nums">
               {formatCurrency(dueSoonTotal)}
             </div>
-            <p className="text-xs text-slate-muted mt-1">
-              {dueSoonDocs.length} bill{dueSoonDocs.length === 1 ? '' : 's'} coming up this week
+            <p className="text-xs text-slate-muted mt-1 tabular-nums font-medium">
+              {dueSoonDocs.length} bill{dueSoonDocs.length === 1 ? '' : 's'} scheduled this week
             </p>
           </div>
         </div>
 
-        {/* Needs Review */}
-        <div className="bg-white rounded-xl p-5 border border-slate-border shadow-card flex flex-col justify-between">
+        {/* Needs Human Review */}
+        <div
+          onClick={() => onNavigate('documents')}
+          className="financial-card-interactive p-5 flex flex-col justify-between cursor-pointer"
+        >
           <div className="flex items-center justify-between">
-            <span className="text-xs font-medium text-slate-muted uppercase tracking-wider">Needs Review</span>
-            <div className="p-2 rounded-lg bg-amber-warn-light text-amber-warn">
+            <span className="text-xs font-semibold text-slate-muted uppercase tracking-wider">
+              Needs Review
+            </span>
+            <div className="w-9 h-9 rounded-lg bg-slate-100 text-navy-700 flex items-center justify-center">
               <Eye className="w-4 h-4" />
             </div>
           </div>
           <div className="mt-3">
-            <div className="text-2xl font-bold text-navy-900 tabular-nums">
+            <div className="text-2xl font-bold text-navy-900 font-mono tabular-nums">
               {needsReviewDocs.length}
             </div>
-            <p className="text-xs text-slate-muted mt-1">
-              Unverified extractions pending human check
+            <p className="text-xs text-slate-muted mt-1 tabular-nums font-medium">
+              Unverified extractions awaiting check
             </p>
           </div>
         </div>
       </div>
 
-      {/* Section 1: Overdue Bills */}
-      <section className="bg-white rounded-xl border border-slate-border shadow-card overflow-hidden">
-        <div className="px-6 py-4 border-b border-slate-border flex items-center justify-between bg-red-overdue-light/30">
-          <div className="flex items-center gap-2.5">
-            <div className="p-1.5 rounded-lg bg-red-overdue text-white">
-              <AlertCircle className="w-4 h-4" />
-            </div>
+      {/* Middle Row: Financial Overview & Alerts Panel (Inspired by Reference 2 & 3) */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        {/* Left 2 Cols: Cash Flow Demand by Category (Deterministic Breakdown) */}
+        <div className="lg:col-span-2 financial-card p-6 space-y-4">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-border pb-3">
             <div>
-              <h2 className="font-semibold text-navy-900 text-sm">Overdue Invoices</h2>
-              <p className="text-xs text-slate-muted">Bills that have passed their stated payment date</p>
+              <div className="flex items-center gap-2">
+                <Layers className="w-4 h-4 text-brand-blue" />
+                <h3 className="font-bold text-sm text-navy-900">Cash Flow Demand by Category</h3>
+              </div>
+              <p className="text-xs text-slate-muted mt-0.5">
+                Exact breakdown of unpaid obligations calculated directly from your stored invoices
+              </p>
             </div>
+            <span className="text-xs font-mono tabular-nums font-bold text-navy-900 bg-slate-100 px-2.5 py-1 rounded-lg">
+              Total: {formatCurrency(totalOutstanding)}
+            </span>
           </div>
-          <span className="text-xs font-bold px-2.5 py-0.5 rounded-full bg-red-overdue text-white">
-            {overdueDocs.length} Overdue
-          </span>
+
+          {categoryBreakdown.length === 0 ? (
+            <div className="py-8 text-center text-slate-muted text-xs">
+              <p className="font-medium text-navy-800">No active bills to categorize.</p>
+              <p className="mt-1">All invoices are settled or none have been imported yet.</p>
+            </div>
+          ) : (
+            <div className="space-y-4">
+              {/* Segmented Stacked Progress Bar (Inspired by Reference Image 3 "Most Signed File") */}
+              <div className="h-3 w-full bg-slate-100 rounded-full overflow-hidden flex shadow-inner">
+                {categoryBreakdown.map((cat) => (
+                  <div
+                    key={cat.category}
+                    style={{ width: `${Math.max(cat.percentage, 4)}%` }}
+                    className={`${cat.color} h-full transition-all`}
+                    title={`${cat.category}: ${formatCurrency(cat.amount)} (${cat.percentage}%)`}
+                  />
+                ))}
+              </div>
+
+              {/* Category Breakdown Table / Grid */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
+                {categoryBreakdown.map((cat) => (
+                  <div
+                    key={cat.category}
+                    className="p-3 rounded-lg border border-slate-border bg-slate-light/40 flex items-center justify-between text-xs hover:bg-slate-light transition-colors"
+                  >
+                    <div className="flex items-center gap-2.5 truncate">
+                      <div className={`w-2.5 h-2.5 rounded-full ${cat.color} shrink-0`} />
+                      <div className="truncate">
+                        <span className="font-semibold text-navy-900 block truncate">{cat.category}</span>
+                        <span className="text-[11px] text-slate-muted">
+                          {cat.count} bill{cat.count === 1 ? '' : 's'}
+                        </span>
+                      </div>
+                    </div>
+                    <div className="text-right shrink-0">
+                      <div className="font-bold text-navy-900 font-mono tabular-nums">
+                        {formatCurrency(cat.amount)}
+                      </div>
+                      <span className="text-[10px] font-semibold text-slate-500 font-mono tabular-nums">
+                        {cat.percentage}%
+                      </span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
         </div>
 
-        {overdueDocs.length === 0 ? (
-          <div className="p-8 text-center text-slate-muted text-xs">
-            <CheckCircle2 className="w-8 h-8 text-green-paid mx-auto mb-2 opacity-80" />
-            <p className="font-semibold text-navy-900 text-sm">No Overdue Bills</p>
-            <p className="mt-1">All invoices are settled or scheduled within reasonable dates.</p>
+        {/* Right Col: Alerts & Data Safety Hub (Inspired by Reference Image 2 Alerts & Reference Image 3 Checklist) */}
+        <div className="financial-card p-6 flex flex-col justify-between space-y-4">
+          <div>
+            <div className="flex items-center justify-between border-b border-slate-border pb-3">
+              <div className="flex items-center gap-2">
+                <AlertCircle className="w-4 h-4 text-brand-blue" />
+                <h3 className="font-bold text-sm text-navy-900">Calm Alerts & Signals</h3>
+              </div>
+              <span className="text-[10px] font-semibold uppercase tracking-wider text-slate-500 bg-slate-100 px-2 py-0.5 rounded">
+                Live Status
+              </span>
+            </div>
+
+            <div className="space-y-3 pt-3">
+              {/* Overdue alert */}
+              {overdueDocs.length > 0 ? (
+                <div className="p-3 rounded-lg border border-red-overdue-border bg-red-overdue-light/40 text-xs text-red-overdue space-y-1.5">
+                  <div className="flex items-center justify-between font-bold">
+                    <span className="flex items-center gap-1.5">
+                      <AlertCircle className="w-3.5 h-3.5" />
+                      <span>{overdueDocs.length} Overdue Invoices</span>
+                    </span>
+                    <span className="font-mono tabular-nums">{formatCurrency(overdueTotal)}</span>
+                  </div>
+                  <p className="text-[11px] text-navy-800 leading-normal">
+                    Requires immediate review or reminder export.
+                  </p>
+                  <button
+                    onClick={() => onNavigate('documents')}
+                    className="text-[11px] font-bold text-red-overdue hover:underline flex items-center gap-1"
+                  >
+                    <span>View Overdue Bills</span>
+                    <ArrowRight className="w-3 h-3" />
+                  </button>
+                </div>
+              ) : (
+                <div className="p-3 rounded-lg border border-green-paid-border bg-green-paid-light/40 text-xs text-green-paid flex items-center gap-2 font-medium">
+                  <CheckCircle2 className="w-4 h-4 shrink-0" />
+                  <span>No overdue bills. Your obligations are clear.</span>
+                </div>
+              )}
+
+              {/* Needs Review alert */}
+              {needsReviewDocs.length > 0 && (
+                <div className="p-3 rounded-lg border border-amber-warn-border bg-amber-warn-light/40 text-xs text-amber-warn space-y-1.5">
+                  <div className="flex items-center justify-between font-bold">
+                    <span className="flex items-center gap-1.5">
+                      <Eye className="w-3.5 h-3.5" />
+                      <span>{needsReviewDocs.length} Unverified Extractions</span>
+                    </span>
+                  </div>
+                  <p className="text-[11px] text-navy-800 leading-normal">
+                    AI fields are held unverified until human review confirms them.
+                  </p>
+                  <button
+                    onClick={() => onNavigate('documents')}
+                    className="text-[11px] font-bold text-amber-warn hover:underline flex items-center gap-1"
+                  >
+                    <span>Review Unverified Bills</span>
+                    <ArrowRight className="w-3 h-3" />
+                  </button>
+                </div>
+              )}
+
+              {/* Local AI Status Pill */}
+              <div className="p-3 rounded-lg border border-slate-border bg-cool-bg text-xs space-y-1">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-1.5 font-semibold text-navy-900">
+                    <Cpu className="w-3.5 h-3.5 text-brand-blue" />
+                    <span>Local AI Engine</span>
+                  </div>
+                  {ollamaAvailable ? (
+                    <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-green-paid-light text-green-paid border border-green-paid-border">
+                      Gemma 2:2b Ready
+                    </span>
+                  ) : (
+                    <button
+                      onClick={onOpenOllamaModal}
+                      className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-warn-light text-amber-warn border border-amber-warn-border hover:underline"
+                    >
+                      Ollama Offline
+                    </button>
+                  )}
+                </div>
+                <p className="text-[11px] text-slate-muted leading-relaxed">
+                  Inference runs 100% on local hardware. Zero financial data is ever transmitted to cloud APIs.
+                </p>
+              </div>
+            </div>
           </div>
-        ) : (
+
+          <div className="pt-2 border-t border-slate-border flex items-center justify-between text-xs text-slate-muted">
+            <span className="flex items-center gap-1">
+              <ShieldCheck className="w-3.5 h-3.5 text-green-paid" />
+              <span>Immutable SQLite Audit Trail</span>
+            </span>
+            <button
+              onClick={() => onNavigate('audit')}
+              className="font-semibold text-brand-blue hover:underline"
+            >
+              View Log →
+            </button>
+          </div>
+        </div>
+      </div>
+
+      {/* Section 1: Overdue Invoices (Priority Attention) */}
+      {overdueDocs.length > 0 && (
+        <section className="financial-card !border-red-overdue-border overflow-hidden">
+          <div className="px-6 py-4 border-b border-red-overdue-border flex items-center justify-between bg-red-overdue-light/30">
+            <div className="flex items-center gap-2.5">
+              <div className="p-1.5 rounded-lg bg-red-overdue text-white">
+                <AlertCircle className="w-4 h-4" />
+              </div>
+              <div>
+                <h2 className="font-semibold text-navy-900 text-sm">Critical Overdue Invoices</h2>
+                <p className="text-xs text-slate-muted">Bills that have passed their stated payment date</p>
+              </div>
+            </div>
+            <span className="text-xs font-bold px-2.5 py-0.5 rounded-full bg-red-overdue text-white tabular-nums font-mono">
+              {overdueDocs.length} Overdue ({formatCurrency(overdueTotal)})
+            </span>
+          </div>
+
           <div className="divide-y divide-slate-border">
             {overdueDocs.map((doc) => (
               <div
@@ -242,20 +506,25 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
                     <FileText className="w-4 h-4" />
                   </div>
                   <div>
-                    <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-2 flex-wrap">
                       <span className="font-bold text-sm text-navy-900">
                         {doc.vendor || 'Unknown Vendor'}
                       </span>
                       {doc.is_sample === 1 && <SampleDataBadge />}
                       <StatusBadge status="overdue" size="sm" />
                       <VerifiedBadge isVerified={doc.is_verified} size="sm" />
+                      <ExtractionTelemetryBadge
+                        method={doc.extraction_method}
+                        ocrConfidence={doc.ocr_confidence}
+                        size="xs"
+                      />
                     </div>
                     <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-slate-muted mt-1">
-                      <span>Invoice: {doc.invoice_number || '—'}</span>
+                      <span>Invoice: <span className="font-mono">{doc.invoice_number || '—'}</span></span>
                       <span>•</span>
                       <span>Category: {doc.category}</span>
                       <span>•</span>
-                      <span className="font-semibold text-red-overdue">
+                      <span className="font-semibold text-red-overdue tabular-nums">
                         Due: {formatDueDate(doc.due_date)}
                       </span>
                     </div>
@@ -264,10 +533,10 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
 
                 <div className="flex items-center gap-3 justify-between sm:justify-end">
                   <div className="text-right">
-                    <div className="text-base font-bold text-red-overdue tabular-nums">
+                    <div className="text-base font-bold text-red-overdue font-mono tabular-nums">
                       {formatCurrency(doc.amount, doc.currency)}
                     </div>
-                    <span className="text-[11px] text-slate-muted">{doc.currency}</span>
+                    <span className="text-[11px] text-slate-muted font-mono">{doc.currency}</span>
                   </div>
                   <div className="flex items-center gap-1.5">
                     <button
@@ -286,7 +555,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
                     </button>
                     <button
                       onClick={() => onOpenReview(doc)}
-                      className="p-1.5 text-slate-muted hover:text-navy-900 rounded-lg hover:bg-slate-100"
+                      className="p-1.5 text-slate-muted hover:text-navy-900 rounded-lg hover:bg-slate-100 transition-colors"
                     >
                       <ArrowRight className="w-4 h-4" />
                     </button>
@@ -295,11 +564,11 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
               </div>
             ))}
           </div>
-        )}
-      </section>
+        </section>
+      )}
 
-      {/* Section 2: Due Soon (7-14 Days) */}
-      <section className="bg-white rounded-xl border border-slate-border shadow-card overflow-hidden">
+      {/* Section 2: Due Soon (Next 7–14 Days) */}
+      <section className="financial-card overflow-hidden">
         <div className="px-6 py-4 border-b border-slate-border flex items-center justify-between bg-amber-warn-light/30">
           <div className="flex items-center gap-2.5">
             <div className="p-1.5 rounded-lg bg-amber-warn text-white">
@@ -310,8 +579,8 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
               <p className="text-xs text-slate-muted">Bills approaching payment deadlines</p>
             </div>
           </div>
-          <span className="text-xs font-bold px-2.5 py-0.5 rounded-full bg-amber-warn text-white">
-            {dueSoonDocs.length} Pending
+          <span className="text-xs font-bold px-2.5 py-0.5 rounded-full bg-amber-warn text-white tabular-nums font-mono">
+            {dueSoonDocs.length} Pending ({formatCurrency(dueSoonTotal)})
           </span>
         </div>
 
@@ -332,20 +601,25 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
                     <FileText className="w-4 h-4" />
                   </div>
                   <div>
-                    <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-2 flex-wrap">
                       <span className="font-bold text-sm text-navy-900">
                         {doc.vendor || 'Unknown Vendor'}
                       </span>
                       {doc.is_sample === 1 && <SampleDataBadge />}
                       <StatusBadge status="due_soon" size="sm" />
                       <VerifiedBadge isVerified={doc.is_verified} size="sm" />
+                      <ExtractionTelemetryBadge
+                        method={doc.extraction_method}
+                        ocrConfidence={doc.ocr_confidence}
+                        size="xs"
+                      />
                     </div>
                     <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-slate-muted mt-1">
-                      <span>Invoice: {doc.invoice_number || '—'}</span>
+                      <span>Invoice: <span className="font-mono">{doc.invoice_number || '—'}</span></span>
                       <span>•</span>
                       <span>Category: {doc.category}</span>
                       <span>•</span>
-                      <span className="font-semibold text-amber-warn">
+                      <span className="font-semibold text-amber-warn tabular-nums">
                         Due: {formatDueDate(doc.due_date)}
                       </span>
                     </div>
@@ -354,10 +628,10 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
 
                 <div className="flex items-center gap-3 justify-between sm:justify-end">
                   <div className="text-right">
-                    <div className="text-base font-bold text-navy-900 tabular-nums">
+                    <div className="text-base font-bold text-navy-900 font-mono tabular-nums">
                       {formatCurrency(doc.amount, doc.currency)}
                     </div>
-                    <span className="text-[11px] text-slate-muted">{doc.currency}</span>
+                    <span className="text-[11px] text-slate-muted font-mono">{doc.currency}</span>
                   </div>
                   <div className="flex items-center gap-1.5">
                     <button
@@ -375,7 +649,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
                     </button>
                     <button
                       onClick={() => onOpenReview(doc)}
-                      className="p-1.5 text-slate-muted hover:text-navy-900 rounded-lg hover:bg-slate-100"
+                      className="p-1.5 text-slate-muted hover:text-navy-900 rounded-lg hover:bg-slate-100 transition-colors"
                     >
                       <ArrowRight className="w-4 h-4" />
                     </button>
@@ -387,116 +661,112 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
         )}
       </section>
 
-      {/* Section 3: Needs Review */}
-      <section className="bg-white rounded-xl border border-slate-border shadow-card overflow-hidden">
+      {/* Section 3: Recent Document Activity Ledger (Inspired by Reference 2 Recent Transactions & Reference 3 Recent Activity) */}
+      <section className="financial-card overflow-hidden">
         <div className="px-6 py-4 border-b border-slate-border flex items-center justify-between bg-slate-light">
           <div className="flex items-center gap-2.5">
             <div className="p-1.5 rounded-lg bg-navy-800 text-white">
-              <Eye className="w-4 h-4" />
+              <FileText className="w-4 h-4" />
             </div>
             <div>
-              <h2 className="font-semibold text-navy-900 text-sm">Needs Human Review</h2>
-              <p className="text-xs text-slate-muted">
-                Unverified AI extractions or newly imported documents requiring confirmation
-              </p>
+              <h2 className="font-semibold text-navy-900 text-sm">Recent Document Activity</h2>
+              <p className="text-xs text-slate-muted">Latest imported bills, receipts, and status changes</p>
             </div>
           </div>
-          <span className="text-xs font-semibold px-2.5 py-0.5 rounded-full bg-slate-200 text-navy-800">
-            {needsReviewDocs.length} Needs Check
-          </span>
+          <button
+            onClick={() => onNavigate('documents')}
+            className="text-xs font-semibold text-brand-blue hover:underline inline-flex items-center gap-1"
+          >
+            <span>View All ({documents.length})</span>
+            <ChevronRight className="w-3.5 h-3.5" />
+          </button>
         </div>
 
-        {needsReviewDocs.length === 0 ? (
+        {recentActivity.length === 0 ? (
           <div className="p-8 text-center text-slate-muted text-xs">
-            <CheckCircle2 className="w-8 h-8 text-green-paid mx-auto mb-2 opacity-80" />
-            <p className="font-semibold text-navy-900 text-sm">All Documents Verified</p>
-            <p className="mt-1">Every imported document has been validated and confirmed by a human.</p>
+            <p className="font-semibold text-navy-900 text-sm">No Document Activity Yet</p>
+            <p className="mt-1">Import your first PDF or scanned receipt to start organizing.</p>
           </div>
         ) : (
           <div className="divide-y divide-slate-border">
-            {needsReviewDocs.map((doc) => (
-              <div
-                key={doc.id}
-                className="p-4 sm:px-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4 hover:bg-slate-light/60 transition-colors"
-              >
-                <div className="flex items-start gap-3.5">
-                  <div className="p-2 rounded-lg bg-amber-warn-light text-amber-warn shrink-0 mt-0.5">
-                    <FileText className="w-4 h-4" />
-                  </div>
-                  <div>
-                    <div className="flex items-center gap-2">
-                      <span className="font-bold text-sm text-navy-900">
-                        {doc.vendor || doc.original_name}
-                      </span>
-                      {doc.is_sample === 1 && <SampleDataBadge />}
-                      <VerifiedBadge isVerified={doc.is_verified} size="sm" />
+            {recentActivity.map((doc) => {
+              const computed = doc.computed_status || doc.status;
+              return (
+                <div
+                  key={doc.id}
+                  onClick={() => onOpenReview(doc)}
+                  className="p-4 sm:px-6 flex flex-col sm:flex-row sm:items-center justify-between gap-3 hover:bg-slate-light/60 transition-colors cursor-pointer group"
+                >
+                  <div className="flex items-center gap-3">
+                    <div className="w-8 h-8 rounded-lg bg-slate-100 text-navy-700 flex items-center justify-center font-bold text-xs shrink-0 group-hover:bg-brand-blue group-hover:text-white transition-colors">
+                      {doc.vendor ? doc.vendor.charAt(0).toUpperCase() : 'B'}
                     </div>
-                    <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-slate-muted mt-1">
-                      <span>File: {doc.original_name}</span>
-                      <span>•</span>
-                      <span>Invoice: {doc.invoice_number || '<Unverified/Missing>'}</span>
-                      <span>•</span>
-                      <span>Due: {doc.due_date ? formatDueDate(doc.due_date) : '<Not Set>'}</span>
+                    <div>
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <span className="font-bold text-sm text-navy-900 group-hover:text-brand-blue transition-colors">
+                          {doc.vendor || doc.original_name}
+                        </span>
+                        {doc.is_sample === 1 && <SampleDataBadge />}
+                        <StatusBadge status={computed} size="sm" />
+                        <VerifiedBadge isVerified={doc.is_verified} size="sm" />
+                      </div>
+                      <div className="flex items-center gap-2 text-xs text-slate-muted mt-0.5">
+                        <span className="font-mono">{doc.original_name}</span>
+                        <span>•</span>
+                        <span>{doc.category}</span>
+                        <span>•</span>
+                        <span className="tabular-nums">Due: {doc.due_date || '—'}</span>
+                      </div>
                     </div>
                   </div>
-                </div>
 
-                <div className="flex items-center gap-3 justify-between sm:justify-end">
-                  <div className="text-right">
-                    <div className="text-base font-bold text-navy-900 tabular-nums">
-                      {formatCurrency(doc.amount, doc.currency)}
+                  <div className="flex items-center gap-4 justify-between sm:justify-end">
+                    <div className="text-right">
+                      <div className="text-sm font-bold text-navy-900 font-mono tabular-nums">
+                        {formatCurrency(doc.amount, doc.currency)}
+                      </div>
+                      <span className="text-[10px] text-slate-muted font-mono">{doc.currency}</span>
                     </div>
-                    <span className="text-[11px] text-slate-muted">{doc.currency}</span>
+                    <ArrowRight className="w-4 h-4 text-slate-muted group-hover:text-navy-900 group-hover:translate-x-0.5 transition-all" />
                   </div>
-                  <button
-                    onClick={() => onOpenReview(doc)}
-                    className="px-3.5 py-1.5 rounded-lg bg-brand-blue hover:bg-brand-blue-hover text-white text-xs font-semibold shadow-sm inline-flex items-center gap-1.5 transition-colors"
-                  >
-                    <span>Review & Verify</span>
-                    <ArrowRight className="w-3.5 h-3.5" />
-                  </button>
                 </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         )}
       </section>
 
-      {/* Section 4: Paid Bills */}
-      <section className="bg-white rounded-xl border border-slate-border shadow-card overflow-hidden">
-        <div className="px-6 py-4 border-b border-slate-border flex items-center justify-between bg-green-paid-light/20">
-          <div className="flex items-center gap-2.5">
-            <div className="p-1.5 rounded-lg bg-green-paid text-white">
-              <CheckCircle2 className="w-4 h-4" />
+      {/* Section 4: Paid & Settled Archive */}
+      {paidDocs.length > 0 && (
+        <section className="financial-card overflow-hidden">
+          <div className="px-6 py-4 border-b border-slate-border flex items-center justify-between bg-green-paid-light/20">
+            <div className="flex items-center gap-2.5">
+              <div className="p-1.5 rounded-lg bg-green-paid text-white">
+                <CheckCircle2 className="w-4 h-4" />
+              </div>
+              <div>
+                <h2 className="font-semibold text-navy-900 text-sm">Settled & Paid Invoices</h2>
+                <p className="text-xs text-slate-muted">Completed payments safely archived</p>
+              </div>
             </div>
-            <div>
-              <h2 className="font-semibold text-navy-900 text-sm">Settled & Paid Invoices</h2>
-              <p className="text-xs text-slate-muted">Completed payments safely archived</p>
-            </div>
+            <span className="text-xs font-semibold px-2.5 py-0.5 rounded-full bg-green-paid-light text-green-paid border border-green-paid-border tabular-nums font-mono">
+              {paidDocs.length} Paid
+            </span>
           </div>
-          <span className="text-xs font-semibold px-2.5 py-0.5 rounded-full bg-green-paid-light text-green-paid border border-green-paid-border">
-            {paidDocs.length} Paid
-          </span>
-        </div>
 
-        {paidDocs.length === 0 ? (
-          <div className="p-8 text-center text-slate-muted text-xs">
-            <p className="font-semibold text-navy-900 text-sm">No Paid Invoices Recorded Yet</p>
-            <p className="mt-1">When you settle bills, click "Mark Paid" to move them here.</p>
-          </div>
-        ) : (
-          <div className="divide-y divide-slate-border max-h-72 overflow-y-auto">
+          <div className="divide-y divide-slate-border max-h-60 overflow-y-auto">
             {paidDocs.map((doc) => (
               <div
                 key={doc.id}
-                className="p-4 sm:px-6 flex items-center justify-between gap-4 hover:bg-slate-light/60 transition-colors opacity-85"
+                onClick={() => onOpenReview(doc)}
+                className="p-4 sm:px-6 flex items-center justify-between gap-4 hover:bg-slate-light/60 transition-colors cursor-pointer opacity-85"
               >
                 <div className="flex items-center gap-3">
                   <div className="p-2 rounded-lg bg-green-paid-light text-green-paid shrink-0">
                     <CheckCircle2 className="w-4 h-4" />
                   </div>
                   <div>
-                    <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-2 flex-wrap">
                       <span className="font-semibold text-sm text-navy-900">
                         {doc.vendor || 'Unknown Vendor'}
                       </span>
@@ -504,34 +774,29 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
                       <StatusBadge status="paid" size="sm" />
                     </div>
                     <div className="flex items-center gap-2 text-xs text-slate-muted mt-0.5">
-                      <span>Invoice: {doc.invoice_number || '—'}</span>
+                      <span>Invoice: <span className="font-mono">{doc.invoice_number || '—'}</span></span>
                       <span>•</span>
-                      <span>Category: {doc.category}</span>
+                      <span>{doc.category}</span>
                       <span>•</span>
-                      <span>Verified: {doc.verified_at ? format(parseISO(doc.verified_at), 'MMM d, yyyy') : 'Yes'}</span>
+                      <span className="tabular-nums">Verified: {doc.verified_at ? format(parseISO(doc.verified_at), 'MMM d') : 'Yes'}</span>
                     </div>
                   </div>
                 </div>
 
                 <div className="flex items-center gap-3">
                   <div className="text-right">
-                    <div className="text-sm font-semibold text-green-paid tabular-nums">
+                    <div className="text-sm font-semibold text-green-paid font-mono tabular-nums">
                       {formatCurrency(doc.amount, doc.currency)}
                     </div>
-                    <span className="text-[10px] text-slate-muted">Completed</span>
+                    <span className="text-[10px] text-slate-muted font-mono">{doc.currency}</span>
                   </div>
-                  <button
-                    onClick={() => onOpenReview(doc)}
-                    className="p-1.5 text-slate-muted hover:text-navy-900 rounded-lg hover:bg-slate-100"
-                  >
-                    <ArrowRight className="w-4 h-4" />
-                  </button>
+                  <ArrowRight className="w-4 h-4 text-slate-muted" />
                 </div>
               </div>
             ))}
           </div>
-        )}
-      </section>
+        </section>
+      )}
     </div>
   );
 };

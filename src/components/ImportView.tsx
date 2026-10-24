@@ -8,9 +8,11 @@ import {
   ArrowRight,
   HardDrive,
   FileCheck,
+  Copy,
 } from 'lucide-react';
-import { uploadDocument } from '../api/client';
+import { uploadDocument, UploadResponse } from '../api/client';
 import { DocumentItem } from '../types';
+import { ExtractionTelemetryBadge } from './StatusBadge';
 
 interface ImportViewProps {
   onDocumentImported: (doc: DocumentItem) => void;
@@ -27,14 +29,23 @@ export const ImportView: React.FC<ImportViewProps> = ({
 }) => {
   const [isDragging, setIsDragging] = useState(false);
   const [uploading, setUploading] = useState(false);
+  const [progressStep, setProgressStep] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [recentUpload, setRecentUpload] = useState<DocumentItem | null>(null);
-  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [recentInfo, setRecentInfo] = useState<UploadResponse['extraction_info'] | null>(null);
+  const [duplicateWarning, setDuplicateWarning] = useState<{
+    file: File;
+    existingDoc: DocumentItem;
+    message: string;
+  } | null>(null);
 
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const allowedTypes = ['application/pdf', 'image/jpeg', 'image/png', 'image/jpg'];
 
-  const handleFile = async (file: File) => {
+  const handleFile = async (file: File, force = false) => {
     setError(null);
+    setDuplicateWarning(null);
+
     if (!allowedTypes.includes(file.type)) {
       setError(`Unsupported file type (${file.type || 'unknown'}). Please upload a PDF, JPG, or PNG document.`);
       return;
@@ -46,15 +57,35 @@ export const ImportView: React.FC<ImportViewProps> = ({
     }
 
     setUploading(true);
+    setProgressStep('Computing SHA-256 hash and checking duplicates...');
+
     try {
-      const doc = await uploadDocument(file);
-      setRecentUpload(doc);
-      onDocumentImported(doc);
+      setTimeout(() => {
+        setProgressStep('Extracting text locally (PDF text / Tesseract OCR)...');
+      }, 350);
+
+      const res = await uploadDocument(file, force);
+
+      if (res.is_duplicate && !force) {
+        setDuplicateWarning({
+          file,
+          existingDoc: res.data,
+          message: res.message || 'Duplicate document detected.',
+        });
+        setUploading(false);
+        setProgressStep(null);
+        return;
+      }
+
+      setRecentUpload(res.data);
+      setRecentInfo(res.extraction_info || null);
+      onDocumentImported(res.data);
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : String(err);
       setError(`Failed to import document: ${msg}`);
     } finally {
       setUploading(false);
+      setProgressStep(null);
     }
   };
 
@@ -86,7 +117,7 @@ export const ImportView: React.FC<ImportViewProps> = ({
       </div>
 
       {/* Local Privacy Pledge Card */}
-      <div className="p-4 rounded-xl border border-slate-border bg-white shadow-card flex items-start gap-4">
+      <div className="financial-card p-4 flex items-start gap-4">
         <div className="p-2.5 rounded-lg bg-brand-blue-light text-brand-blue shrink-0">
           <ShieldCheck className="w-5 h-5" />
         </div>
@@ -98,9 +129,9 @@ export const ImportView: React.FC<ImportViewProps> = ({
             </span>
           </div>
           <p className="text-slate-muted leading-relaxed">
-            Your bills and invoices are never sent to external cloud AI endpoints (e.g. OpenAI, Anthropic, or external OCR servers).
+            Your bills and invoices are never sent to external cloud AI endpoints.
             Files are retained in your local <code className="px-1 py-0.5 bg-slate-100 rounded text-navy-900 font-mono text-[11px]">./data/uploads/</code> folder.
-            If Ollama is running locally, an open-weight model parses the text on your GPU/CPU without internet access.
+            Text is parsed with local PDF extraction and on-device Tesseract OCR, followed by structured extraction using your local Ollama model.
           </p>
         </div>
       </div>
@@ -110,7 +141,7 @@ export const ImportView: React.FC<ImportViewProps> = ({
         onDrop={onDrop}
         onDragOver={onDragOver}
         onDragLeave={onDragLeave}
-        onClick={() => fileInputRef.current?.click()}
+        onClick={() => !uploading && fileInputRef.current?.click()}
         className={`relative border-2 border-dashed rounded-2xl p-10 text-center cursor-pointer transition-all ${
           isDragging
             ? 'border-brand-blue bg-brand-blue-light/50 scale-[1.01]'
@@ -140,10 +171,12 @@ export const ImportView: React.FC<ImportViewProps> = ({
 
           <div>
             <h3 className="text-base font-semibold text-navy-900">
-              {uploading ? 'Importing document locally...' : 'Drop your invoice or receipt here'}
+              {uploading ? (progressStep || 'Processing document locally...') : 'Drop your invoice or receipt here'}
             </h3>
             <p className="text-xs text-slate-muted mt-1">
-              or <span className="text-brand-blue font-semibold hover:underline">browse files</span> from your computer
+              {uploading
+                ? 'Extracting text and analyzing invoice fields on your hardware...'
+                : <>or <span className="text-brand-blue font-semibold hover:underline">browse files</span> from your computer</>}
             </p>
           </div>
 
@@ -151,10 +184,39 @@ export const ImportView: React.FC<ImportViewProps> = ({
             <span className="px-2.5 py-1 rounded-md bg-slate-100 font-mono text-[11px]">PDF</span>
             <span className="px-2.5 py-1 rounded-md bg-slate-100 font-mono text-[11px]">JPG</span>
             <span className="px-2.5 py-1 rounded-md bg-slate-100 font-mono text-[11px]">PNG</span>
-            <span>• Max 25 MB</span>
+            <span>• Max 25 MB • SHA-256 Verified</span>
           </div>
         </div>
       </div>
+
+      {/* Duplicate Warning Banner */}
+      {duplicateWarning && (
+        <div className="p-4 rounded-xl border border-amber-warn-border bg-amber-warn-light/80 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs text-navy-900 animate-in slide-in-from-top-2">
+          <div className="flex items-start gap-2.5">
+            <Copy className="w-5 h-5 text-amber-warn shrink-0 mt-0.5" />
+            <div>
+              <span className="font-bold text-amber-warn block text-sm">Duplicate Document Detected</span>
+              <p className="text-navy-800 mt-0.5">
+                {duplicateWarning.message}
+              </p>
+            </div>
+          </div>
+          <div className="flex items-center gap-2 shrink-0">
+            <button
+              onClick={() => onOpenReview(duplicateWarning.existingDoc)}
+              className="px-3 py-1.5 rounded-lg bg-navy-900 hover:bg-navy-800 text-white font-semibold shadow-sm transition-colors"
+            >
+              View Existing Record
+            </button>
+            <button
+              onClick={() => handleFile(duplicateWarning.file, true)}
+              className="px-3 py-1.5 rounded-lg border border-amber-warn text-amber-warn hover:bg-amber-100 font-medium transition-colors"
+            >
+              Re-import Anyway
+            </button>
+          </div>
+        </div>
+      )}
 
       {/* Error Banner */}
       {error && (
@@ -168,56 +230,77 @@ export const ImportView: React.FC<ImportViewProps> = ({
 
       {/* Success Banner / Immediate Review Trigger */}
       {recentUpload && (
-        <div className="p-5 rounded-xl border border-green-paid-border bg-green-paid-light/40 flex flex-col sm:flex-row sm:items-center justify-between gap-4 animate-in slide-in-from-top-2">
-          <div className="flex items-start gap-3">
-            <div className="p-2 rounded-lg bg-green-paid text-white shrink-0 mt-0.5">
-              <FileCheck className="w-5 h-5" />
-            </div>
-            <div>
-              <div className="flex items-center gap-2">
-                <span className="font-bold text-sm text-navy-900">{recentUpload.original_name}</span>
-                <span className="text-[11px] px-2 py-0.5 rounded-full bg-amber-warn-light text-amber-warn border border-amber-warn-border font-semibold">
-                  Needs Review
-                </span>
+        <div className="financial-card !border-green-paid-border p-5 space-y-3 animate-in slide-in-from-top-2">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <div className="flex items-start gap-3">
+              <div className="p-2 rounded-lg bg-green-paid text-white shrink-0 mt-0.5">
+                <FileCheck className="w-5 h-5" />
               </div>
-              <p className="text-xs text-slate-muted mt-0.5">
-                Saved safely to local disk ({(recentUpload.file_size / 1024).toFixed(1)} KB). Extracted fields remain unverified until human review.
-              </p>
+              <div>
+                <div className="flex items-center gap-2">
+                  <span className="font-bold text-sm text-navy-900">{recentUpload.vendor || recentUpload.original_name}</span>
+                  <span className="text-[11px] px-2 py-0.5 rounded-full bg-amber-warn-light text-amber-warn border border-amber-warn-border font-semibold">
+                    Needs Human Review
+                  </span>
+                </div>
+                <p className="text-xs text-slate-muted mt-0.5">
+                  File: <code className="font-mono text-navy-800">{recentUpload.original_name}</code> ({(recentUpload.file_size / 1024).toFixed(1)} KB)
+                  {recentUpload.file_hash && ` • SHA-256: ${recentUpload.file_hash.slice(0, 10)}...`}
+                </p>
+              </div>
             </div>
-          </div>
 
-          <div className="flex items-center gap-2">
             <button
               onClick={() => onOpenReview(recentUpload)}
-              className="px-4 py-2 rounded-lg bg-brand-blue hover:bg-brand-blue-hover text-white text-xs font-semibold shadow-sm inline-flex items-center gap-1.5 transition-colors"
+              className="px-4 py-2 rounded-lg bg-brand-blue hover:bg-brand-blue-hover text-white text-xs font-semibold shadow-sm inline-flex items-center gap-1.5 transition-colors shrink-0"
             >
               <span>Review Invoice Details</span>
               <ArrowRight className="w-4 h-4" />
             </button>
+          </div>
+
+          {/* Extraction telemetry pills */}
+          <div className="flex flex-wrap items-center gap-2 pt-2 border-t border-slate-border text-[11px]">
+            <ExtractionTelemetryBadge
+              method={recentUpload.extraction_method}
+              ocrConfidence={recentUpload.ocr_confidence}
+              modelUsed={recentInfo?.model_used}
+              isGemma={recentInfo?.is_gemma}
+            />
+            {recentUpload.amount !== null && (
+              <span className="px-2 py-0.5 rounded bg-emerald-50 text-emerald-800 border border-emerald-200 font-mono tabular-nums font-semibold">
+                Extracted: ${recentUpload.amount.toFixed(2)} {recentUpload.currency}
+              </span>
+            )}
+            {recentUpload.due_date && (
+              <span className="px-2 py-0.5 rounded bg-amber-50 text-amber-800 border border-amber-200 font-mono tabular-nums font-medium">
+                Due: {recentUpload.due_date}
+              </span>
+            )}
           </div>
         </div>
       )}
 
       {/* 3 Safety & Architecture Pillars */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 pt-2">
-        <div className="p-4 rounded-xl border border-slate-border bg-white shadow-card space-y-2">
+        <div className="financial-card p-4 space-y-2">
           <div className="flex items-center gap-2 text-xs font-semibold text-navy-900">
             <HardDrive className="w-4 h-4 text-brand-blue" />
             <span>Local Disk Retention</span>
           </div>
           <p className="text-xs text-slate-muted leading-relaxed">
-            Per policy, your original files are never automatically deleted or overwritten. They remain on disk even if an invoice record is archived.
+            Per policy, your original files are never automatically deleted. SHA-256 hashing protects against accidental duplicate imports.
           </p>
         </div>
 
-        <div className="p-4 rounded-xl border border-slate-border bg-white shadow-card space-y-2">
+        <div className="financial-card p-4 space-y-2">
           <div className="flex items-center gap-2 text-xs font-semibold text-navy-900">
             <Cpu className="w-4 h-4 text-amber-warn" />
-            <span>Ollama Open-Weight AI</span>
+            <span>Open-Weight Local AI</span>
           </div>
           <p className="text-xs text-slate-muted leading-relaxed">
             {ollamaAvailable ? (
-              <span>Local model is active. Fields will be parsed factually without inventing missing numbers.</span>
+              <span>Local model is active. Fields are parsed factually without inventing missing numbers.</span>
             ) : (
               <span>
                 Ollama is offline.{' '}
@@ -230,7 +313,7 @@ export const ImportView: React.FC<ImportViewProps> = ({
           </p>
         </div>
 
-        <div className="p-4 rounded-xl border border-slate-border bg-white shadow-card space-y-2">
+        <div className="financial-card p-4 space-y-2">
           <div className="flex items-center gap-2 text-xs font-semibold text-navy-900">
             <CheckCircle2 className="w-4 h-4 text-green-paid" />
             <span>Human Approval Gate</span>

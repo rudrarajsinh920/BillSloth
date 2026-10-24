@@ -2,6 +2,7 @@ import React from 'react';
 import {
   LayoutDashboard,
   Receipt,
+  Calendar,
   UploadCloud,
   BellRing,
   CalendarCheck2,
@@ -10,16 +11,18 @@ import {
   Cpu,
   Sparkles,
   Trash2,
+  Bot,
 } from 'lucide-react';
 import { OllamaStatus } from '../types';
 
-export type NavTab = 'dashboard' | 'documents' | 'import' | 'reminders' | 'digest' | 'audit';
+export type NavTab = 'dashboard' | 'documents' | 'calendar' | 'import' | 'reminders' | 'digest' | 'audit';
 
 interface NavbarProps {
   activeTab: NavTab;
   onTabChange: (tab: NavTab) => void;
   ollamaStatus: OllamaStatus | null;
   onOpenOllamaModal: () => void;
+  onOpenAskModal: () => void;
   pendingRemindersCount: number;
   needsReviewCount: number;
   hasSampleData: boolean;
@@ -33,6 +36,7 @@ export const Navbar: React.FC<NavbarProps> = ({
   onTabChange,
   ollamaStatus,
   onOpenOllamaModal,
+  onOpenAskModal,
   pendingRemindersCount,
   needsReviewCount,
   hasSampleData,
@@ -55,6 +59,7 @@ export const Navbar: React.FC<NavbarProps> = ({
       badge: needsReviewCount > 0 ? needsReviewCount : undefined,
       badgeColor: 'bg-amber-warn text-white',
     },
+    { id: 'calendar', label: 'Calendar', icon: Calendar },
     { id: 'import', label: 'Import Bill', icon: UploadCloud },
     {
       id: 'reminders',
@@ -119,17 +124,19 @@ export const Navbar: React.FC<NavbarProps> = ({
                 <button
                   key={tab.id}
                   onClick={() => onTabChange(tab.id as NavTab)}
-                  className={`relative px-3 py-2 rounded-lg text-xs font-medium flex items-center gap-2 transition-all ${
+                  title={tab.label}
+                  aria-label={tab.label}
+                  className={`relative px-2.5 sm:px-3 py-2 rounded-lg text-xs font-medium flex items-center gap-1.5 sm:gap-2 transition-all focus-visible:ring-2 focus-visible:ring-brand-blue focus-visible:outline-none ${
                     isActive
                       ? 'bg-brand-blue text-white shadow-sm'
                       : 'text-navy-700 hover:text-navy-900 hover:bg-slate-light'
                   }`}
                 >
-                  <Icon className={`w-4 h-4 ${isActive ? 'text-white' : 'text-slate-muted'}`} />
+                  <Icon className={`w-4 h-4 shrink-0 ${isActive ? 'text-white' : 'text-slate-muted'}`} />
                   <span className="hidden md:inline">{tab.label}</span>
                   {tab.badge !== undefined && (
                     <span
-                      className={`ml-1 text-[10px] font-bold px-1.5 py-0.2 rounded-full ${
+                      className={`ml-1 text-[10px] font-bold px-1.5 py-0.2 rounded-full font-mono tabular-nums ${
                         isActive ? 'bg-white text-brand-blue' : tab.badgeColor
                       }`}
                     >
@@ -143,6 +150,16 @@ export const Navbar: React.FC<NavbarProps> = ({
 
           {/* Right Status Actions */}
           <div className="flex items-center gap-2.5">
+            {/* Ask AI Natural Language Assistant */}
+            <button
+              onClick={onOpenAskModal}
+              title="Ask BillSloth Assistant powered by local Gemma 2 2B"
+              className="px-2.5 py-1.5 rounded-lg border border-brand-blue/30 bg-brand-blue-light text-brand-blue hover:bg-brand-blue hover:text-white text-xs font-semibold flex items-center gap-1.5 transition-colors shadow-sm focus-visible:ring-2 focus-visible:ring-brand-blue"
+            >
+              <Bot className="w-3.5 h-3.5 text-brand-blue group-hover:text-white" />
+              <span className="hidden sm:inline">Ask AI</span>
+            </button>
+
             {/* Ollama Status Button */}
             <button
               onClick={onOpenOllamaModal}

@@ -142,7 +142,7 @@ export const RemindersView: React.FC<RemindersViewProps> = ({
       </div>
 
       {/* Safety Banner */}
-      <div className="p-4 rounded-xl border border-slate-border bg-white shadow-card flex items-start gap-3">
+      <div className="financial-card p-4 flex items-start gap-3">
         <ShieldCheck className="w-5 h-5 text-brand-blue shrink-0 mt-0.5" />
         <div className="text-xs text-navy-800 space-y-1">
           <p className="font-semibold text-navy-900">Safety & Human Agency Guarantee</p>
@@ -206,7 +206,7 @@ export const RemindersView: React.FC<RemindersViewProps> = ({
       {/* Reminders List */}
       <div className="space-y-4">
         {filtered.length === 0 ? (
-          <div className="bg-white rounded-xl border border-slate-border p-12 text-center text-slate-muted text-xs shadow-card">
+          <div className="financial-card p-12 text-center text-slate-muted text-xs">
             <CheckCircle2 className="w-8 h-8 text-green-paid mx-auto mb-2 opacity-80" />
             <p className="font-semibold text-navy-900 text-sm">No Reminders in This Queue</p>
             <p className="mt-1">
@@ -223,8 +223,8 @@ export const RemindersView: React.FC<RemindersViewProps> = ({
             return (
               <div
                 key={rem.id}
-                className={`bg-white rounded-xl border transition-shadow shadow-card overflow-hidden ${
-                  isApproved ? 'border-green-paid-border' : 'border-slate-border hover:shadow-card-hover'
+                className={`financial-card overflow-hidden ${
+                  isApproved ? '!border-green-paid-border' : ''
                 }`}
               >
                 <div className="p-5 space-y-3">
@@ -239,7 +239,7 @@ export const RemindersView: React.FC<RemindersViewProps> = ({
                         <BellRing className="w-4 h-4" />
                       </div>
                       <div className="flex items-center gap-2">
-                        <span className="font-semibold text-xs text-navy-900">
+                        <span className="font-semibold text-xs text-navy-900 tabular-nums">
                           Scheduled: {format(parseISO(rem.reminder_date), 'EEEE, MMMM d, yyyy')}
                         </span>
                         {rem.is_sample === 1 && <SampleDataBadge />}
@@ -319,8 +319,7 @@ export const RemindersView: React.FC<RemindersViewProps> = ({
                           <div className="flex items-center gap-2">
                             <FileText className="w-3.5 h-3.5" />
                             <span>
-                              Linked Bill: <strong className="text-navy-900">{rem.vendor}</strong> ($
-                              {(rem.amount || 0).toFixed(2)} {rem.currency})
+                              Linked Bill: <strong className="text-navy-900">{rem.vendor}</strong> (<span className="font-mono tabular-nums">${(rem.amount || 0).toFixed(2)}</span> {rem.currency})
                             </span>
                           </div>
                           {rem.document_id && (

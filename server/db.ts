@@ -45,6 +45,11 @@ export function initDb() {
       extraction_metadata TEXT,
       payment_reference TEXT,
       notes TEXT,
+      file_hash TEXT,
+      extraction_method TEXT,
+      ocr_confidence REAL,
+      model_confidence TEXT,
+      validation_flags TEXT,
       created_at TEXT NOT NULL,
       updated_at TEXT NOT NULL
     );
@@ -70,6 +75,23 @@ export function initDb() {
       timestamp TEXT NOT NULL
     );
   `);
+
+  // Phase 2 backward-compatible schema migrations
+  const migrations = [
+    'ALTER TABLE documents ADD COLUMN file_hash TEXT;',
+    'ALTER TABLE documents ADD COLUMN extraction_method TEXT;',
+    'ALTER TABLE documents ADD COLUMN ocr_confidence REAL;',
+    'ALTER TABLE documents ADD COLUMN model_confidence TEXT;',
+    'ALTER TABLE documents ADD COLUMN validation_flags TEXT;',
+  ];
+
+  for (const sql of migrations) {
+    try {
+      db.exec(sql);
+    } catch {
+      // Column already exists, safe to ignore
+    }
+  }
 }
 
 export function logAudit(action: string, documentId: string | null, details: Record<string, unknown>) {

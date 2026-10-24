@@ -34,6 +34,11 @@ export interface DocumentItem {
   extraction_metadata: string | null;
   payment_reference: string | null;
   notes: string | null;
+  file_hash?: string | null;
+  extraction_method?: 'pdf_text' | 'local_ocr' | 'manual' | 'sample' | string | null;
+  ocr_confidence?: number | null;
+  model_confidence?: string | null;
+  validation_flags?: string | null;
   created_at: string;
   updated_at: string;
   reminders?: ReminderItem[];
@@ -71,6 +76,8 @@ export interface OllamaStatus {
   url: string;
   models: string[];
   activeModel: string | null;
+  hasGemma?: boolean;
+  recommendedGemmaModel?: string;
   error?: string;
 }
 

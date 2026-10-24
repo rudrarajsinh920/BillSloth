@@ -2,7 +2,7 @@ import { Router, Request, Response } from 'express';
 import multer from 'multer';
 import path from 'path';
 import { db, logAudit, UPLOADS_DIR } from './db.js';
-import { checkOllamaStatus, extractWithLocalOllama } from './ollama.js';
+import { checkOllamaStatus, extractWithLocalOllama, askBillSlothAssistant } from './ollama.js';
 import { seedSampleData, clearSampleData } from './sampleData.js';
 import { format, isPast, isToday, differenceInDays } from 'date-fns';
 
@@ -103,6 +103,10 @@ function computeStatus(currentStatus: string, dueDateStr: string | null, isVerif
 // -------------------------------------------------------------
 // AI STATUS ENDPOINT
 // -------------------------------------------------------------
+router.get('/health', (_req: Request, res: Response) => {
+  res.json({ status: 'ok', app: 'BillSloth', local: true, timestamp: new Date().toISOString() });
+});
+
 router.get('/ai/status', async (_req: Request, res: Response) => {
   const status = await checkOllamaStatus();
   res.json(status);
@@ -810,6 +814,151 @@ router.post('/sample-data/clear', (_req: Request, res: Response) => {
   try {
     const count = clearSampleData(true);
     res.json({ success: true, message: `Cleared ${count} sample items.` });
+  } catch (err: unknown) {
+    const msg = err instanceof Error ? err.message : String(err);
+    res.status(500).json({ success: false, error: msg });
+  }
+});
+
+// -------------------------------------------------------------
+// NATURAL LANGUAGE LOCAL AI ASSISTANT ("Ask BillSloth")
+// -------------------------------------------------------------
+router.post('/ai/ask', async (req: Request, res: Response) => {
+  try {
+    const query = req.body.query || req.body.question;
+    if (!query || typeof query !== 'string' || !query.trim()) {
+      return res.status(400).json({ success: false, error: 'Query prompt is required' });
+    }
+
+    // Build compact factual ledger summary for the local model (prioritize active/unsettled bills)
+    const docs = db.prepare(`
+      SELECT id, vendor, invoice_number, amount, currency, due_date, status, category, is_verified 
+      FROM documents 
+      ORDER BY CASE WHEN status = 'paid' THEN 2 ELSE 1 END, due_date ASC 
+      LIMIT 25
+    `).all() as Array<{
+      id: string;
+      vendor: string | null;
+      invoice_number: string | null;
+      amount: number | null;
+      currency: string;
+      due_date: string | null;
+      status: string;
+      category: string;
+      is_verified: number;
+    }>;
+
+    const summaryRows = docs.map((d) =>
+      `- Vendor: ${d.vendor || 'Unknown'}, Amount: ${d.amount || 0} ${d.currency}, Due: ${d.due_date || 'No Date'}, Status: ${d.status}, Category: ${d.category}, Verified: ${d.is_verified === 1 ? 'Yes' : 'No'}`
+    );
+
+    const contextText = summaryRows.join('\n') || 'No bills currently recorded in the database.';
+
+    const result = await askBillSlothAssistant(query.trim(), contextText);
+    if (!result.success) {
+      return res.status(503).json({ success: false, error: result.error });
+    }
+
+    logAudit('AI_ASSISTANT_QUERY', null, { query: query.trim(), model: result.model });
+
+    res.json({
+      success: true,
+      answer: result.answer,
+      model: result.model,
+    });
+  } catch (err: unknown) {
+    const msg = err instanceof Error ? err.message : String(err);
+    res.status(500).json({ success: false, error: msg });
+  }
+});
+
+// -------------------------------------------------------------
+// CSV ACCOUNTING EXPORT
+// -------------------------------------------------------------
+router.get('/documents/export/csv', (_req: Request, res: Response) => {
+  try {
+    const docs = db.prepare('SELECT * FROM documents ORDER BY due_date ASC').all() as Array<Record<string, unknown>>;
+
+    const headers = [
+      'ID',
+      'Vendor',
+      'InvoiceNumber',
+      'Amount',
+      'Currency',
+      'Category',
+      'Status',
+      'HumanVerified',
+      'IssueDate',
+      'DueDate',
+      'PaymentReference',
+      'Notes',
+      'CreatedAt'
+    ];
+
+    const escapeCsv = (val: unknown) => {
+      if (val === null || val === undefined) return '';
+      const str = String(val).replace(/"/g, '""');
+      return `"${str}"`;
+    };
+
+    const csvLines = [headers.join(',')];
+    docs.forEach((doc) => {
+      const line = [
+        escapeCsv(doc.id),
+        escapeCsv(doc.vendor),
+        escapeCsv(doc.invoice_number),
+        escapeCsv(doc.amount),
+        escapeCsv(doc.currency),
+        escapeCsv(doc.category),
+        escapeCsv(doc.status),
+        escapeCsv(doc.is_verified === 1 ? 'YES' : 'NO'),
+        escapeCsv(doc.issue_date),
+        escapeCsv(doc.due_date),
+        escapeCsv(doc.payment_reference),
+        escapeCsv(doc.notes),
+        escapeCsv(doc.created_at),
+      ].join(',');
+      csvLines.push(line);
+    });
+
+    const csvContent = csvLines.join('\n');
+    res.setHeader('Content-Type', 'text/csv; charset=utf-8');
+    res.setHeader('Content-Disposition', `attachment; filename="billsloth-ledger-${format(new Date(), 'yyyy-MM-dd')}.csv"`);
+    res.send(csvContent);
+  } catch (err: unknown) {
+    const msg = err instanceof Error ? err.message : String(err);
+    res.status(500).json({ success: false, error: msg });
+  }
+});
+
+// -------------------------------------------------------------
+// LOCAL SYSTEM BACKUP
+// -------------------------------------------------------------
+router.get('/system/backup', (_req: Request, res: Response) => {
+  try {
+    const documents = db.prepare('SELECT * FROM documents').all();
+    const reminders = db.prepare('SELECT * FROM reminders').all();
+    const audit_logs = db.prepare('SELECT * FROM audit_logs').all();
+
+    const backupPayload = {
+      app: 'BillSloth',
+      version: '1.0.0',
+      exported_at: new Date().toISOString(),
+      counts: {
+        documents: documents.length,
+        reminders: reminders.length,
+        audit_logs: audit_logs.length,
+      },
+      data: {
+        documents,
+        reminders,
+        audit_logs,
+      },
+    };
+
+    res.setHeader('Content-Type', 'application/json; charset=utf-8');
+    res.setHeader('Content-Disposition', `attachment; filename="billsloth-backup-${format(new Date(), 'yyyy-MM-dd')}.json"`);
+    res.json(backupPayload);
   } catch (err: unknown) {
     const msg = err instanceof Error ? err.message : String(err);
     res.status(500).json({ success: false, error: msg });

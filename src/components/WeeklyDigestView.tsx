@@ -79,7 +79,7 @@ export const WeeklyDigestView: React.FC<WeeklyDigestViewProps> = ({
   return (
     <div className="max-w-4xl mx-auto space-y-6 animate-in fade-in duration-150">
       {/* Header */}
-      <div className="bg-white rounded-xl p-6 border border-slate-border shadow-card flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      <div className="financial-card p-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <div className="flex items-center gap-2">
             <h1 className="text-xl font-bold text-navy-900 tracking-tight">Weekly Financial Calm Digest</h1>
@@ -112,38 +112,38 @@ export const WeeklyDigestView: React.FC<WeeklyDigestViewProps> = ({
 
       {/* 4 Digest Stat Pills */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-        <div className="bg-white rounded-xl p-4 border border-slate-border shadow-card">
+        <div className="financial-card p-4">
           <span className="text-[11px] font-semibold text-slate-muted uppercase tracking-wider block">
             Total Outstanding
           </span>
-          <span className="text-xl font-bold text-navy-900 mt-1 block tabular-nums">
+          <span className="text-xl font-bold text-navy-900 mt-1 block tabular-nums font-mono">
             {formatCurrency(metrics.totalOutstanding)}
           </span>
         </div>
 
-        <div className="bg-white rounded-xl p-4 border border-slate-border shadow-card">
+        <div className="financial-card p-4">
           <span className="text-[11px] font-semibold text-red-overdue uppercase tracking-wider block">
             Overdue Balance
           </span>
-          <span className="text-xl font-bold text-red-overdue mt-1 block tabular-nums">
+          <span className="text-xl font-bold text-red-overdue mt-1 block tabular-nums font-mono">
             {formatCurrency(metrics.overdueAmount)}
           </span>
         </div>
 
-        <div className="bg-white rounded-xl p-4 border border-slate-border shadow-card">
+        <div className="financial-card p-4">
           <span className="text-[11px] font-semibold text-amber-warn uppercase tracking-wider block">
             Due Next 7 Days
           </span>
-          <span className="text-xl font-bold text-navy-900 mt-1 block tabular-nums">
+          <span className="text-xl font-bold text-navy-900 mt-1 block tabular-nums font-mono">
             {formatCurrency(metrics.dueSoonAmount)}
           </span>
         </div>
 
-        <div className="bg-white rounded-xl p-4 border border-slate-border shadow-card">
+        <div className="financial-card p-4">
           <span className="text-[11px] font-semibold text-slate-muted uppercase tracking-wider block">
             Pending Reminders
           </span>
-          <span className="text-xl font-bold text-brand-blue mt-1 block tabular-nums">
+          <span className="text-xl font-bold text-brand-blue mt-1 block tabular-nums font-mono">
             {metrics.pendingRemindersCount}
           </span>
         </div>
@@ -151,7 +151,7 @@ export const WeeklyDigestView: React.FC<WeeklyDigestViewProps> = ({
 
       {/* Critical Overdue Section */}
       {overdueBills.length > 0 && (
-        <div className="bg-white rounded-xl border border-red-overdue-border shadow-card overflow-hidden">
+        <div className="financial-card !border-red-overdue-border overflow-hidden">
           <div className="px-5 py-3.5 bg-red-overdue-light/40 border-b border-red-overdue-border flex items-center justify-between">
             <div className="flex items-center gap-2">
               <AlertCircle className="w-4 h-4 text-red-overdue" />
@@ -159,7 +159,7 @@ export const WeeklyDigestView: React.FC<WeeklyDigestViewProps> = ({
                 Critical Overdue Invoices ({overdueBills.length})
               </h3>
             </div>
-            <span className="text-xs font-bold text-red-overdue tabular-nums">
+            <span className="text-xs font-bold text-red-overdue tabular-nums font-mono">
               {formatCurrency(metrics.overdueAmount)}
             </span>
           </div>
@@ -176,12 +176,12 @@ export const WeeklyDigestView: React.FC<WeeklyDigestViewProps> = ({
                     <span className="font-bold text-sm text-navy-900">{bill.vendor || 'Unknown Vendor'}</span>
                     {bill.is_sample === 1 && <SampleDataBadge />}
                   </div>
-                  <span className="text-xs text-red-overdue font-semibold">
+                  <span className="text-xs text-red-overdue font-semibold tabular-nums">
                     Due date was {bill.due_date || 'past'}
                   </span>
                 </div>
                 <div className="text-right">
-                  <div className="font-bold text-sm text-red-overdue tabular-nums">
+                  <div className="font-bold text-sm text-red-overdue tabular-nums font-mono">
                     {formatCurrency(bill.amount || 0)}
                   </div>
                   <span className="text-[11px] text-slate-muted">{bill.currency}</span>
@@ -193,7 +193,7 @@ export const WeeklyDigestView: React.FC<WeeklyDigestViewProps> = ({
       )}
 
       {/* Due This Week Section */}
-      <div className="bg-white rounded-xl border border-slate-border shadow-card overflow-hidden">
+      <div className="financial-card overflow-hidden">
         <div className="px-5 py-3.5 bg-slate-light border-b border-slate-border flex items-center justify-between">
           <div className="flex items-center gap-2">
             <Clock className="w-4 h-4 text-amber-warn" />
@@ -201,7 +201,7 @@ export const WeeklyDigestView: React.FC<WeeklyDigestViewProps> = ({
               Cash Flow Needs This Week ({dueSoonBills.length})
             </h3>
           </div>
-          <span className="text-xs font-bold text-navy-900 tabular-nums">
+          <span className="text-xs font-bold text-navy-900 tabular-nums font-mono">
             {formatCurrency(metrics.dueSoonAmount)}
           </span>
         </div>
@@ -224,10 +224,10 @@ export const WeeklyDigestView: React.FC<WeeklyDigestViewProps> = ({
                     {bill.is_sample === 1 && <SampleDataBadge />}
                     <span className="text-[11px] text-slate-muted font-normal">• {bill.category}</span>
                   </div>
-                  <span className="text-xs text-amber-warn font-medium">Due: {bill.due_date}</span>
+                  <span className="text-xs text-amber-warn font-medium tabular-nums">Due: {bill.due_date}</span>
                 </div>
                 <div className="text-right">
-                  <div className="font-bold text-sm text-navy-900 tabular-nums">
+                  <div className="font-bold text-sm text-navy-900 tabular-nums font-mono">
                     {formatCurrency(bill.amount || 0)}
                   </div>
                   <span className="text-[11px] text-slate-muted">{bill.currency}</span>
@@ -240,7 +240,7 @@ export const WeeklyDigestView: React.FC<WeeklyDigestViewProps> = ({
 
       {/* Unverified Items Needing Review */}
       {needsReviewBills.length > 0 && (
-        <div className="bg-white rounded-xl border border-slate-border shadow-card overflow-hidden">
+        <div className="financial-card overflow-hidden">
           <div className="px-5 py-3.5 bg-amber-warn-light/30 border-b border-slate-border flex items-center justify-between">
             <div className="flex items-center gap-2">
               <Eye className="w-4 h-4 text-amber-warn" />
@@ -261,7 +261,7 @@ export const WeeklyDigestView: React.FC<WeeklyDigestViewProps> = ({
                     {bill.vendor || bill.original_name}
                   </span>
                   <span className="text-xs text-slate-muted block mt-0.5">
-                    File: {bill.original_name} • Amount: ${bill.amount || 0}
+                    File: {bill.original_name} • Amount: <span className="tabular-nums font-mono">${bill.amount || 0}</span>
                   </span>
                 </div>
                 <button
@@ -279,7 +279,7 @@ export const WeeklyDigestView: React.FC<WeeklyDigestViewProps> = ({
 
       {/* Reminders Awaiting Human Approval */}
       {pendingReminders.length > 0 && (
-        <div className="bg-white rounded-xl border border-slate-border shadow-card overflow-hidden">
+        <div className="financial-card overflow-hidden">
           <div className="px-5 py-3.5 bg-brand-blue-light/40 border-b border-slate-border flex items-center justify-between">
             <div className="flex items-center gap-2">
               <BellRing className="w-4 h-4 text-brand-blue" />

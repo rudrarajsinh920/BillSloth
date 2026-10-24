@@ -1,5 +1,15 @@
 import React from 'react';
-import { AlertCircle, Clock, CheckCircle2, Eye, ShieldAlert, Sparkles } from 'lucide-react';
+import {
+  AlertCircle,
+  Clock,
+  CheckCircle2,
+  Eye,
+  ShieldAlert,
+  Sparkles,
+  FileText,
+  Scan,
+  Cpu,
+} from 'lucide-react';
 import { DocumentStatus } from '../types';
 
 interface StatusBadgeProps {
@@ -117,5 +127,69 @@ export const SampleDataBadge: React.FC = () => {
       <Sparkles className="w-2.5 h-2.5 text-slate-500" />
       <span>Sample</span>
     </span>
+  );
+};
+
+export interface ExtractionTelemetryBadgeProps {
+  method?: string | null;
+  ocrConfidence?: number | null;
+  modelUsed?: string | null;
+  isGemma?: boolean;
+  size?: 'xs' | 'sm' | 'md';
+}
+
+export const ExtractionTelemetryBadge: React.FC<ExtractionTelemetryBadgeProps> = ({
+  method,
+  ocrConfidence,
+  modelUsed,
+  isGemma,
+  size = 'sm',
+}) => {
+  const isXs = size === 'xs';
+  const isSm = size === 'sm';
+  const sizeClasses = isXs ? 'text-[9px] px-1.5 py-0.2' : isSm ? 'text-[10px] px-2 py-0.5' : 'text-xs px-2.5 py-1';
+
+  if (!method && !modelUsed) return null;
+
+  return (
+    <div className="inline-flex items-center gap-1 flex-wrap">
+      {/* Method & Confidence */}
+      {method === 'local_ocr' && (
+        <span
+          title={`Extracted locally with Tesseract OCR (Measured confidence: ${ocrConfidence || 0}%)`}
+          className={`inline-flex items-center gap-1 rounded-md border border-slate-border bg-slate-100 text-navy-800 font-medium ${sizeClasses}`}
+        >
+          <Scan className={isXs ? 'w-2.5 h-2.5 text-slate-600' : 'w-3 h-3 text-slate-600'} />
+          <span>Local OCR</span>
+          {ocrConfidence !== null && ocrConfidence !== undefined && (
+            <span className="font-mono text-slate-500 tabular-nums font-semibold">
+              {ocrConfidence}%
+            </span>
+          )}
+        </span>
+      )}
+
+      {method === 'pdf_text' && (
+        <span
+          title="Extracted locally from embedded PDF text stream (95% advisory confidence)"
+          className={`inline-flex items-center gap-1 rounded-md border border-slate-border bg-slate-100 text-navy-800 font-medium ${sizeClasses}`}
+        >
+          <FileText className={isXs ? 'w-2.5 h-2.5 text-slate-600' : 'w-3 h-3 text-slate-600'} />
+          <span>PDF Text</span>
+          <span className="font-mono text-slate-500 tabular-nums">95%</span>
+        </span>
+      )}
+
+      {/* Local AI Model Badge */}
+      {modelUsed && (
+        <span
+          title={`Structured locally with ${modelUsed} on your device`}
+          className={`inline-flex items-center gap-1 rounded-md border border-blue-200 bg-brand-blue-light text-brand-blue font-medium ${sizeClasses}`}
+        >
+          <Cpu className={isXs ? 'w-2.5 h-2.5' : 'w-3 h-3'} />
+          <span>{isGemma || /gemma/i.test(modelUsed) ? 'Gemma 2' : modelUsed}</span>
+        </span>
+      )}
+    </div>
   );
 };

@@ -2,12 +2,14 @@ import { useState, useEffect, useCallback } from 'react';
 import { Navbar, NavTab } from './components/Navbar';
 import { DashboardView } from './components/DashboardView';
 import { DocumentsView } from './components/DocumentsView';
+import { CalendarView } from './components/CalendarView';
 import { ImportView } from './components/ImportView';
 import { RemindersView } from './components/RemindersView';
 import { WeeklyDigestView } from './components/WeeklyDigestView';
 import { AuditLogView } from './components/AuditLogView';
 import { ReviewModal } from './components/ReviewModal';
 import { OllamaModal } from './components/OllamaModal';
+import { AskAssistantModal } from './components/AskAssistantModal';
 import { DocumentItem, ReminderItem, OllamaStatus } from './types';
 import {
   fetchDocuments,
@@ -27,6 +29,7 @@ export function App() {
   const [reminders, setReminders] = useState<ReminderItem[]>([]);
   const [ollamaStatus, setOllamaStatus] = useState<OllamaStatus | null>(null);
   const [isOllamaModalOpen, setIsOllamaModalOpen] = useState(false);
+  const [isAskModalOpen, setIsAskModalOpen] = useState(false);
 
   // Review Modal State
   const [reviewDocId, setReviewDocId] = useState<string | null>(null);
@@ -155,6 +158,7 @@ export function App() {
         onTabChange={setActiveTab}
         ollamaStatus={ollamaStatus}
         onOpenOllamaModal={() => setIsOllamaModalOpen(true)}
+        onOpenAskModal={() => setIsAskModalOpen(true)}
         pendingRemindersCount={pendingRemindersCount}
         needsReviewCount={needsReviewCount}
         hasSampleData={hasSampleData}
@@ -193,6 +197,15 @@ export function App() {
                 onPrepareReminder={handlePrepareReminder}
                 onDeleteDocument={handleDocumentDeleted}
                 onNavigateToImport={() => setActiveTab('import')}
+              />
+            )}
+
+            {activeTab === 'calendar' && (
+              <CalendarView
+                documents={documents}
+                onOpenReview={handleOpenReview}
+                onQuickMarkPaid={handleQuickMarkPaid}
+                onPrepareReminder={handlePrepareReminder}
               />
             )}
 
@@ -271,6 +284,17 @@ export function App() {
           if (s.available) {
             showToast('Ollama local model connected!');
           }
+        }}
+      />
+
+      {/* Ask BillSloth On-Device AI Assistant Modal */}
+      <AskAssistantModal
+        isOpen={isAskModalOpen}
+        onClose={() => setIsAskModalOpen(false)}
+        ollamaAvailable={!!ollamaStatus?.available}
+        onOpenOllamaModal={() => {
+          setIsAskModalOpen(false);
+          setIsOllamaModalOpen(true);
         }}
       />
 

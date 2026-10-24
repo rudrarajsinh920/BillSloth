@@ -31,17 +31,35 @@ export async function fetchDocumentById(id: string): Promise<DocumentItem> {
   return json.data;
 }
 
-export async function uploadDocument(file: File): Promise<DocumentItem> {
+export interface UploadResponse {
+  success: boolean;
+  data: DocumentItem;
+  is_duplicate?: boolean;
+  duplicate_of?: string;
+  message?: string;
+  extraction_info?: {
+    method: string;
+    ocr_confidence: number;
+    model_used: string | null;
+    is_gemma: boolean;
+    validation_flags: string[];
+  };
+}
+
+export async function uploadDocument(file: File, force = false): Promise<UploadResponse> {
   const formData = new FormData();
   formData.append('file', file);
 
-  const res = await fetch(`${API_BASE}/documents/upload`, {
+  const res = await fetch(`${API_BASE}/documents/upload${force ? '?force=true' : ''}`, {
     method: 'POST',
     body: formData,
   });
   const json = await res.json();
-  if (!res.ok) throw new Error(json.error || 'Upload failed');
-  return json.data;
+  if (res.status === 409 && json.is_duplicate) {
+    return json;
+  }
+  if (!res.ok) throw new Error(json.error || json.message || 'Upload failed');
+  return json;
 }
 
 export async function extractDocumentFields(
@@ -153,3 +171,17 @@ export async function clearSampleData(): Promise<void> {
   const res = await fetch(`${API_BASE}/sample-data/clear`, { method: 'POST' });
   if (!res.ok) throw new Error('Failed to clear sample data');
 }
+
+export async function askAiAssistant(query: string): Promise<{ answer: string; model?: string }> {
+  const res = await fetch(`${API_BASE}/ai/ask`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ query }),
+  });
+  const json = await res.json();
+  if (!res.ok) throw new Error(json.error || 'AI query failed');
+  return json;
+}
+
+export const CSV_EXPORT_URL = `${API_BASE}/documents/export/csv`;
+export const SYSTEM_BACKUP_URL = `${API_BASE}/system/backup`;
