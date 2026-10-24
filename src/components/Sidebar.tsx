@@ -54,35 +54,41 @@ export const Sidebar: React.FC<SidebarProps> = ({
       id: 'dashboard' as NavTab,
       label: 'Dashboard',
       icon: LayoutDashboard,
+      iconColor: 'text-indigo-500',
     },
     {
       id: 'documents' as NavTab,
       label: 'Invoices & Bills',
       icon: Receipt,
+      iconColor: 'text-cyan-500',
       badge: needsReviewCount > 0 ? needsReviewCount : undefined,
-      badgeColor: 'bg-amber-warn text-white',
+      badgeColor: 'bg-amber-500 text-white shadow-xs shadow-amber-500/30',
     },
     {
       id: 'calendar' as NavTab,
       label: 'Calendar Schedule',
       icon: Calendar,
+      iconColor: 'text-blue-500',
     },
     {
       id: 'reminders' as NavTab,
       label: 'Reminders & Approvals',
       icon: BellRing,
+      iconColor: 'text-violet-500',
       badge: pendingRemindersCount > 0 ? pendingRemindersCount : undefined,
-      badgeColor: 'bg-brand-blue text-white',
+      badgeColor: 'bg-indigo-600 text-white shadow-xs shadow-indigo-500/30',
     },
     {
       id: 'digest' as NavTab,
       label: 'Weekly Digest',
       icon: CalendarCheck2,
+      iconColor: 'text-teal-500',
     },
     {
       id: 'audit' as NavTab,
       label: 'System Audit Trail',
       icon: ShieldCheck,
+      iconColor: 'text-emerald-500',
     },
   ];
 
@@ -92,24 +98,37 @@ export const Sidebar: React.FC<SidebarProps> = ({
   };
 
   const sidebarContent = (
-    <div className="flex flex-col h-full bg-white select-none">
+    <div className="flex flex-col h-full bg-white/95 backdrop-blur-xl border-r border-slate-200/80 select-none">
       {/* Brand Header */}
-      <div className="p-5 border-b border-slate-border flex items-center justify-between">
+      <div className="p-5 border-b border-slate-200/80 flex items-center justify-between">
         <button
           onClick={() => handleNavClick('dashboard')}
           className="flex items-center gap-3 text-left group focus:outline-none"
         >
-          <div className="w-10 h-10 rounded-xl bg-navy-900 flex items-center justify-center text-white font-bold text-xl shadow-sm group-hover:bg-brand-blue transition-colors">
-            <span>🦥</span>
+          {/* Glowing Animated Sloth Emblem */}
+          <div className="relative">
+            <div className="w-11 h-11 rounded-2xl bg-gradient-to-tr from-indigo-600 via-blue-600 to-cyan-400 p-[1.5px] shadow-lg shadow-indigo-500/20 group-hover:shadow-indigo-500/35 transition-all">
+              <div className="w-full h-full bg-navy-900 rounded-[14px] flex items-center justify-center text-xl text-white">
+                <span className="animate-float-gentle inline-block">🦥</span>
+              </div>
+            </div>
+            {/* Pulsing online beacon */}
+            <span className="absolute -bottom-0.5 -right-0.5 flex h-3 w-3">
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+              <span className="relative inline-flex rounded-full h-3 w-3 bg-emerald-500 border-2 border-white"></span>
+            </span>
           </div>
+
           <div>
             <div className="flex items-center gap-1.5">
-              <span className="font-bold text-base text-navy-900 tracking-tight">BillSloth</span>
-              <span className="text-[10px] font-semibold px-1.5 py-0.2 rounded-md bg-emerald-50 text-emerald-700 border border-emerald-200/80">
+              <span className="font-extrabold text-base tracking-tight bg-gradient-to-r from-navy-900 via-indigo-950 to-blue-900 bg-clip-text text-transparent">
+                BillSloth
+              </span>
+              <span className="text-[10px] font-bold px-1.5 py-0.2 rounded-md bg-gradient-to-r from-emerald-50 to-teal-50 text-emerald-700 border border-emerald-200/80 shadow-2xs">
                 Local
               </span>
             </div>
-            <p className="text-[11px] text-slate-muted font-medium">Private Financial Ledger</p>
+            <p className="text-[11px] text-slate-400 font-medium">Private Financial Vault</p>
           </div>
         </button>
 
@@ -123,13 +142,13 @@ export const Sidebar: React.FC<SidebarProps> = ({
         </button>
       </div>
 
-      {/* Navigation Links (Matching FinCore sidebar layout) */}
-      <div className="flex-1 overflow-y-auto px-3 py-4 space-y-6">
+      {/* Navigation Links (FinCore & MySign layout with vibrant active state) */}
+      <div className="flex-1 overflow-y-auto px-3.5 py-4 space-y-6">
         <div>
-          <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider px-3 mb-2 block">
+          <span className="text-[10px] font-extrabold text-slate-400 uppercase tracking-widest px-3 mb-2.5 block">
             Navigation
           </span>
-          <nav className="space-y-1">
+          <nav className="space-y-1.5">
             {mainNav.map((item) => {
               const Icon = item.icon;
               const isActive = activeTab === item.id;
@@ -137,15 +156,24 @@ export const Sidebar: React.FC<SidebarProps> = ({
                 <button
                   key={item.id}
                   onClick={() => handleNavClick(item.id)}
-                  className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-semibold transition-all ${
+                  className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-semibold transition-all relative overflow-hidden group ${
                     isActive
-                      ? 'bg-navy-900 text-white shadow-sm'
-                      : 'text-slate-600 hover:text-navy-900 hover:bg-slate-100/80'
+                      ? 'bg-gradient-to-r from-navy-900 via-indigo-950 to-navy-900 text-white shadow-md shadow-indigo-950/20'
+                      : 'text-slate-600 hover:text-navy-900 hover:bg-slate-100/70'
                   }`}
                 >
+                  {/* Cyan neon left accent indicator on active */}
+                  {isActive && (
+                    <span className="absolute left-0 top-1.5 bottom-1.5 w-1 rounded-r-full bg-cyan-400 shadow-sm shadow-cyan-400/80" />
+                  )}
+
                   <div className="flex items-center gap-3">
-                    <Icon className={`w-4 h-4 shrink-0 ${isActive ? 'text-white' : 'text-slate-400'}`} />
-                    <span>{item.label}</span>
+                    <Icon
+                      className={`w-4 h-4 shrink-0 transition-transform group-hover:scale-110 ${
+                        isActive ? 'text-cyan-300' : item.iconColor
+                      }`}
+                    />
+                    <span className={isActive ? 'font-bold' : 'font-medium'}>{item.label}</span>
                   </div>
                   {item.badge !== undefined && (
                     <span
@@ -162,55 +190,68 @@ export const Sidebar: React.FC<SidebarProps> = ({
           </nav>
         </div>
 
-        {/* Tools & AI Assistance */}
+        {/* AI & Operations (Showstopper gradient portal) */}
         <div>
-          <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider px-3 mb-2 block">
-            AI & Operations
+          <span className="text-[10px] font-extrabold text-slate-400 uppercase tracking-widest px-3 mb-2.5 block">
+            AI Operations
           </span>
-          <div className="space-y-1">
-            <button
-              onClick={() => {
-                onOpenAskModal();
-                onCloseMobile();
-              }}
-              className="w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-semibold text-brand-blue bg-blue-50/70 hover:bg-blue-100/70 border border-blue-200/60 transition-colors"
-            >
-              <div className="flex items-center gap-3">
-                <Sparkles className="w-4 h-4 text-brand-blue" />
-                <span>Ask Sloth AI</span>
-              </div>
-              <span className="text-[10px] font-mono px-1.5 py-0.2 rounded bg-white text-brand-blue border border-blue-200">
-                ⌘K
-              </span>
-            </button>
+          <div className="space-y-2">
+            {/* Ask Sloth AI with rainbow gradient border */}
+            <div className="p-[1.5px] rounded-xl bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 shadow-sm shadow-indigo-500/10 hover:shadow-indigo-500/25 transition-all">
+              <button
+                onClick={() => {
+                  onOpenAskModal();
+                  onCloseMobile();
+                }}
+                className="w-full flex items-center justify-between px-3 py-2.5 rounded-[10px] bg-white hover:bg-gradient-to-r hover:from-indigo-50/50 hover:to-purple-50/50 text-xs font-bold text-indigo-950 transition-all"
+              >
+                <div className="flex items-center gap-2.5">
+                  <div className="p-1 rounded-md bg-indigo-50 text-indigo-600">
+                    <Sparkles className="w-3.5 h-3.5 animate-pulse-glow" />
+                  </div>
+                  <span className="bg-gradient-to-r from-indigo-700 to-purple-700 bg-clip-text text-transparent">
+                    Ask Sloth AI
+                  </span>
+                </div>
+                <span className="text-[10px] font-mono px-1.5 py-0.5 rounded-md bg-indigo-50 text-indigo-600 border border-indigo-200/80 font-bold">
+                  ⌘K
+                </span>
+              </button>
+            </div>
 
             <button
               onClick={() => handleNavClick('import')}
-              className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-semibold transition-colors ${
+              className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-semibold transition-colors ${
                 activeTab === 'import'
                   ? 'bg-navy-900 text-white shadow-sm'
                   : 'text-slate-600 hover:text-navy-900 hover:bg-slate-100/80'
               }`}
             >
-              <UploadCloud className={`w-4 h-4 ${activeTab === 'import' ? 'text-white' : 'text-slate-400'}`} />
+              <UploadCloud className={`w-4 h-4 ${activeTab === 'import' ? 'text-cyan-300' : 'text-blue-500'}`} />
               <span>Import New Bill</span>
             </button>
           </div>
         </div>
       </div>
 
-      {/* Bottom Area: Local AI Engine Card & Privacy Guarantee */}
-      <div className="p-4 border-t border-slate-border space-y-3 shrink-0">
+      {/* Bottom Area: Futuristic Local AI Engine Card & Privacy Guarantee */}
+      <div className="p-4 border-t border-slate-200/80 space-y-3 shrink-0">
         {/* On-Device AI Status Card */}
         <div
           onClick={onOpenOllamaModal}
-          className="p-3 rounded-xl border border-slate-border bg-slate-50/80 hover:bg-slate-100/80 cursor-pointer transition-colors"
+          className="p-3.5 rounded-xl border border-slate-200/80 bg-gradient-to-b from-slate-50 to-white hover:border-indigo-300/60 hover:shadow-md hover:shadow-indigo-500/10 cursor-pointer transition-all relative overflow-hidden group"
           title="Click to view local model status & Ollama connection"
         >
           <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <div className={`p-1.5 rounded-lg ${ollamaStatus?.available ? 'bg-emerald-100 text-emerald-700' : 'bg-slate-200 text-slate-600'}`}>
-                <Cpu className="w-3.5 h-3.5" />
+            <div className="flex items-center gap-2.5">
+              <div
+                className={`p-2 rounded-xl transition-colors ${
+                  ollamaStatus?.available
+                    ? 'bg-gradient-to-tr from-emerald-500 to-teal-400 text-white shadow-xs shadow-emerald-500/20'
+                    : 'bg-indigo-50 text-indigo-600 border border-indigo-200/60'
+                }`}
+              >
+                <Cpu className="w-4 h-4" />
               </div>
               <div>
                 <span className="text-xs font-bold text-navy-900 block leading-tight">
@@ -221,29 +262,36 @@ export const Sidebar: React.FC<SidebarProps> = ({
                 </span>
               </div>
             </div>
-            <span
-              className={`w-2 h-2 rounded-full ${
-                ollamaStatus?.available ? 'bg-emerald-500 animate-pulse' : 'bg-slate-400'
-              }`}
-            />
+
+            {/* Glowing status orb */}
+            <span className="relative flex h-2.5 w-2.5">
+              {ollamaStatus?.available && (
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+              )}
+              <span
+                className={`relative inline-flex rounded-full h-2.5 w-2.5 ${
+                  ollamaStatus?.available ? 'bg-emerald-500' : 'bg-slate-400'
+                }`}
+              ></span>
+            </span>
           </div>
 
-          <div className="mt-2 pt-2 border-t border-slate-200 flex items-center justify-between text-[10px] text-slate-500">
-            <span className="flex items-center gap-1 font-semibold text-emerald-700">
-              <Lock className="w-2.5 h-2.5" /> Zero Cloud AI
+          <div className="mt-2.5 pt-2 border-t border-slate-100 flex items-center justify-between text-[10px]">
+            <span className="flex items-center gap-1 font-bold text-emerald-700">
+              <Lock className="w-2.5 h-2.5 text-emerald-600" /> 100% Zero Cloud
             </span>
-            <span className="underline hover:text-navy-900 font-medium">Status</span>
+            <span className="font-semibold text-indigo-600 group-hover:underline">Guide →</span>
           </div>
         </div>
 
         {/* Sample Data Toggle Action */}
         <div className="flex items-center justify-between text-xs px-1 text-slate-500">
-          <span className="text-[11px]">Illustrative Demo:</span>
+          <span className="text-[11px] font-medium">Interactive Demo:</span>
           {hasSampleData ? (
             <button
               onClick={onClearSample}
               disabled={loadingSample}
-              className="text-[11px] font-semibold text-red-600 hover:underline inline-flex items-center gap-1 disabled:opacity-50"
+              className="text-[11px] font-bold text-rose-600 hover:text-rose-700 hover:underline inline-flex items-center gap-1 disabled:opacity-50"
             >
               <Trash2 className="w-3 h-3" />
               <span>Clear Sample</span>
@@ -252,9 +300,9 @@ export const Sidebar: React.FC<SidebarProps> = ({
             <button
               onClick={onLoadSample}
               disabled={loadingSample}
-              className="text-[11px] font-semibold text-brand-blue hover:underline inline-flex items-center gap-1 disabled:opacity-50"
+              className="text-[11px] font-bold text-indigo-600 hover:text-indigo-700 hover:underline inline-flex items-center gap-1 disabled:opacity-50"
             >
-              <Bot className="w-3 h-3 text-amber-warn" />
+              <Bot className="w-3 h-3 text-amber-500" />
               <span>Load Sample</span>
             </button>
           )}
@@ -266,7 +314,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
   return (
     <>
       {/* Desktop Sticky Sidebar (Visible on lg: and up) */}
-      <aside className="hidden lg:block w-64 h-screen sticky top-0 border-r border-slate-border shrink-0 z-30">
+      <aside className="hidden lg:block w-64 h-screen sticky top-0 shrink-0 z-30">
         {sidebarContent}
       </aside>
 
@@ -275,7 +323,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
         <div className="lg:hidden fixed inset-0 z-50 flex">
           <div
             onClick={onCloseMobile}
-            className="fixed inset-0 bg-navy-900/40 backdrop-blur-xs transition-opacity"
+            className="fixed inset-0 bg-navy-900/50 backdrop-blur-xs transition-opacity"
             aria-hidden="true"
           />
           <div className="relative w-72 max-w-[85vw] h-full shadow-2xl z-10 animate-in slide-in-from-left duration-200">
