@@ -11,7 +11,7 @@ import { AuditLogView } from './components/AuditLogView';
 import { ReviewModal } from './components/ReviewModal';
 import { OllamaModal } from './components/OllamaModal';
 import { AskAssistantModal } from './components/AskAssistantModal';
-import { WelcomeOverlay } from './components/WelcomeOverlay';
+import { CalmSlothIntro } from './components/CalmSlothIntro';
 import { DocumentItem, ReminderItem, OllamaStatus } from './types';
 import {
   fetchDocuments,
@@ -43,23 +43,8 @@ export function App() {
   const [loadingSample, setLoadingSample] = useState(false);
   const [toast, setToast] = useState<{ message: string; type: 'success' | 'info' } | null>(null);
 
-  // Welcome Intro Overlay State (first-visit detection)
-  const [showWelcome, setShowWelcome] = useState<boolean>(() => {
-    try {
-      return !localStorage.getItem('billsloth_welcome_dismissed');
-    } catch {
-      return false;
-    }
-  });
-
-  const handleDismissWelcome = () => {
-    setShowWelcome(false);
-    try {
-      localStorage.setItem('billsloth_welcome_dismissed', 'true');
-    } catch {
-      // Ignore storage errors in restricted contexts
-    }
-  };
+  // Calm Sloth Intro State (replays on every page load and refresh)
+  const [showIntro, setShowIntro] = useState<boolean>(true);
 
   const showToast = (message: string, type: 'success' | 'info' = 'success') => {
     setToast({ message, type });
@@ -200,7 +185,7 @@ export function App() {
         onLoadSample={handleLoadSample}
         onClearSample={handleClearSample}
         loadingSample={loadingSample}
-        onReplayWelcome={() => setShowWelcome(true)}
+        onReplayIntro={() => setShowIntro(true)}
       />
 
       {/* Main Canvas Area */}
@@ -348,11 +333,13 @@ export function App() {
         }}
       />
 
-      {/* First-Visit Premium Welcome Intro Overlay */}
-      <WelcomeOverlay
-        isOpen={showWelcome}
-        onDismiss={handleDismissWelcome}
-      />
+      {/* The Calm Sloth Premium Welcome Intro (replays on every page load/refresh) */}
+      {showIntro && (
+        <CalmSlothIntro
+          onComplete={() => setShowIntro(false)}
+          onSkip={() => setShowIntro(false)}
+        />
+      )}
 
       {/* Toast Notification */}
       {toast && (

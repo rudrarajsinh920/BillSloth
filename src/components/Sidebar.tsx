@@ -32,7 +32,7 @@ interface SidebarProps {
   onLoadSample: () => void;
   onClearSample: () => void;
   loadingSample: boolean;
-  onReplayWelcome?: () => void;
+  onReplayIntro?: () => void;
 }
 
 export const Sidebar: React.FC<SidebarProps> = ({
@@ -49,7 +49,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
   onLoadSample,
   onClearSample,
   loadingSample,
-  onReplayWelcome,
+  onReplayIntro,
 }) => {
   const mainNav = [
     {
@@ -310,12 +310,12 @@ export const Sidebar: React.FC<SidebarProps> = ({
           )}
         </div>
 
-        {/* Replay Welcome Intro */}
-        {onReplayWelcome && (
+        {/* Replay Calm Sloth Intro */}
+        {onReplayIntro && (
           <div className="flex items-center justify-between text-xs px-1 text-slate-500 pt-1.5 border-t border-slate-100">
-            <span className="text-[11px] font-medium">Welcome Intro:</span>
+            <span className="text-[11px] font-medium">Calm Sloth Intro:</span>
             <button
-              onClick={onReplayWelcome}
+              onClick={onReplayIntro}
               className="text-[11px] font-bold text-indigo-600 hover:text-indigo-700 hover:underline inline-flex items-center gap-1"
             >
               <span>Play Intro ↺</span>
