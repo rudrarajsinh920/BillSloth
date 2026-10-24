@@ -15,6 +15,7 @@ import {
 } from 'lucide-react';
 import { DocumentItem, BillCategory } from '../types';
 import { StatusBadge, VerifiedBadge, SampleDataBadge, ExtractionTelemetryBadge } from './StatusBadge';
+import { getVendorColor } from './DashboardView';
 import { format, parseISO, differenceInDays } from 'date-fns';
 import { CSV_EXPORT_URL } from '../api/client';
 
@@ -312,6 +313,7 @@ export const DocumentsView: React.FC<DocumentsViewProps> = ({
           <div className="space-y-3 sm:hidden">
             {filteredDocuments.map((doc) => {
               const computed = doc.computed_status || doc.status;
+              const vendorStyle = getVendorColor(doc.vendor || '');
               return (
                 <div
                   key={doc.id}
@@ -321,7 +323,9 @@ export const DocumentsView: React.FC<DocumentsViewProps> = ({
                   {/* Top line: Avatar + Vendor + Status badge */}
                   <div className="flex items-center justify-between gap-2">
                     <div className="flex items-center gap-2.5 truncate">
-                      <div className="w-8 h-8 rounded-lg bg-navy-900 text-white font-bold text-xs flex items-center justify-center shrink-0">
+                      <div
+                        className={`w-8 h-8 rounded-xl font-bold text-xs flex items-center justify-center shrink-0 border ${vendorStyle.bg} ${vendorStyle.text} ${vendorStyle.border}`}
+                      >
                         {doc.vendor ? doc.vendor.charAt(0).toUpperCase() : 'B'}
                       </div>
                       <div className="truncate">
@@ -423,6 +427,7 @@ export const DocumentsView: React.FC<DocumentsViewProps> = ({
                 <tbody className="divide-y divide-slate-border">
                   {filteredDocuments.map((doc) => {
                     const computed = doc.computed_status || doc.status;
+                    const vendorStyle = getVendorColor(doc.vendor || '');
                     return (
                       <tr
                         key={doc.id}
@@ -436,20 +441,29 @@ export const DocumentsView: React.FC<DocumentsViewProps> = ({
 
                         {/* Vendor & Document */}
                         <td className="py-3 px-4">
-                          <div className="flex items-center gap-2 flex-wrap">
-                            <span className="font-bold text-navy-900 text-sm">
-                              {doc.vendor || '<Unknown Vendor>'}
-                            </span>
-                            {doc.is_sample === 1 && <SampleDataBadge />}
-                            <ExtractionTelemetryBadge
-                              method={doc.extraction_method}
-                              ocrConfidence={doc.ocr_confidence}
-                              size="xs"
-                            />
-                          </div>
-                          <div className="text-[11px] text-slate-muted font-mono truncate max-w-xs mt-0.5">
-                            {doc.invoice_number ? `#${doc.invoice_number} • ` : ''}
-                            {doc.original_name}
+                          <div className="flex items-center gap-3">
+                            <div
+                              className={`w-8 h-8 rounded-xl flex items-center justify-center font-bold text-xs shrink-0 border ${vendorStyle.bg} ${vendorStyle.text} ${vendorStyle.border}`}
+                            >
+                              {doc.vendor ? doc.vendor.charAt(0).toUpperCase() : 'B'}
+                            </div>
+                            <div>
+                              <div className="flex items-center gap-2 flex-wrap">
+                                <span className="font-bold text-navy-900 text-sm">
+                                  {doc.vendor || '<Unknown Vendor>'}
+                                </span>
+                                {doc.is_sample === 1 && <SampleDataBadge />}
+                                <ExtractionTelemetryBadge
+                                  method={doc.extraction_method}
+                                  ocrConfidence={doc.ocr_confidence}
+                                  size="xs"
+                                />
+                              </div>
+                              <div className="text-[11px] text-slate-muted font-mono truncate max-w-xs mt-0.5">
+                                {doc.invoice_number ? `#${doc.invoice_number} • ` : ''}
+                                {doc.original_name}
+                              </div>
+                            </div>
                           </div>
                         </td>
 

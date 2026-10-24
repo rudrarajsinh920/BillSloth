@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
-import { Navbar, NavTab } from './components/Navbar';
+import { Sidebar, NavTab } from './components/Sidebar';
+import { TopHeader } from './components/TopHeader';
 import { DashboardView } from './components/DashboardView';
 import { DocumentsView } from './components/DocumentsView';
 import { CalendarView } from './components/CalendarView';
@@ -30,6 +31,7 @@ export function App() {
   const [ollamaStatus, setOllamaStatus] = useState<OllamaStatus | null>(null);
   const [isOllamaModalOpen, setIsOllamaModalOpen] = useState(false);
   const [isAskModalOpen, setIsAskModalOpen] = useState(false);
+  const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
 
   // Review Modal State
   const [reviewDocId, setReviewDocId] = useState<string | null>(null);
@@ -65,6 +67,18 @@ export function App() {
   useEffect(() => {
     refreshAll();
   }, [refreshAll]);
+
+  // Global keyboard shortcut: Cmd+K or Ctrl+K to open AI Assistant
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+        e.preventDefault();
+        setIsAskModalOpen((prev) => !prev);
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, []);
 
   // Open review for a document
   const handleOpenReview = (doc: DocumentItem) => {
@@ -110,7 +124,7 @@ export function App() {
         action_type: 'calendar_ics',
       });
       await refreshAll();
-      showToast(`Reminder prepared for human approval! View in Reminders tab.`);
+      showToast(`Reminder prepared for human approval! View in Reminders.`);
       setActiveTab('reminders');
     } catch (err: unknown) {
       alert(`Error preparing reminder: ${err instanceof Error ? err.message : String(err)}`);
@@ -151,11 +165,13 @@ export function App() {
   ).length;
 
   return (
-    <div className="min-h-screen flex flex-col bg-cool-bg text-navy-900 font-sans">
-      {/* Top Navigation */}
-      <Navbar
+    <div className="min-h-screen flex bg-cool-bg text-navy-900 font-sans antialiased">
+      {/* Left Navigation Sidebar (FinCore & MySign style) */}
+      <Sidebar
         activeTab={activeTab}
         onTabChange={setActiveTab}
+        isOpenMobile={isMobileSidebarOpen}
+        onCloseMobile={() => setIsMobileSidebarOpen(false)}
         ollamaStatus={ollamaStatus}
         onOpenOllamaModal={() => setIsOllamaModalOpen(true)}
         onOpenAskModal={() => setIsAskModalOpen(true)}
@@ -167,100 +183,113 @@ export function App() {
         loadingSample={loadingSample}
       />
 
-      {/* Main Page Container */}
-      <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {loading ? (
-          <div className="py-24 text-center text-slate-muted text-xs">
-            <div className="w-8 h-8 border-2 border-brand-blue border-t-transparent rounded-full animate-spin mx-auto mb-3" />
-            <p className="font-semibold text-navy-900 text-sm">Opening Local Financial Ledger...</p>
-            <p className="mt-1">Connecting to SQLite and verifying local models.</p>
+      {/* Main Canvas Area */}
+      <div className="flex-1 flex flex-col min-w-0 min-h-screen">
+        {/* Top Header */}
+        <TopHeader
+          activeTab={activeTab}
+          onOpenMobileSidebar={() => setIsMobileSidebarOpen(true)}
+          onOpenAskModal={() => setIsAskModalOpen(true)}
+          onNavigateToImport={() => setActiveTab('import')}
+          onNavigateToReminders={() => setActiveTab('reminders')}
+          pendingRemindersCount={pendingRemindersCount}
+        />
+
+        {/* Content Body */}
+        <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
+          {loading ? (
+            <div className="py-24 text-center text-slate-muted text-xs">
+              <div className="w-8 h-8 border-2 border-brand-blue border-t-transparent rounded-full animate-spin mx-auto mb-3" />
+              <p className="font-semibold text-navy-900 text-sm">Opening Local Financial Ledger...</p>
+              <p className="mt-1">Connecting to SQLite and verifying local models.</p>
+            </div>
+          ) : (
+            <>
+              {activeTab === 'dashboard' && (
+                <DashboardView
+                  documents={documents}
+                  onOpenReview={handleOpenReview}
+                  onNavigate={setActiveTab}
+                  onQuickMarkPaid={handleQuickMarkPaid}
+                  onPrepareReminder={handlePrepareReminder}
+                  onOpenOllamaModal={() => setIsOllamaModalOpen(true)}
+                  ollamaAvailable={!!ollamaStatus?.available}
+                />
+              )}
+
+              {activeTab === 'documents' && (
+                <DocumentsView
+                  documents={documents}
+                  onOpenReview={handleOpenReview}
+                  onQuickMarkPaid={handleQuickMarkPaid}
+                  onPrepareReminder={handlePrepareReminder}
+                  onDeleteDocument={handleDocumentDeleted}
+                  onNavigateToImport={() => setActiveTab('import')}
+                />
+              )}
+
+              {activeTab === 'calendar' && (
+                <CalendarView
+                  documents={documents}
+                  onOpenReview={handleOpenReview}
+                  onQuickMarkPaid={handleQuickMarkPaid}
+                  onPrepareReminder={handlePrepareReminder}
+                />
+              )}
+
+              {activeTab === 'import' && (
+                <ImportView
+                  onDocumentImported={(newDoc) => {
+                    setDocuments((prev) => [newDoc, ...prev]);
+                    showToast(`Imported ${newDoc.original_name} to local vault.`);
+                  }}
+                  onOpenReview={handleOpenReview}
+                  ollamaAvailable={!!ollamaStatus?.available}
+                  onOpenOllamaModal={() => setIsOllamaModalOpen(true)}
+                />
+              )}
+
+              {activeTab === 'reminders' && (
+                <RemindersView
+                  reminders={reminders}
+                  documents={documents}
+                  onRefresh={refreshAll}
+                  onOpenReview={handleOpenReview}
+                />
+              )}
+
+              {activeTab === 'digest' && (
+                <WeeklyDigestView
+                  onOpenReview={handleOpenReview}
+                  onNavigate={setActiveTab}
+                />
+              )}
+
+              {activeTab === 'audit' && <AuditLogView />}
+            </>
+          )}
+        </main>
+
+        {/* Minimalist Professional Footer */}
+        <footer className="bg-white border-t border-slate-border py-4 px-6 text-xs text-slate-muted mt-auto">
+          <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-3">
+            <div className="flex items-center gap-2">
+              <span className="font-bold text-navy-900">🦥 BillSloth</span>
+              <span className="text-slate-300">•</span>
+              <span className="text-slate-500">Local-First Financial Intelligence</span>
+            </div>
+            <div className="flex items-center gap-3 text-[11px] text-slate-400">
+              <span>100% Air-Gapped Privacy</span>
+              <span className="text-slate-300">•</span>
+              <span>Zero Cloud AI</span>
+              <span className="text-slate-300">•</span>
+              <span>On-Device Gemma 2B</span>
+            </div>
           </div>
-        ) : (
-          <>
-            {activeTab === 'dashboard' && (
-              <DashboardView
-                documents={documents}
-                onOpenReview={handleOpenReview}
-                onNavigate={setActiveTab}
-                onQuickMarkPaid={handleQuickMarkPaid}
-                onPrepareReminder={handlePrepareReminder}
-                onOpenOllamaModal={() => setIsOllamaModalOpen(true)}
-                ollamaAvailable={!!ollamaStatus?.available}
-              />
-            )}
+        </footer>
+      </div>
 
-            {activeTab === 'documents' && (
-              <DocumentsView
-                documents={documents}
-                onOpenReview={handleOpenReview}
-                onQuickMarkPaid={handleQuickMarkPaid}
-                onPrepareReminder={handlePrepareReminder}
-                onDeleteDocument={handleDocumentDeleted}
-                onNavigateToImport={() => setActiveTab('import')}
-              />
-            )}
-
-            {activeTab === 'calendar' && (
-              <CalendarView
-                documents={documents}
-                onOpenReview={handleOpenReview}
-                onQuickMarkPaid={handleQuickMarkPaid}
-                onPrepareReminder={handlePrepareReminder}
-              />
-            )}
-
-            {activeTab === 'import' && (
-              <ImportView
-                onDocumentImported={(newDoc) => {
-                  setDocuments((prev) => [newDoc, ...prev]);
-                  showToast(`Imported ${newDoc.original_name} to local vault.`);
-                }}
-                onOpenReview={handleOpenReview}
-                ollamaAvailable={!!ollamaStatus?.available}
-                onOpenOllamaModal={() => setIsOllamaModalOpen(true)}
-              />
-            )}
-
-            {activeTab === 'reminders' && (
-              <RemindersView
-                reminders={reminders}
-                documents={documents}
-                onRefresh={refreshAll}
-                onOpenReview={handleOpenReview}
-              />
-            )}
-
-            {activeTab === 'digest' && (
-              <WeeklyDigestView
-                onOpenReview={handleOpenReview}
-                onNavigate={setActiveTab}
-              />
-            )}
-
-            {activeTab === 'audit' && <AuditLogView />}
-          </>
-        )}
-      </main>
-
-      {/* Footer */}
-      <footer className="bg-white border-t border-slate-border py-5 px-4 text-xs text-slate-muted">
-        <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-3">
-          <div className="flex items-center gap-2">
-            <span className="font-bold text-navy-900">🦥 BillSloth</span>
-            <span className="text-slate-400">•</span>
-            <span className="text-slate-500">Calm on-device financial productivity</span>
-          </div>
-          <div className="flex items-center gap-3 text-[11px] text-slate-500">
-            <span>100% Local Privacy</span>
-            <span className="text-slate-300">•</span>
-            <span>Zero Cloud Transmission</span>
-            <span className="text-slate-300">•</span>
-            <span>Documents Stored On-Device</span>
-          </div>
-        </div>
-      </footer>
-
-      {/* Document Review Modal */}
+      {/* Document Review Modal (Side-by-Side split view) */}
       <ReviewModal
         documentId={reviewDocId}
         isOpen={isReviewModalOpen}
