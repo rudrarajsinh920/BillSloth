@@ -242,19 +242,20 @@ export function App() {
         )}
       </main>
 
-      {/* Footer with Hacktoberfest metadata and Data Safety reminders */}
-      <footer className="bg-white border-t border-slate-border py-6 px-4 text-xs text-slate-muted">
+      {/* Footer */}
+      <footer className="bg-white border-t border-slate-border py-5 px-4 text-xs text-slate-muted">
         <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-3">
           <div className="flex items-center gap-2">
             <span className="font-bold text-navy-900">🦥 BillSloth</span>
-            <span>• Local-First Financial Productivity</span>
+            <span className="text-slate-400">•</span>
+            <span className="text-slate-500">Calm on-device financial productivity</span>
           </div>
-          <div className="flex items-center gap-4 text-[11px]">
-            <span>Hacktoberfest Week 3 "Slow and Steady"</span>
-            <span>•</span>
-            <span>No Cloud Transmission</span>
-            <span>•</span>
-            <span>Original Documents Retained Locally</span>
+          <div className="flex items-center gap-3 text-[11px] text-slate-500">
+            <span>100% Local Privacy</span>
+            <span className="text-slate-300">•</span>
+            <span>Zero Cloud Transmission</span>
+            <span className="text-slate-300">•</span>
+            <span>Documents Stored On-Device</span>
           </div>
         </div>
       </footer>

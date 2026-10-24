@@ -8,7 +8,6 @@ import {
   CalendarCheck2,
   History,
   ShieldCheck,
-  Cpu,
   Sparkles,
   Trash2,
   Bot,
@@ -60,7 +59,6 @@ export const Navbar: React.FC<NavbarProps> = ({
       badgeColor: 'bg-amber-warn text-white',
     },
     { id: 'calendar', label: 'Calendar', icon: Calendar },
-    { id: 'import', label: 'Import Bill', icon: UploadCloud },
     {
       id: 'reminders',
       label: 'Reminders',
@@ -73,50 +71,35 @@ export const Navbar: React.FC<NavbarProps> = ({
   ];
 
   return (
-    <header className="sticky top-0 z-40 bg-white border-b border-slate-border shadow-sm">
-      {/* Top Banner with Product Promise and Privacy Guarantee */}
-      <div className="bg-navy-900 text-slate-300 text-[11px] px-4 py-1.5 flex items-center justify-between">
-        <div className="flex items-center gap-3">
-          <span className="font-semibold text-white tracking-wide">HACKTOBERFEST WEEK 3 — "SLOW AND STEADY"</span>
-          <span className="text-slate-500 hidden sm:inline">•</span>
-          <span className="text-slate-300 hidden sm:inline">"Stop chasing bills. Know what needs attention."</span>
-        </div>
-        <div className="flex items-center gap-4">
-          <div className="flex items-center gap-1.5 text-emerald-400 font-medium">
-            <ShieldCheck className="w-3.5 h-3.5" />
-            <span>100% Local-First Privacy (Zero Cloud AI)</span>
-          </div>
-        </div>
-      </div>
-
-      {/* Main Navbar */}
+    <header className="sticky top-0 z-40 bg-white border-b border-slate-border shadow-xs">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-16">
-          {/* Logo */}
-          <div className="flex items-center gap-3">
+        <div className="flex items-center justify-between h-16 gap-3">
+          {/* Logo & Brand Identity */}
+          <div className="flex items-center gap-3 shrink-0">
             <button
               onClick={() => onTabChange('dashboard')}
               className="flex items-center gap-2.5 text-left group focus:outline-none"
             >
-              <div className="w-9 h-9 rounded-lg bg-navy-900 flex items-center justify-center text-white font-bold text-lg shadow-sm group-hover:bg-brand-blue transition-colors">
+              <div className="w-9 h-9 rounded-xl bg-navy-900 flex items-center justify-center text-white font-bold text-lg shadow-sm group-hover:bg-brand-blue transition-colors">
                 <span>🦥</span>
               </div>
               <div>
                 <div className="flex items-center gap-1.5">
                   <span className="font-bold text-base text-navy-900 tracking-tight">BillSloth</span>
-                  <span className="text-[10px] uppercase font-bold tracking-wider px-1.5 py-0.2 rounded bg-brand-blue-light text-brand-blue">
-                    Local
+                  <span className="text-[10px] font-semibold px-1.5 py-0.2 rounded-md bg-emerald-50 text-emerald-700 border border-emerald-200/60 inline-flex items-center gap-1">
+                    <ShieldCheck className="w-3 h-3 text-emerald-600" />
+                    <span>Local</span>
                   </span>
                 </div>
-                <p className="text-[11px] text-slate-muted hidden md:block">
-                  Calm, human-in-the-loop bill tracker
+                <p className="text-[11px] text-slate-muted hidden lg:block leading-none mt-0.5">
+                  Private on-device bill tracker
                 </p>
               </div>
             </button>
           </div>
 
-          {/* Navigation Items */}
-          <nav className="flex items-center gap-1">
+          {/* Navigation Items (Centered, sleek SaaS styling matching Reference Images 2 & 3) */}
+          <nav className="flex items-center gap-1 overflow-x-auto py-1 scrollbar-none">
             {tabs.map((tab) => {
               const Icon = tab.icon;
               const isActive = activeTab === tab.id;
@@ -126,18 +109,18 @@ export const Navbar: React.FC<NavbarProps> = ({
                   onClick={() => onTabChange(tab.id as NavTab)}
                   title={tab.label}
                   aria-label={tab.label}
-                  className={`relative px-2.5 sm:px-3 py-2 rounded-lg text-xs font-medium flex items-center gap-1.5 sm:gap-2 transition-all focus-visible:ring-2 focus-visible:ring-brand-blue focus-visible:outline-none ${
+                  className={`relative px-2.5 sm:px-3 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition-all whitespace-nowrap focus-visible:ring-2 focus-visible:ring-brand-blue focus-visible:outline-none ${
                     isActive
-                      ? 'bg-brand-blue text-white shadow-sm'
-                      : 'text-navy-700 hover:text-navy-900 hover:bg-slate-light'
+                      ? 'bg-navy-900 text-white shadow-xs'
+                      : 'text-slate-600 hover:text-navy-900 hover:bg-slate-100'
                   }`}
                 >
-                  <Icon className={`w-4 h-4 shrink-0 ${isActive ? 'text-white' : 'text-slate-muted'}`} />
+                  <Icon className={`w-3.5 h-3.5 shrink-0 ${isActive ? 'text-white' : 'text-slate-400'}`} />
                   <span className="hidden md:inline">{tab.label}</span>
                   {tab.badge !== undefined && (
                     <span
-                      className={`ml-1 text-[10px] font-bold px-1.5 py-0.2 rounded-full font-mono tabular-nums ${
-                        isActive ? 'bg-white text-brand-blue' : tab.badgeColor
+                      className={`ml-0.5 text-[10px] font-bold px-1.5 py-0.2 rounded-full font-mono tabular-nums ${
+                        isActive ? 'bg-white text-navy-900' : tab.badgeColor
                       }`}
                     >
                       {tab.badge}
@@ -148,57 +131,72 @@ export const Navbar: React.FC<NavbarProps> = ({
             })}
           </nav>
 
-          {/* Right Status Actions */}
-          <div className="flex items-center gap-2.5">
-            {/* Ask AI Natural Language Assistant */}
+          {/* Right Status & Primary Action Controls */}
+          <div className="flex items-center gap-2 shrink-0">
+            {/* Ask AI Pill Button (Prominent, polished SaaS search-style trigger) */}
             <button
               onClick={onOpenAskModal}
-              title="Ask BillSloth Assistant powered by local Gemma 2 2B"
-              className="px-2.5 py-1.5 rounded-lg border border-brand-blue/30 bg-brand-blue-light text-brand-blue hover:bg-brand-blue hover:text-white text-xs font-semibold flex items-center gap-1.5 transition-colors shadow-sm focus-visible:ring-2 focus-visible:ring-brand-blue"
+              title="Ask BillSloth Assistant powered by local Gemma 2 2B (Cmd+K)"
+              className="flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-3 py-1.5 rounded-full bg-slate-100 hover:bg-slate-200/80 text-navy-800 text-xs font-semibold border border-slate-200 transition-all shadow-xs group focus-visible:ring-2 focus-visible:ring-brand-blue"
             >
-              <Bot className="w-3.5 h-3.5 text-brand-blue group-hover:text-white" />
-              <span className="hidden sm:inline">Ask AI</span>
+              <Sparkles className="w-3.5 h-3.5 text-brand-blue group-hover:scale-110 transition-transform" />
+              <span>Ask AI</span>
+              <kbd className="hidden sm:inline-block px-1.5 py-0.2 text-[9px] font-mono font-medium text-slate-500 bg-white rounded border border-slate-200 shadow-2xs">
+                ⌘K
+              </kbd>
             </button>
 
-            {/* Ollama Status Button */}
+            {/* Local AI Engine Status (Understated, calm, elegant status badge) */}
             <button
               onClick={onOpenOllamaModal}
-              title="Click to view local Ollama AI status and available models"
-              className={`px-2.5 py-1.5 rounded-lg border text-xs font-medium flex items-center gap-2 transition-colors ${
+              title={
                 ollamaStatus?.available
-                  ? 'border-green-paid-border bg-green-paid-light text-green-paid hover:bg-green-100'
-                  : 'border-amber-warn-border bg-amber-warn-light text-amber-warn hover:bg-amber-100'
+                  ? `Local AI Online: ${ollamaStatus.activeModel || 'Gemma 2B'} connected at ${ollamaStatus.url}`
+                  : 'Local AI on Standby. Click to inspect or connect local Ollama runtime.'
+              }
+              className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-full border text-xs font-medium transition-colors focus-visible:ring-2 focus-visible:ring-brand-blue ${
+                ollamaStatus?.available
+                  ? 'border-emerald-200 bg-emerald-50/80 text-emerald-800 hover:bg-emerald-100'
+                  : 'border-slate-200 bg-slate-50 text-slate-600 hover:bg-slate-100'
               }`}
             >
-              <Cpu className="w-3.5 h-3.5" />
-              <span className="hidden lg:inline">
-                {ollamaStatus?.available
-                  ? `Ollama: ${ollamaStatus.activeModel || 'Ready'}`
-                  : 'Ollama: Offline'}
+              <span
+                className={`w-2 h-2 rounded-full shrink-0 ${
+                  ollamaStatus?.available ? 'bg-emerald-500 animate-pulse' : 'bg-slate-400'
+                }`}
+              />
+              <span className="text-[11px] font-semibold hidden xl:inline">
+                {ollamaStatus?.available ? 'Local AI: Ready' : 'Local AI: Standby'}
               </span>
-              <span className="w-2 h-2 rounded-full bg-current animate-pulse" />
             </button>
 
-            {/* Sample Data Toggle */}
+            {/* Primary Action: Import Bill (Matching Reference Image 2 & 3 CTA) */}
+            <button
+              onClick={() => onTabChange('import')}
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-brand-blue hover:bg-brand-blue-hover text-white text-xs font-semibold shadow-xs transition-colors focus-visible:ring-2 focus-visible:ring-brand-blue"
+            >
+              <UploadCloud className="w-3.5 h-3.5" />
+              <span className="hidden sm:inline">Import Bill</span>
+            </button>
+
+            {/* Sample Data Toggle (Discreet icon button) */}
             {hasSampleData ? (
               <button
                 onClick={onClearSample}
                 disabled={loadingSample}
-                title="Clear all illustrative sample bills"
-                className="px-2.5 py-1.5 rounded-lg border border-slate-border bg-white hover:bg-red-50 hover:text-red-overdue text-slate-muted text-xs font-medium flex items-center gap-1.5 transition-colors disabled:opacity-50"
+                title="Clear illustrative sample data"
+                className="p-1.5 rounded-lg border border-slate-200 bg-white hover:bg-red-50 text-slate-400 hover:text-red-600 transition-colors disabled:opacity-50"
               >
                 <Trash2 className="w-3.5 h-3.5" />
-                <span className="hidden xl:inline">Clear Sample Data</span>
               </button>
             ) : (
               <button
                 onClick={onLoadSample}
                 disabled={loadingSample}
                 title="Load realistic sample bills for testing"
-                className="px-2.5 py-1.5 rounded-lg border border-slate-border bg-white hover:bg-slate-50 text-navy-800 text-xs font-medium flex items-center gap-1.5 transition-colors disabled:opacity-50"
+                className="p-1.5 rounded-lg border border-slate-200 bg-white hover:bg-slate-50 text-slate-500 hover:text-navy-900 transition-colors disabled:opacity-50"
               >
-                <Sparkles className="w-3.5 h-3.5 text-amber-warn" />
-                <span className="hidden xl:inline">Load Sample Data</span>
+                <Bot className="w-3.5 h-3.5 text-amber-warn" />
               </button>
             )}
           </div>

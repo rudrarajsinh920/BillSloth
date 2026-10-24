@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Sparkles, X, Send, Bot, User, AlertTriangle } from 'lucide-react';
+import { Sparkles, X, Send, Bot, User } from 'lucide-react';
 import { askAiAssistant } from '../api/client';
 
 interface AskAssistantModalProps {
@@ -136,18 +136,18 @@ export const AskAssistantModal: React.FC<AskAssistantModalProps> = ({
           </button>
         </div>
 
-        {/* Offline notice if Ollama is not running */}
+        {/* Preview notice if Ollama is on standby */}
         {!ollamaAvailable && (
-          <div className="px-6 py-2.5 bg-amber-warn-light border-b border-amber-warn-border flex items-center justify-between text-xs text-amber-warn shrink-0">
+          <div className="px-6 py-2 bg-slate-50 border-b border-slate-200 flex items-center justify-between text-xs text-slate-600 shrink-0">
             <div className="flex items-center gap-2">
-              <AlertTriangle className="w-4 h-4 shrink-0" />
-              <span>Ollama is currently offline. Start Ollama locally to enable answers.</span>
+              <Bot className="w-4 h-4 text-brand-blue shrink-0" />
+              <span>Preview Mode: Ledger queries active. Run Ollama locally for live on-device LLM inference.</span>
             </div>
             <button
               onClick={onOpenOllamaModal}
-              className="font-bold underline hover:text-amber-800"
+              className="font-semibold text-brand-blue hover:underline"
             >
-              Setup Instructions
+              Connect Guide →
             </button>
           </div>
         )}

@@ -10,7 +10,6 @@ import {
   ArrowRight,
   DollarSign,
   FileText,
-  AlertTriangle,
   ShieldCheck,
   Cpu,
   Layers,
@@ -186,21 +185,23 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
         </div>
       </div>
 
-      {/* Ollama Disconnected Warning Pill (if offline) */}
+      {/* Local AI Engine Notice (Calm, informative preview indicator) */}
       {!ollamaAvailable && (
-        <div className="bg-amber-warn-light/80 border border-amber-warn-border rounded-xl p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs text-navy-800">
+        <div className="bg-slate-50 border border-slate-200 rounded-xl p-3.5 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs text-navy-800">
           <div className="flex items-start sm:items-center gap-2.5">
-            <AlertTriangle className="w-4 h-4 text-amber-warn shrink-0 mt-0.5 sm:mt-0" />
+            <Cpu className="w-4 h-4 text-brand-blue shrink-0 mt-0.5 sm:mt-0" />
             <div>
-              <span className="font-semibold text-amber-warn">Local Ollama is offline.</span>{' '}
-              Manual bill organization is fully active. You can run Ollama locally anytime to enable AI field extraction.
+              <span className="font-semibold text-navy-900">Local AI Engine on Standby.</span>{' '}
+              <span className="text-slate-600">
+                All ledger management, categorization, and calculations are active. Connect your local Ollama runtime to enable Gemma 2 2B document extraction.
+              </span>
             </div>
           </div>
           <button
             onClick={onOpenOllamaModal}
-            className="text-xs font-semibold text-amber-warn hover:underline underline-offset-2 shrink-0 self-start sm:self-auto"
+            className="text-xs font-semibold text-brand-blue hover:text-brand-blue-hover hover:underline underline-offset-2 shrink-0 self-start sm:self-auto"
           >
-            View Setup Instructions →
+            Connection Guide →
           </button>
         </div>
       )}
