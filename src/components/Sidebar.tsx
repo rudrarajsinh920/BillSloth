@@ -32,6 +32,7 @@ interface SidebarProps {
   onLoadSample: () => void;
   onClearSample: () => void;
   loadingSample: boolean;
+  onReplayWelcome?: () => void;
 }
 
 export const Sidebar: React.FC<SidebarProps> = ({
@@ -48,6 +49,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
   onLoadSample,
   onClearSample,
   loadingSample,
+  onReplayWelcome,
 }) => {
   const mainNav = [
     {
@@ -307,6 +309,19 @@ export const Sidebar: React.FC<SidebarProps> = ({
             </button>
           )}
         </div>
+
+        {/* Replay Welcome Intro */}
+        {onReplayWelcome && (
+          <div className="flex items-center justify-between text-xs px-1 text-slate-500 pt-1.5 border-t border-slate-100">
+            <span className="text-[11px] font-medium">Welcome Intro:</span>
+            <button
+              onClick={onReplayWelcome}
+              className="text-[11px] font-bold text-indigo-600 hover:text-indigo-700 hover:underline inline-flex items-center gap-1"
+            >
+              <span>Play Intro ↺</span>
+            </button>
+          </div>
+        )}
       </div>
     </div>
   );

@@ -11,6 +11,7 @@ import { AuditLogView } from './components/AuditLogView';
 import { ReviewModal } from './components/ReviewModal';
 import { OllamaModal } from './components/OllamaModal';
 import { AskAssistantModal } from './components/AskAssistantModal';
+import { WelcomeOverlay } from './components/WelcomeOverlay';
 import { DocumentItem, ReminderItem, OllamaStatus } from './types';
 import {
   fetchDocuments,
@@ -41,6 +42,24 @@ export function App() {
   const [loading, setLoading] = useState(true);
   const [loadingSample, setLoadingSample] = useState(false);
   const [toast, setToast] = useState<{ message: string; type: 'success' | 'info' } | null>(null);
+
+  // Welcome Intro Overlay State (first-visit detection)
+  const [showWelcome, setShowWelcome] = useState<boolean>(() => {
+    try {
+      return !localStorage.getItem('billsloth_welcome_dismissed');
+    } catch {
+      return false;
+    }
+  });
+
+  const handleDismissWelcome = () => {
+    setShowWelcome(false);
+    try {
+      localStorage.setItem('billsloth_welcome_dismissed', 'true');
+    } catch {
+      // Ignore storage errors in restricted contexts
+    }
+  };
 
   const showToast = (message: string, type: 'success' | 'info' = 'success') => {
     setToast({ message, type });
@@ -181,6 +200,7 @@ export function App() {
         onLoadSample={handleLoadSample}
         onClearSample={handleClearSample}
         loadingSample={loadingSample}
+        onReplayWelcome={() => setShowWelcome(true)}
       />
 
       {/* Main Canvas Area */}
@@ -326,6 +346,12 @@ export function App() {
           setIsAskModalOpen(false);
           setIsOllamaModalOpen(true);
         }}
+      />
+
+      {/* First-Visit Premium Welcome Intro Overlay */}
+      <WelcomeOverlay
+        isOpen={showWelcome}
+        onDismiss={handleDismissWelcome}
       />
 
       {/* Toast Notification */}
