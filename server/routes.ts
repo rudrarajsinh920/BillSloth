@@ -4,6 +4,7 @@ import path from 'path';
 import { db, logAudit, UPLOADS_DIR } from './db.js';
 import { checkOllamaStatus, extractWithLocalOllama, askBillSlothAssistant } from './ollama.js';
 import { seedSampleData, clearSampleData } from './sampleData.js';
+import { answerLedgerQuestion, LedgerBill } from '../src/api/ledgerAssistant.js';
 import { format, isPast, isToday, differenceInDays } from 'date-fns';
 
 const router = Router();
@@ -830,41 +831,55 @@ router.post('/ai/ask', async (req: Request, res: Response) => {
       return res.status(400).json({ success: false, error: 'Query prompt is required' });
     }
 
-    // Build compact factual ledger summary for the local model (prioritize active/unsettled bills)
-    const docs = db.prepare(`
-      SELECT id, vendor, invoice_number, amount, currency, due_date, status, category, is_verified 
+    // Fetch real documents from the SQLite database
+    const rows = db.prepare(`
+      SELECT id, vendor, invoice_number, amount, currency, issue_date, due_date, status, category, is_verified, payment_reference, notes, original_name
       FROM documents 
-      ORDER BY CASE WHEN status = 'paid' THEN 2 ELSE 1 END, due_date ASC 
-      LIMIT 25
-    `).all() as Array<{
-      id: string;
-      vendor: string | null;
-      invoice_number: string | null;
-      amount: number | null;
-      currency: string;
-      due_date: string | null;
-      status: string;
-      category: string;
-      is_verified: number;
-    }>;
+      ORDER BY due_date ASC, created_at DESC
+    `).all() as unknown as DocumentRow[];
 
-    const summaryRows = docs.map((d) =>
-      `- Vendor: ${d.vendor || 'Unknown'}, Amount: ${d.amount || 0} ${d.currency}, Due: ${d.due_date || 'No Date'}, Status: ${d.status}, Category: ${d.category}, Verified: ${d.is_verified === 1 ? 'Yes' : 'No'}`
-    );
+    const enrichedBills: LedgerBill[] = rows.map((doc: DocumentRow) => ({
+      id: doc.id,
+      vendor: doc.vendor,
+      invoice_number: doc.invoice_number,
+      amount: doc.amount,
+      currency: doc.currency || 'USD',
+      issue_date: doc.issue_date,
+      due_date: doc.due_date,
+      status: doc.status,
+      computed_status: computeStatus(doc.status, doc.due_date, doc.is_verified),
+      category: doc.category || 'Other',
+      is_verified: doc.is_verified,
+      payment_reference: doc.payment_reference,
+      notes: doc.notes,
+      original_name: doc.original_name,
+    }));
 
-    const contextText = summaryRows.join('\n') || 'No bills currently recorded in the database.';
+    // Compute deterministic, intent-aware ledger answer
+    const ledgerResult = answerLedgerQuestion(query.trim(), enrichedBills);
 
-    const result = await askBillSlothAssistant(query.trim(), contextText);
-    if (!result.success) {
-      return res.status(503).json({ success: false, error: result.error });
+    // If query is an open-ended generative request (like drafting an email) and Ollama is online,
+    // we can enrich with Ollama generation; otherwise, ledgerResult is 100% accurate and immediate!
+    const ollamaStatus = await checkOllamaStatus();
+    let finalAnswer = ledgerResult.answer;
+
+    if (ollamaStatus.available && ledgerResult.intent === 'draft_email') {
+      const summaryRows = enrichedBills.map((d) =>
+        `- Vendor: ${d.vendor || 'Unknown'}, Amount: ${d.amount || 0} ${d.currency}, Due: ${d.due_date || 'No Date'}, Status: ${d.computed_status}, Category: ${d.category}`
+      );
+      const contextText = summaryRows.join('\n') || 'No bills recorded.';
+      const aiResult = await askBillSlothAssistant(query.trim(), contextText);
+      if (aiResult.success && aiResult.answer) {
+        finalAnswer = aiResult.answer;
+      }
     }
 
-    logAudit('AI_ASSISTANT_QUERY', null, { query: query.trim(), model: result.model });
+    logAudit('AI_ASSISTANT_QUERY', null, { query: query.trim(), intent: ledgerResult.intent });
 
     res.json({
       success: true,
-      answer: result.answer,
-      model: result.model,
+      answer: finalAnswer,
+      intent: ledgerResult.intent,
     });
   } catch (err: unknown) {
     const msg = err instanceof Error ? err.message : String(err);

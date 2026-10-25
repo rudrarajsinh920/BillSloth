@@ -9,7 +9,6 @@ import {
   Zap,
 } from 'lucide-react';
 import { NavTab } from './Sidebar';
-import { getActiveAiEngine, getGeminiApiKey } from '../api/gemini';
 
 interface TopHeaderProps {
   activeTab: NavTab;
@@ -105,41 +104,31 @@ export const TopHeader: React.FC<TopHeaderProps> = ({
             className="hidden md:flex items-center gap-2.5 px-3.5 py-1.5 rounded-xl bg-[#162238] hover:bg-[#1C2B46] border border-[#29374D] text-[#A8B7CC] text-xs w-48 lg:w-64 transition-all hover:border-[#22D3EE]/50 hover:text-[#F8FAFC] group focus:outline-none"
           >
             <Search className="w-3.5 h-3.5 text-[#A8B7CC] group-hover:text-[#22D3EE] transition-colors shrink-0" />
-            <span className="flex-1 text-left truncate font-medium">Ask AI or search ledger...</span>
+            <span className="flex-1 text-left truncate font-medium">Ask BillSloth or search ledger...</span>
             <kbd className="px-1.5 py-0.5 rounded-md bg-[#0B1220] text-[9px] font-mono text-[#A8B7CC] border border-[#29374D] shrink-0 font-bold">
               ⌘K
             </kbd>
           </button>
 
-          {/* Ask AI Pill Button */}
+          {/* Ask BillSloth Pill Button */}
           <button
             onClick={onOpenAskModal}
             className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-[#162238] hover:bg-[#1C2B46] text-[#22D3EE] border border-[#29374D] hover:border-[#22D3EE]/50 text-xs font-bold transition-all hover:scale-105 active:scale-95"
             title="Ask BillSloth Assistant"
           >
             <Sparkles className="w-3.5 h-3.5 text-[#22D3EE] animate-pulse-glow" />
-            <span className="hidden sm:inline">Ask AI</span>
+            <span className="hidden sm:inline">Ask BillSloth</span>
           </button>
 
-          {/* AI Engine Status & Key Config Pill */}
-          {(() => {
-            const engine = getActiveAiEngine();
-            const hasGemini = Boolean(getGeminiApiKey());
-            return (
-              <button
-                onClick={onOpenAiSettings || onOpenAskModal}
-                className={`hidden lg:flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl border text-xs font-semibold transition-all hover:scale-105 ${
-                  engine === 'gemini' && hasGemini
-                    ? 'bg-[#22D3EE]/15 border-[#22D3EE]/40 text-[#22D3EE]'
-                    : 'bg-[#162238] border-[#29374D] hover:border-[#22D3EE]/50 text-[#A8B7CC] hover:text-[#F8FAFC]'
-                }`}
-                title="AI Engine Settings (Gemini Flash Cloud or Local Ollama)"
-              >
-                <Zap className={`w-3.5 h-3.5 ${engine === 'gemini' && hasGemini ? 'text-[#22D3EE]' : 'text-[#A8B7CC]'}`} />
-                <span>{engine === 'gemini' && hasGemini ? 'Gemini Active' : 'AI Engine'}</span>
-              </button>
-            );
-          })()}
+          {/* Assistant Settings Button */}
+          <button
+            onClick={onOpenAiSettings || onOpenAskModal}
+            className="hidden lg:flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl border border-[#29374D] bg-[#162238] hover:bg-[#1C2B46] hover:border-[#22D3EE]/50 text-[#A8B7CC] hover:text-[#F8FAFC] text-xs font-semibold transition-all hover:scale-105"
+            title="Assistant Settings & Model Configuration"
+          >
+            <Zap className="w-3.5 h-3.5 text-[#A8B7CC]" />
+            <span>Settings</span>
+          </button>
 
           {/* Reminders / Notification Bell */}
           <button

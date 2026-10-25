@@ -17,6 +17,7 @@ import {
   getActiveAiEngine,
   getGeminiApiKey,
 } from './gemini';
+import { answerLedgerQuestion } from './ledgerAssistant';
 
 const API_BASE = '/api';
 
@@ -184,7 +185,7 @@ export async function extractDocumentFields(id: string, rawText?: string): Promi
         amount: geminiRes.fields.amount !== undefined ? geminiRes.fields.amount : baseDoc.amount || null,
         currency: geminiRes.fields.currency || baseDoc.currency || 'USD',
         due_date: geminiRes.fields.due_date || baseDoc.due_date || null,
-        category: (geminiRes.fields.category as any) || baseDoc.category || 'Other',
+        category: (geminiRes.fields.category as DocumentItem['category']) || baseDoc.category || 'Other',
         is_verified: 0,
         extraction_method: 'gemini-flash',
       };
@@ -377,284 +378,42 @@ export async function clearSampleData(): Promise<void> {
   }
 }
 
-function synthesizeAssistantResponse(query: string, docs: DocumentItem[]): string {
-  const q = query.toLowerCase().trim();
-
-  // 1. "How to work BillSloth" / "How does it work" / "Help" / "About"
-  if (
-    q.includes('how to work') ||
-    q.includes('how does') ||
-    q.includes('how billsloth') ||
-    q.includes('what is billsloth') ||
-    q.includes('workflow') ||
-    q.includes('features') ||
-    q.includes('how it works')
-  ) {
-    return [
-      `🦥 **How BillSloth Works — Slow and Steady Bill Management:**`,
-      ``,
-      `1. **Local-First Document Import**:`,
-      `   Drop any PDF, JPG, or PNG invoice. Your original files stay strictly in local storage (\`./data/uploads/\`). SHA-256 cryptographic hashing prevents duplicate uploads.`,
-      ``,
-      `2. **On-Device Text & AI Parsing**:`,
-      `   Local PDF parsers and Tesseract OCR read invoice text. When connected to local Ollama (\`ollama serve\`), an open-weight Gemma 2 2B model extracts amounts, dates, vendors, and line items without sending a single byte to cloud endpoints.`,
-      ``,
-      `3. **Human-in-the-Loop Approval Gate**:`,
-      `   BillSloth tags newly extracted bills as 'Unverified'. You review and approve the figures. The app never triggers automatic bank debits or sends unauthorized emails.`,
-      ``,
-      `4. **Cash Flow & Deadlines**:`,
-      `   View the 30-Day Cash Maturity Radar, Due Date Calendar, and export scheduled .ICS reminders for Google Calendar or Apple Calendar.`,
-      ``,
-      `5. **Immutable SQLite Audit Trail**:`,
-      `   Every extraction, status transition, and verified record is logged cryptographically to your on-device ledger.`,
-      ``,
-      `💡 *Tip: For full live LLM generation, run \`ollama run gemma2:2b\` and \`npm run dev\` on your local machine!*`,
-    ].join('\n');
-  }
-
-  // 2. Overdue bills
-  if (q.includes('overdue') || q.includes('past due') || q.includes('late')) {
-    const overdue = docs.filter(
-      (d) => (d.computed_status || d.status) === 'overdue'
-    );
-    const total = overdue.reduce((sum, d) => sum + (d.amount || 0), 0);
-    if (overdue.length === 0) {
-      return `Great news! You currently have zero overdue bills recorded in your ledger.`;
-    }
-    return [
-      `⚠️ **You have ${overdue.length} overdue ${overdue.length === 1 ? 'bill' : 'bills'} totaling $${total.toFixed(2)}:**`,
-      ``,
-      ...overdue.map(
-        (d) =>
-          `• **${d.vendor || d.original_name}**: $${(d.amount || 0).toFixed(2)} ${d.currency || 'USD'} (Due date was ${d.due_date || 'past'}, Invoice: ${d.invoice_number || 'N/A'})`
-      ),
-      ``,
-      `Action: Open **Bills & Invoices** or the **Due Date Calendar** to review and settle.`,
-    ].join('\n');
-  }
-
-  // 3. Due soon / next 7 days / upcoming
-  if (
-    q.includes('due soon') ||
-    q.includes('next 7 days') ||
-    q.includes('upcoming') ||
-    q.includes('this week')
-  ) {
-    const dueSoon = docs.filter(
-      (d) => (d.computed_status || d.status) === 'due_soon'
-    );
-    const total = dueSoon.reduce((sum, d) => sum + (d.amount || 0), 0);
-    if (dueSoon.length === 0) {
-      return `You have no bills scheduled due in the next 7 days.`;
-    }
-    return [
-      `📅 **Upcoming obligations due in the next 7 days (Total: $${total.toFixed(2)}):**`,
-      ``,
-      ...dueSoon.map(
-        (d) =>
-          `• **${d.vendor || d.original_name}**: $${(d.amount || 0).toFixed(2)} ${d.currency || 'USD'} — Due on ${d.due_date || 'N/A'} (Category: ${d.category || 'General'})`
-      ),
-      ``,
-      `Scheduled cash needed this week: **$${total.toFixed(2)}**.`,
-    ].join('\n');
-  }
-
-  // 4. Total balance / how much do I owe / outstanding
-  if (
-    q.includes('total') ||
-    q.includes('balance') ||
-    q.includes('owe') ||
-    q.includes('outstanding')
-  ) {
-    const unpaid = docs.filter((d) => (d.computed_status || d.status) !== 'paid');
-    const total = unpaid.reduce((sum, d) => sum + (d.amount || 0), 0);
-    const overdue = docs.filter((d) => (d.computed_status || d.status) === 'overdue');
-    const overdueTotal = overdue.reduce((sum, d) => sum + (d.amount || 0), 0);
-    const dueSoon = docs.filter((d) => (d.computed_status || d.status) === 'due_soon');
-    const dueSoonTotal = dueSoon.reduce((sum, d) => sum + (d.amount || 0), 0);
-
-    return [
-      `💰 **Total Outstanding Commitments:**`,
-      ``,
-      `Your total unpaid commitments across active bills is **$${total.toFixed(2)} USD**:`,
-      `• **Critical Overdue**: $${overdueTotal.toFixed(2)} (${overdue.length} ${overdue.length === 1 ? 'bill' : 'bills'})`,
-      `• **Due in Next 7 Days**: $${dueSoonTotal.toFixed(2)} (${dueSoon.length} ${dueSoon.length === 1 ? 'bill' : 'bills'})`,
-      `• **Pending / Needs Review**: $${(total - overdueTotal - dueSoonTotal).toFixed(2)}`,
-      ``,
-      `All transactions are stored locally on your device in SQLite.`,
-    ].join('\n');
-  }
-
-  // 5. Unverified / needs review / human verification
-  if (
-    q.includes('unverified') ||
-    q.includes('review') ||
-    q.includes('human') ||
-    q.includes('verify')
-  ) {
-    const unverified = docs.filter(
-      (d) => d.is_verified === 0 || (d.computed_status || d.status) === 'needs_review'
-    );
-    if (unverified.length === 0) {
-      return `All recorded bills have been verified by a human! Zero unverified bills remain.`;
-    }
-    return [
-      `🔍 **Bills Awaiting Human Verification (${unverified.length}):**`,
-      ``,
-      ...unverified.map(
-        (d) =>
-          `• **${d.vendor || d.original_name}**: $${(d.amount || 0).toFixed(2)} ${d.currency || 'USD'} (Category: ${d.category || 'Other'}, File: ${d.original_name})`
-      ),
-      ``,
-      `Per BillSloth safety policy, extracted data requires your sign-off before being scheduled or archived.`,
-    ].join('\n');
-  }
-
-  // 6. SaaS / Software costs
-  if (q.includes('saas') || q.includes('software') || q.includes('subscription')) {
-    const saas = docs.filter(
-      (d) =>
-        (d.category || '').toLowerCase().includes('software') ||
-        (d.category || '').toLowerCase().includes('saas')
-    );
-    const total = saas.reduce((sum, d) => sum + (d.amount || 0), 0);
-    return [
-      `💻 **Software & SaaS Subscriptions Summary:**`,
-      ``,
-      `Total recurring Software/SaaS cost: **$${total.toFixed(2)}**:`,
-      ...saas.map(
-        (d) =>
-          `• **${d.vendor || d.original_name}**: $${(d.amount || 0).toFixed(2)} (Status: ${(d.computed_status || d.status).replace(/_/g, ' ')}, Due: ${d.due_date || 'N/A'})`
-      ),
-    ].join('\n');
-  }
-
-  // 7. Utilities
-  if (
-    q.includes('utility') ||
-    q.includes('utilities') ||
-    q.includes('power') ||
-    q.includes('electric') ||
-    q.includes('water')
-  ) {
-    const utils = docs.filter((d) =>
-      (d.category || '').toLowerCase().includes('utilities')
-    );
-    const total = utils.reduce((sum, d) => sum + (d.amount || 0), 0);
-    return [
-      `⚡ **Utilities Summary:**`,
-      ``,
-      `Total Utilities commitments: **$${total.toFixed(2)}**:`,
-      ...utils.map(
-        (d) =>
-          `• **${d.vendor || d.original_name}**: $${(d.amount || 0).toFixed(2)} (Status: ${(d.computed_status || d.status).replace(/_/g, ' ')}, Due: ${d.due_date || 'N/A'})`
-      ),
-    ].join('\n');
-  }
-
-  // 8. Paid / Settled bills
-  if (q.includes('paid') || q.includes('settled') || q.includes('archive')) {
-    const paid = docs.filter((d) => (d.computed_status || d.status) === 'paid');
-    const total = paid.reduce((sum, d) => sum + (d.amount || 0), 0);
-    return [
-      `✅ **Settled & Paid Bills (${paid.length}):**`,
-      ``,
-      `Total settled transactions: **$${total.toFixed(2)}**:`,
-      ...paid.map(
-        (d) =>
-          `• **${d.vendor || d.original_name}**: $${(d.amount || 0).toFixed(2)} ${d.currency || 'USD'} (Paid reference: ${d.payment_reference || 'Confirmed'})`
-      ),
-    ].join('\n');
-  }
-
-  // 9. Specific vendor lookup
-  const matchedDoc = docs.find(
-    (d) =>
-      (d.vendor || '').toLowerCase().includes(q) ||
-      (d.original_name || '').toLowerCase().includes(q) ||
-      (d.invoice_number || '').toLowerCase().includes(q)
-  );
-  if (matchedDoc) {
-    return [
-      `📄 **Invoice Details for ${matchedDoc.vendor || matchedDoc.original_name}:**`,
-      ``,
-      `• **Vendor**: ${matchedDoc.vendor || 'Unknown'}`,
-      `• **Amount**: $${(matchedDoc.amount || 0).toFixed(2)} ${matchedDoc.currency || 'USD'}`,
-      `• **Invoice Number**: ${matchedDoc.invoice_number || 'None specified'}`,
-      `• **Due Date**: ${matchedDoc.due_date || 'No due date'}`,
-      `• **Status**: ${(matchedDoc.computed_status || matchedDoc.status).replace(/_/g, ' ').toUpperCase()}`,
-      `• **Category**: ${matchedDoc.category || 'Other'}`,
-      `• **Human Verified**: ${matchedDoc.is_verified === 1 ? 'Yes (Signed off)' : 'No (Pending review)'}`,
-      matchedDoc.payment_reference ? `• **Payment Reference**: ${matchedDoc.payment_reference}` : '',
-      matchedDoc.notes ? `• **Notes**: ${matchedDoc.notes}` : '',
-    ]
-      .filter(Boolean)
-      .join('\n');
-  }
-
-  // 10. General factual ledger summary
-  const unpaidCount = docs.filter(
-    (d) => (d.computed_status || d.status) !== 'paid'
-  ).length;
-  const overdueCount = docs.filter(
-    (d) => (d.computed_status || d.status) === 'overdue'
-  ).length;
-  const totalDue = docs
-    .filter((d) => (d.computed_status || d.status) !== 'paid')
-    .reduce((s, d) => s + (d.amount || 0), 0);
-
-  return [
-    `🦥 **BillSloth Local Assistant Query Result:**`,
-    ``,
-    `Based on your on-device ledger (${docs.length} recorded bills):`,
-    `• **Active Unpaid Bills**: ${unpaidCount} bills totaling $${totalDue.toFixed(2)} USD`,
-    `• **Overdue Attention**: ${overdueCount} bills needing immediate settlement`,
-    `• **Recorded Vendors**: ${Array.from(
-      new Set(docs.map((d) => d.vendor || d.original_name))
-    )
-      .slice(0, 5)
-      .join(', ')}`,
-    ``,
-    `*Try asking:*`,
-    `• "What is my total outstanding balance?"`,
-    `• "Which invoices are currently overdue?"`,
-    `• "What bills are due within the next 7 days?"`,
-    `• "How does BillSloth work?"`,
-    `• "Show details for Metro Grid" (or any vendor)`,
-  ].join('\n');
-}
-
-export async function askAiAssistant(query: string): Promise<{ answer: string; model?: string }> {
+export async function askAiAssistant(query: string): Promise<{ answer: string; intent?: string }> {
   const engine = getActiveAiEngine();
   const geminiKey = getGeminiApiKey();
 
-  // 1. If Gemini engine is active or key is configured
+  // 1. If Gemini engine is active and key is configured
   if ((engine === 'gemini' || geminiKey) && geminiKey) {
     const geminiRes = await askGeminiAssistant(query, localDocsStore);
-    if (geminiRes.success) {
-      return { answer: geminiRes.answer, model: `${geminiRes.model} (Cloud AI)` };
+    if (geminiRes.success && geminiRes.answer) {
+      return { answer: geminiRes.answer };
     }
   }
 
-  // 2. If Ollama engine is active (or default local dev server)
+  // 2. If backend server is available (e.g. running locally)
   try {
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), 3000);
     const res = await fetch(`${API_BASE}/ai/ask`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ query }),
+      signal: controller.signal,
     });
+    clearTimeout(timer);
     const json = await res.json();
     if (res.ok && json.success) {
-      return json;
+      return { answer: json.answer, intent: json.intent };
     }
   } catch {
     // Backend offline / Vercel demo environment
   }
 
-  // 3. In-Browser Smart Engine fallback
+  // 3. Fallback to deterministic intent-aware ledger intelligence
+  const ledgerRes = answerLedgerQuestion(query, localDocsStore);
   return {
-    answer: synthesizeAssistantResponse(query, localDocsStore),
-    model: 'Smart In-Browser Engine (Zero-install)',
+    answer: ledgerRes.answer,
+    intent: ledgerRes.intent,
   };
 }
 
