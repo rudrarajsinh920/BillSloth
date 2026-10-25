@@ -127,14 +127,14 @@ export const RemindersView: React.FC<RemindersViewProps> = ({
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-xl font-bold text-navy-900 tracking-tight">Reminders & Approvals</h1>
-          <p className="text-xs text-slate-muted mt-1">
+          <h1 className="text-xl font-bold text-[#F8FAFC] tracking-tight">Reminders & Approvals</h1>
+          <p className="text-xs text-[#A8B7CC] mt-1">
             Human-in-the-loop reminder drafts. Never automatically emailed or debited.
           </p>
         </div>
         <button
           onClick={() => setShowCreateModal(true)}
-          className="px-4 py-2 rounded-lg bg-brand-blue hover:bg-brand-blue-hover text-white text-xs font-semibold shadow-sm inline-flex items-center gap-1.5 transition-colors self-start sm:self-auto"
+          className="px-4 py-2 rounded-lg bg-[#22D3EE] hover:bg-[#06B6D4] text-[#0B1220] text-xs font-bold shadow-md inline-flex items-center gap-1.5 transition-colors self-start sm:self-auto"
         >
           <Plus className="w-4 h-4" />
           <span>Prepare New Reminder</span>
@@ -142,31 +142,31 @@ export const RemindersView: React.FC<RemindersViewProps> = ({
       </div>
 
       {/* Safety Banner */}
-      <div className="financial-card p-4 flex items-start gap-3">
-        <ShieldCheck className="w-5 h-5 text-brand-blue shrink-0 mt-0.5" />
-        <div className="text-xs text-navy-800 space-y-1">
-          <p className="font-semibold text-navy-900">Safety & Human Agency Guarantee</p>
-          <p className="text-slate-muted">
-            BillSloth will <strong>never</strong> dispatch unsolicited emails, notify external parties, or trigger automatic bank withdrawals.
+      <div className="bg-[#162238] border border-[#29374D] rounded-xl p-4 flex items-start gap-3 shadow-lg">
+        <ShieldCheck className="w-5 h-5 text-[#34D399] shrink-0 mt-0.5" />
+        <div className="text-xs text-[#A8B7CC] space-y-1">
+          <p className="font-semibold text-[#F8FAFC]">Safety & Human Agency Guarantee</p>
+          <p className="text-[#A8B7CC]">
+            BillSloth will <strong className="text-[#F8FAFC]">never</strong> dispatch unsolicited emails, notify external parties, or trigger automatic bank withdrawals.
             Every reminder is prepared for you to inspect, adjust, and approve. Once approved, you can export a calendar file (.ICS) or copy the memo.
           </p>
         </div>
       </div>
 
       {/* Tabs */}
-      <div className="flex items-center gap-2 border-b border-slate-border pb-1">
+      <div className="flex items-center gap-2 border-b border-[#29374D] pb-1">
         <button
           onClick={() => setFilterStatus('pending_approval')}
           className={`px-3 py-2 text-xs font-semibold rounded-lg transition-colors flex items-center gap-2 ${
             filterStatus === 'pending_approval'
-              ? 'bg-brand-blue text-white shadow-sm'
-              : 'text-slate-muted hover:text-navy-900 hover:bg-slate-100'
+              ? 'bg-[#FBBF24]/20 text-[#FBBF24] border border-[#FBBF24]/40 shadow-sm'
+              : 'text-[#A8B7CC] hover:text-[#F8FAFC] hover:bg-[#111D32]'
           }`}
         >
           <span>Pending Human Approval</span>
           <span
-            className={`text-[10px] px-1.5 py-0.2 rounded-full ${
-              filterStatus === 'pending_approval' ? 'bg-white text-brand-blue' : 'bg-slate-200 text-slate-700'
+            className={`text-[10px] px-1.5 py-0.2 rounded-full font-bold ${
+              filterStatus === 'pending_approval' ? 'bg-[#FBBF24] text-[#0B1220]' : 'bg-[#111D32] text-[#A8B7CC] border border-[#29374D]'
             }`}
           >
             {pendingCount}
@@ -177,14 +177,14 @@ export const RemindersView: React.FC<RemindersViewProps> = ({
           onClick={() => setFilterStatus('approved')}
           className={`px-3 py-2 text-xs font-semibold rounded-lg transition-colors flex items-center gap-2 ${
             filterStatus === 'approved'
-              ? 'bg-green-paid text-white shadow-sm'
-              : 'text-slate-muted hover:text-navy-900 hover:bg-slate-100'
+              ? 'bg-[#34D399]/20 text-[#34D399] border border-[#34D399]/40 shadow-sm'
+              : 'text-[#A8B7CC] hover:text-[#F8FAFC] hover:bg-[#111D32]'
           }`}
         >
           <span>Approved Reminders</span>
           <span
-            className={`text-[10px] px-1.5 py-0.2 rounded-full ${
-              filterStatus === 'approved' ? 'bg-white text-green-paid' : 'bg-slate-200 text-slate-700'
+            className={`text-[10px] px-1.5 py-0.2 rounded-full font-bold ${
+              filterStatus === 'approved' ? 'bg-[#34D399] text-[#0B1220]' : 'bg-[#111D32] text-[#A8B7CC] border border-[#29374D]'
             }`}
           >
             {approvedCount}
@@ -195,8 +195,8 @@ export const RemindersView: React.FC<RemindersViewProps> = ({
           onClick={() => setFilterStatus('all')}
           className={`px-3 py-2 text-xs font-semibold rounded-lg transition-colors ${
             filterStatus === 'all'
-              ? 'bg-navy-900 text-white'
-              : 'text-slate-muted hover:text-navy-900 hover:bg-slate-100'
+              ? 'bg-[#22D3EE]/20 text-[#22D3EE] border border-[#22D3EE]/40 font-bold'
+              : 'text-[#A8B7CC] hover:text-[#F8FAFC] hover:bg-[#111D32]'
           }`}
         >
           <span>All ({reminders.length})</span>
@@ -206,9 +206,9 @@ export const RemindersView: React.FC<RemindersViewProps> = ({
       {/* Reminders List */}
       <div className="space-y-4">
         {filtered.length === 0 ? (
-          <div className="financial-card p-12 text-center text-slate-muted text-xs">
-            <CheckCircle2 className="w-8 h-8 text-green-paid mx-auto mb-2 opacity-80" />
-            <p className="font-semibold text-navy-900 text-sm">No Reminders in This Queue</p>
+          <div className="bg-[#162238] border border-[#29374D] rounded-xl p-12 text-center text-[#A8B7CC] text-xs shadow-lg">
+            <CheckCircle2 className="w-8 h-8 text-[#34D399] mx-auto mb-2 opacity-80" />
+            <p className="font-semibold text-[#F8FAFC] text-sm">No Reminders in This Queue</p>
             <p className="mt-1">
               {filterStatus === 'pending_approval'
                 ? 'All pending reminders have been reviewed and approved.'
@@ -223,23 +223,25 @@ export const RemindersView: React.FC<RemindersViewProps> = ({
             return (
               <div
                 key={rem.id}
-                className={`financial-card overflow-hidden ${
-                  isApproved ? '!border-green-paid-border' : ''
+                className={`bg-[#162238] border rounded-xl overflow-hidden shadow-lg transition-colors ${
+                  isApproved ? 'border-[#34D399]/40' : 'border-[#29374D]'
                 }`}
               >
                 <div className="p-5 space-y-3">
                   {/* Top line with date & status */}
-                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-border pb-3">
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-[#29374D] pb-3">
                     <div className="flex items-center gap-2">
                       <div
-                        className={`p-1.5 rounded-lg shrink-0 ${
-                          isApproved ? 'bg-green-paid-light text-green-paid' : 'bg-brand-blue-light text-brand-blue'
+                        className={`p-1.5 rounded-lg shrink-0 border ${
+                          isApproved
+                            ? 'bg-[#34D399]/15 text-[#34D399] border-[#34D399]/30'
+                            : 'bg-[#FBBF24]/15 text-[#FBBF24] border-[#FBBF24]/30'
                         }`}
                       >
                         <BellRing className="w-4 h-4" />
                       </div>
                       <div className="flex items-center gap-2">
-                        <span className="font-semibold text-xs text-navy-900 tabular-nums">
+                        <span className="font-semibold text-xs text-[#F8FAFC] tabular-nums">
                           Scheduled: {format(parseISO(rem.reminder_date), 'EEEE, MMMM d, yyyy')}
                         </span>
                         {rem.is_sample === 1 && <SampleDataBadge />}
@@ -248,12 +250,12 @@ export const RemindersView: React.FC<RemindersViewProps> = ({
 
                     <div className="flex items-center gap-2">
                       {isApproved ? (
-                        <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-green-paid px-2.5 py-0.5 rounded-full bg-green-paid-light border border-green-paid-border">
+                        <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-[#34D399] px-2.5 py-0.5 rounded-full bg-[#34D399]/15 border border-[#34D399]/30">
                           <CheckCircle2 className="w-3.5 h-3.5" />
                           <span>Approved by Human</span>
                         </span>
                       ) : (
-                        <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-amber-warn px-2.5 py-0.5 rounded-full bg-amber-warn-light border border-amber-warn-border">
+                        <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-[#FBBF24] px-2.5 py-0.5 rounded-full bg-[#FBBF24]/15 border border-[#FBBF24]/40">
                           <AlertTriangle className="w-3.5 h-3.5" />
                           <span>Needs Human Approval</span>
                         </span>
@@ -265,42 +267,42 @@ export const RemindersView: React.FC<RemindersViewProps> = ({
                   {isEditing ? (
                     <div className="space-y-3 pt-1">
                       <div>
-                        <label className="block text-xs font-semibold text-navy-900 mb-1">Title</label>
+                        <label className="block text-xs font-semibold text-[#F8FAFC] mb-1">Title</label>
                         <input
                           type="text"
                           value={editTitle}
                           onChange={(e) => setEditTitle(e.target.value)}
-                          className="w-full px-3 py-1.5 text-xs rounded-lg border border-slate-border font-medium focus:border-brand-blue"
+                          className="w-full px-3 py-1.5 text-xs rounded-lg border border-[#29374D] bg-[#111D32] text-[#F8FAFC] font-medium focus:border-[#22D3EE] focus:outline-none"
                         />
                       </div>
                       <div>
-                        <label className="block text-xs font-semibold text-navy-900 mb-1">Reminder Date</label>
+                        <label className="block text-xs font-semibold text-[#F8FAFC] mb-1">Reminder Date</label>
                         <input
                           type="date"
                           value={editDate}
                           onChange={(e) => setEditDate(e.target.value)}
-                          className="w-full sm:w-48 px-3 py-1.5 text-xs rounded-lg border border-slate-border font-mono focus:border-brand-blue"
+                          className="w-full sm:w-48 px-3 py-1.5 text-xs rounded-lg border border-[#29374D] bg-[#111D32] text-[#F8FAFC] font-mono focus:border-[#22D3EE] focus:outline-none"
                         />
                       </div>
                       <div>
-                        <label className="block text-xs font-semibold text-navy-900 mb-1">Message Memo</label>
+                        <label className="block text-xs font-semibold text-[#F8FAFC] mb-1">Message Memo</label>
                         <textarea
                           value={editMessage}
                           onChange={(e) => setEditMessage(e.target.value)}
                           rows={3}
-                          className="w-full px-3 py-1.5 text-xs rounded-lg border border-slate-border focus:border-brand-blue"
+                          className="w-full px-3 py-1.5 text-xs rounded-lg border border-[#29374D] bg-[#111D32] text-[#F8FAFC] focus:border-[#22D3EE] focus:outline-none"
                         />
                       </div>
                       <div className="flex items-center gap-2 justify-end pt-1">
                         <button
                           onClick={() => setEditingId(null)}
-                          className="px-3 py-1.5 rounded-lg border border-slate-border text-xs text-navy-700 hover:bg-slate-50"
+                          className="px-3 py-1.5 rounded-lg border border-[#29374D] text-xs text-[#A8B7CC] hover:bg-[#111D32] hover:text-[#F8FAFC] transition-colors"
                         >
                           Cancel
                         </button>
                         <button
                           onClick={() => handleSaveEdit(rem.id)}
-                          className="px-4 py-1.5 rounded-lg bg-brand-blue hover:bg-brand-blue-hover text-white text-xs font-semibold"
+                          className="px-4 py-1.5 rounded-lg bg-[#22D3EE] hover:bg-[#06B6D4] text-[#0B1220] text-xs font-bold transition-colors"
                         >
                           Save Changes
                         </button>
@@ -308,18 +310,18 @@ export const RemindersView: React.FC<RemindersViewProps> = ({
                     </div>
                   ) : (
                     <div>
-                      <h3 className="font-bold text-sm text-navy-900">{rem.title}</h3>
-                      <p className="text-xs text-slate-700 mt-1.5 leading-relaxed bg-slate-light p-3 rounded-lg border border-slate-border whitespace-pre-wrap font-sans">
+                      <h3 className="font-bold text-sm text-[#F8FAFC]">{rem.title}</h3>
+                      <p className="text-xs text-[#A8B7CC] mt-1.5 leading-relaxed bg-[#111D32] p-3 rounded-lg border border-[#29374D] whitespace-pre-wrap font-sans">
                         {rem.message}
                       </p>
 
                       {/* Associated bill info */}
                       {rem.vendor && (
-                        <div className="mt-2 text-xs text-slate-muted flex items-center justify-between">
+                        <div className="mt-2 text-xs text-[#A8B7CC] flex items-center justify-between">
                           <div className="flex items-center gap-2">
-                            <FileText className="w-3.5 h-3.5" />
+                            <FileText className="w-3.5 h-3.5 text-[#22D3EE]" />
                             <span>
-                              Linked Bill: <strong className="text-navy-900">{rem.vendor}</strong> (<span className="font-mono tabular-nums">${(rem.amount || 0).toFixed(2)}</span> {rem.currency})
+                              Linked Bill: <strong className="text-[#F8FAFC]">{rem.vendor}</strong> (<span className="font-mono tabular-nums text-[#22D3EE]">${(rem.amount || 0).toFixed(2)}</span> {rem.currency})
                             </span>
                           </div>
                           {rem.document_id && (
@@ -328,7 +330,7 @@ export const RemindersView: React.FC<RemindersViewProps> = ({
                                 const found = documents.find((d) => d.id === rem.document_id);
                                 if (found) onOpenReview(found);
                               }}
-                              className="text-brand-blue hover:underline font-medium text-[11px]"
+                              className="text-[#22D3EE] hover:underline font-semibold text-[11px]"
                             >
                               Review Bill Details →
                             </button>
@@ -340,31 +342,31 @@ export const RemindersView: React.FC<RemindersViewProps> = ({
 
                   {/* Actions Bar */}
                   {!isEditing && (
-                    <div className="flex flex-wrap items-center justify-between gap-3 pt-3 border-t border-slate-border">
+                    <div className="flex flex-wrap items-center justify-between gap-3 pt-3 border-t border-[#29374D]">
                       <div className="flex items-center gap-2">
                         {/* Download .ICS calendar event */}
                         <a
                           href={`/api/reminders/${rem.id}/ics`}
                           download
-                          className="px-3 py-1.5 rounded-lg border border-slate-border bg-white hover:bg-slate-50 text-navy-800 text-xs font-medium inline-flex items-center gap-1.5 transition-colors"
+                          className="px-3 py-1.5 rounded-lg border border-[#29374D] bg-[#111D32] hover:bg-[#1C2B46] text-[#F8FAFC] text-xs font-medium inline-flex items-center gap-1.5 transition-colors"
                         >
-                          <CalendarPlus className="w-3.5 h-3.5 text-brand-blue" />
+                          <CalendarPlus className="w-3.5 h-3.5 text-[#22D3EE]" />
                           <span>Export .ICS Calendar</span>
                         </a>
 
                         {/* Copy memo */}
                         <button
                           onClick={() => handleCopy(rem)}
-                          className="px-3 py-1.5 rounded-lg border border-slate-border bg-white hover:bg-slate-50 text-navy-800 text-xs font-medium inline-flex items-center gap-1.5 transition-colors"
+                          className="px-3 py-1.5 rounded-lg border border-[#29374D] bg-[#111D32] hover:bg-[#1C2B46] text-[#F8FAFC] text-xs font-medium inline-flex items-center gap-1.5 transition-colors"
                         >
                           {copiedId === rem.id ? (
                             <>
-                              <Check className="w-3.5 h-3.5 text-green-paid" />
-                              <span className="text-green-paid">Copied!</span>
+                              <Check className="w-3.5 h-3.5 text-[#34D399]" />
+                              <span className="text-[#34D399] font-bold">Copied!</span>
                             </>
                           ) : (
                             <>
-                              <Copy className="w-3.5 h-3.5 text-slate-muted" />
+                              <Copy className="w-3.5 h-3.5 text-[#A8B7CC]" />
                               <span>Copy Text</span>
                             </>
                           )}
@@ -374,15 +376,15 @@ export const RemindersView: React.FC<RemindersViewProps> = ({
                       <div className="flex items-center gap-2">
                         <button
                           onClick={() => handleStartEdit(rem)}
-                          className="px-3 py-1.5 rounded-lg border border-slate-border text-navy-800 hover:bg-slate-50 text-xs font-medium inline-flex items-center gap-1"
+                          className="px-3 py-1.5 rounded-lg border border-[#29374D] text-[#A8B7CC] hover:text-[#F8FAFC] hover:bg-[#111D32] text-xs font-medium inline-flex items-center gap-1 transition-colors"
                         >
-                          <Edit3 className="w-3.5 h-3.5 text-slate-muted" />
+                          <Edit3 className="w-3.5 h-3.5 text-[#A8B7CC]" />
                           <span>Edit</span>
                         </button>
 
                         <button
                           onClick={() => handleDiscard(rem.id)}
-                          className="px-3 py-1.5 rounded-lg border border-red-overdue-border text-red-overdue hover:bg-red-50 text-xs font-medium inline-flex items-center gap-1"
+                          className="px-3 py-1.5 rounded-lg border border-[#FB7185]/40 text-[#FB7185] hover:bg-[#FB7185]/15 text-xs font-medium inline-flex items-center gap-1 transition-colors"
                         >
                           <XCircle className="w-3.5 h-3.5" />
                           <span>Discard</span>
@@ -391,7 +393,7 @@ export const RemindersView: React.FC<RemindersViewProps> = ({
                         {!isApproved && (
                           <button
                             onClick={() => handleApprove(rem.id)}
-                            className="px-4 py-1.5 rounded-lg bg-green-paid hover:bg-green-700 text-white text-xs font-bold inline-flex items-center gap-1.5 shadow-sm transition-colors"
+                            className="px-4 py-1.5 rounded-lg bg-[#34D399] hover:bg-[#059669] text-[#0B1220] text-xs font-bold inline-flex items-center gap-1.5 shadow-md transition-colors"
                           >
                             <CheckCircle2 className="w-3.5 h-3.5" />
                             <span>Approve Reminder</span>
@@ -409,16 +411,16 @@ export const RemindersView: React.FC<RemindersViewProps> = ({
 
       {/* Create New Reminder Modal */}
       {showCreateModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-navy-900/50 backdrop-blur-sm p-4 animate-in fade-in">
-          <div className="bg-white rounded-xl shadow-2xl border border-slate-border max-w-lg w-full p-6 space-y-4">
-            <h3 className="font-bold text-base text-navy-900">Prepare New Reminder</h3>
-            <p className="text-xs text-slate-muted">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#0B1220]/80 backdrop-blur-md p-4 animate-in fade-in">
+          <div className="bg-[#162238] rounded-2xl shadow-2xl border border-[#29374D] max-w-lg w-full p-6 space-y-4">
+            <h3 className="font-bold text-base text-[#F8FAFC]">Prepare New Reminder</h3>
+            <p className="text-xs text-[#A8B7CC]">
               Creates a reminder card for human approval. Won't send emails automatically.
             </p>
 
             <form onSubmit={handleCreateNew} className="space-y-4">
               <div>
-                <label className="block text-xs font-semibold text-navy-900 mb-1">
+                <label className="block text-xs font-semibold text-[#F8FAFC] mb-1">
                   Link to Existing Bill (Optional)
                 </label>
                 <select
@@ -436,7 +438,7 @@ export const RemindersView: React.FC<RemindersViewProps> = ({
                       }
                     }
                   }}
-                  className="w-full px-3 py-2 text-xs rounded-lg border border-slate-border bg-white focus:border-brand-blue"
+                  className="w-full px-3 py-2 text-xs rounded-lg border border-[#29374D] bg-[#111D32] text-[#F8FAFC] focus:border-[#22D3EE] focus:outline-none"
                 >
                   <option value="">No linked bill (Generic reminder)</option>
                   {documents.map((d) => (
@@ -448,51 +450,51 @@ export const RemindersView: React.FC<RemindersViewProps> = ({
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-navy-900 mb-1">Title</label>
+                <label className="block text-xs font-semibold text-[#F8FAFC] mb-1">Title</label>
                 <input
                   type="text"
                   required
                   value={newTitle}
                   onChange={(e) => setNewTitle(e.target.value)}
                   placeholder="e.g. Schedule payment for Metro Grid"
-                  className="w-full px-3 py-2 text-xs rounded-lg border border-slate-border focus:border-brand-blue"
+                  className="w-full px-3 py-2 text-xs rounded-lg border border-[#29374D] bg-[#111D32] text-[#F8FAFC] focus:border-[#22D3EE] focus:outline-none placeholder:text-[#64748B]"
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-navy-900 mb-1">Reminder Date</label>
+                <label className="block text-xs font-semibold text-[#F8FAFC] mb-1">Reminder Date</label>
                 <input
                   type="date"
                   required
                   value={newDate}
                   onChange={(e) => setNewDate(e.target.value)}
-                  className="w-full px-3 py-2 text-xs rounded-lg border border-slate-border font-mono focus:border-brand-blue"
+                  className="w-full px-3 py-2 text-xs rounded-lg border border-[#29374D] bg-[#111D32] text-[#F8FAFC] font-mono focus:border-[#22D3EE] focus:outline-none"
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-navy-900 mb-1">Message Memo</label>
+                <label className="block text-xs font-semibold text-[#F8FAFC] mb-1">Message Memo</label>
                 <textarea
                   required
                   value={newMessage}
                   onChange={(e) => setNewMessage(e.target.value)}
                   rows={3}
                   placeholder="Memo details, payment link or account notes..."
-                  className="w-full px-3 py-2 text-xs rounded-lg border border-slate-border focus:border-brand-blue"
+                  className="w-full px-3 py-2 text-xs rounded-lg border border-[#29374D] bg-[#111D32] text-[#F8FAFC] focus:border-[#22D3EE] focus:outline-none placeholder:text-[#64748B]"
                 />
               </div>
 
-              <div className="flex items-center justify-end gap-2 pt-2 border-t border-slate-border">
+              <div className="flex items-center justify-end gap-2 pt-2 border-t border-[#29374D]">
                 <button
                   type="button"
                   onClick={() => setShowCreateModal(false)}
-                  className="px-4 py-2 rounded-lg border border-slate-border text-xs text-navy-800 hover:bg-slate-50"
+                  className="px-4 py-2 rounded-lg border border-[#29374D] text-xs text-[#A8B7CC] hover:bg-[#111D32] hover:text-[#F8FAFC] transition-colors"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  className="px-5 py-2 rounded-lg bg-brand-blue hover:bg-brand-blue-hover text-white text-xs font-semibold shadow-sm"
+                  className="px-5 py-2 rounded-lg bg-[#22D3EE] hover:bg-[#06B6D4] text-[#0B1220] text-xs font-bold shadow-md transition-colors"
                 >
                   Save Reminder
                 </button>

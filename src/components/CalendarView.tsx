@@ -86,15 +86,15 @@ export const CalendarView: React.FC<CalendarViewProps> = ({
   const getStatusColor = (doc: DocumentItem) => {
     const s = doc.computed_status || doc.status;
     if (s === 'paid') {
-      return 'bg-emerald-50 text-emerald-800 border-emerald-200 hover:bg-emerald-100';
+      return 'bg-[#34D399]/10 text-[#34D399] border-[#34D399]/30 hover:bg-[#34D399]/20';
     }
     if (s === 'overdue') {
-      return 'bg-red-50 text-red-800 border-red-200 hover:bg-red-100 font-bold';
+      return 'bg-[#FB7185]/15 text-[#FB7185] border-[#FB7185]/40 hover:bg-[#FB7185]/25 font-bold';
     }
     if (s === 'due_soon') {
-      return 'bg-amber-50 text-amber-800 border-amber-200 hover:bg-amber-100 font-medium';
+      return 'bg-[#FBBF24]/15 text-[#FBBF24] border-[#FBBF24]/40 hover:bg-[#FBBF24]/25 font-semibold';
     }
-    return 'bg-blue-50 text-navy-800 border-blue-200 hover:bg-blue-100';
+    return 'bg-[#22D3EE]/10 text-[#22D3EE] border-[#22D3EE]/30 hover:bg-[#22D3EE]/20';
   };
 
   return (
@@ -103,12 +103,12 @@ export const CalendarView: React.FC<CalendarViewProps> = ({
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
           <div className="flex items-center gap-2">
-            <h1 className="text-xl font-bold text-navy-900 tracking-tight">Due Date Calendar</h1>
-            <span className="text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded bg-brand-blue-light text-brand-blue">
+            <h1 className="text-xl font-bold text-[#F8FAFC] tracking-tight">Due Date Calendar</h1>
+            <span className="text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded bg-[#22D3EE]/15 text-[#22D3EE] border border-[#22D3EE]/30">
               Monthly Schedule
             </span>
           </div>
-          <p className="text-xs text-slate-muted mt-1">
+          <p className="text-xs text-[#A8B7CC] mt-1">
             Visual overview of scheduled bill maturities, settlement deadlines, and cash flow timing
           </p>
         </div>
@@ -117,25 +117,25 @@ export const CalendarView: React.FC<CalendarViewProps> = ({
         <div className="flex items-center gap-2 self-start md:self-auto">
           <button
             onClick={goToToday}
-            className="px-3 py-1.5 rounded-lg border border-slate-border bg-white hover:bg-slate-50 text-navy-800 text-xs font-semibold transition-colors shadow-sm"
+            className="px-3 py-1.5 rounded-lg border border-[#29374D] bg-[#111D32] hover:bg-[#162238] text-[#F8FAFC] text-xs font-semibold transition-colors shadow-sm"
           >
             Today
           </button>
-          <div className="flex items-center rounded-lg border border-slate-border bg-white shadow-sm overflow-hidden">
+          <div className="flex items-center rounded-lg border border-[#29374D] bg-[#111D32] shadow-sm overflow-hidden">
             <button
               onClick={prevMonth}
               aria-label="Previous month"
-              className="p-1.5 text-navy-800 hover:bg-slate-100 transition-colors"
+              className="p-1.5 text-[#A8B7CC] hover:text-[#F8FAFC] hover:bg-[#162238] transition-colors"
             >
               <ChevronLeft className="w-4 h-4" />
             </button>
-            <span className="px-3 py-1.5 text-xs font-bold text-navy-900 min-w-[130px] text-center select-none font-mono">
+            <span className="px-3 py-1.5 text-xs font-bold text-[#F8FAFC] min-w-[130px] text-center select-none font-mono">
               {format(currentMonth, 'MMMM yyyy')}
             </span>
             <button
               onClick={nextMonth}
               aria-label="Next month"
-              className="p-1.5 text-navy-800 hover:bg-slate-100 transition-colors"
+              className="p-1.5 text-[#A8B7CC] hover:text-[#F8FAFC] hover:bg-[#162238] transition-colors"
             >
               <ChevronRight className="w-4 h-4" />
             </button>
@@ -145,62 +145,62 @@ export const CalendarView: React.FC<CalendarViewProps> = ({
 
       {/* Monthly Financial Health Bar */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-        <div className="financial-card p-3.5 flex items-center justify-between">
+        <div className="bg-[#162238] border border-[#29374D] rounded-xl p-3.5 flex items-center justify-between">
           <div>
-            <span className="text-[11px] font-semibold text-slate-muted uppercase tracking-wider block">
+            <span className="text-[11px] font-semibold text-[#A8B7CC] uppercase tracking-wider block">
               Total Commitments
             </span>
-            <span className="text-lg font-bold font-mono tabular-nums text-navy-900">
+            <span className="text-lg font-bold font-mono tabular-nums text-[#F8FAFC]">
               ${totalMonthDue.toFixed(2)}
             </span>
-            <span className="text-[10px] text-slate-muted block mt-0.5">
+            <span className="text-[10px] text-[#A8B7CC] block mt-0.5">
               {docsInMonth.length} bills in {format(currentMonth, 'MMMM')}
             </span>
           </div>
-          <div className="p-2.5 rounded-xl bg-navy-900 text-white">
+          <div className="p-2.5 rounded-xl bg-[#111D32] text-[#22D3EE] border border-[#29374D]">
             <CalendarIcon className="w-4 h-4" />
           </div>
         </div>
 
-        <div className="financial-card p-3.5 flex items-center justify-between">
+        <div className="bg-[#162238] border border-[#29374D] rounded-xl p-3.5 flex items-center justify-between">
           <div>
-            <span className="text-[11px] font-semibold text-slate-muted uppercase tracking-wider block">
+            <span className="text-[11px] font-semibold text-[#A8B7CC] uppercase tracking-wider block">
               Pending / Due
             </span>
-            <span className="text-lg font-bold font-mono tabular-nums text-amber-warn">
+            <span className="text-lg font-bold font-mono tabular-nums text-[#FBBF24]">
               ${pendingMonthTotal.toFixed(2)}
             </span>
-            <span className="text-[10px] text-slate-muted block mt-0.5">
+            <span className="text-[10px] text-[#A8B7CC] block mt-0.5">
               Awaiting human settlement
             </span>
           </div>
-          <div className="p-2.5 rounded-xl bg-amber-warn-light text-amber-warn">
+          <div className="p-2.5 rounded-xl bg-[#FBBF24]/10 text-[#FBBF24] border border-[#FBBF24]/20">
             <Clock className="w-4 h-4" />
           </div>
         </div>
 
-        <div className="financial-card p-3.5 flex items-center justify-between">
+        <div className="bg-[#162238] border border-[#29374D] rounded-xl p-3.5 flex items-center justify-between">
           <div>
-            <span className="text-[11px] font-semibold text-slate-muted uppercase tracking-wider block">
+            <span className="text-[11px] font-semibold text-[#A8B7CC] uppercase tracking-wider block">
               Settled & Paid
             </span>
-            <span className="text-lg font-bold font-mono tabular-nums text-green-paid">
+            <span className="text-lg font-bold font-mono tabular-nums text-[#34D399]">
               ${paidMonthTotal.toFixed(2)}
             </span>
-            <span className="text-[10px] text-slate-muted block mt-0.5">
+            <span className="text-[10px] text-[#A8B7CC] block mt-0.5">
               Completed transactions
             </span>
           </div>
-          <div className="p-2.5 rounded-xl bg-green-paid-light text-green-paid">
+          <div className="p-2.5 rounded-xl bg-[#34D399]/10 text-[#34D399] border border-[#34D399]/20">
             <CheckCircle2 className="w-4 h-4" />
           </div>
         </div>
       </div>
 
       {/* Main Calendar Grid */}
-      <div className="financial-card overflow-hidden">
+      <div className="bg-[#162238] border border-[#29374D] rounded-xl overflow-hidden shadow-lg">
         {/* Days of week header */}
-        <div className="grid grid-cols-7 bg-slate-light border-b border-slate-border text-center text-xs font-semibold text-navy-800 py-2.5">
+        <div className="grid grid-cols-7 bg-[#111D32] border-b border-[#29374D] text-center text-xs font-semibold text-[#A8B7CC] py-2.5">
           <span>Mon</span>
           <span>Tue</span>
           <span>Wed</span>
@@ -211,7 +211,7 @@ export const CalendarView: React.FC<CalendarViewProps> = ({
         </div>
 
         {/* Days Grid */}
-        <div className="grid grid-cols-7 divide-x divide-y divide-slate-border border-b border-slate-border">
+        <div className="grid grid-cols-7 divide-x divide-y divide-[#29374D] border-b border-[#29374D]">
           {calendarDays.map((day, idx) => {
             const inMonth = isSameMonth(day, currentMonth);
             const isDayToday = isToday(day);
@@ -223,26 +223,26 @@ export const CalendarView: React.FC<CalendarViewProps> = ({
                 key={idx}
                 onClick={() => setSelectedDate(day)}
                 className={`min-h-[110px] p-1.5 flex flex-col justify-between cursor-pointer transition-colors ${
-                  !inMonth ? 'bg-slate-50/60 opacity-60' : 'bg-white hover:bg-slate-50/80'
-                } ${isDaySelected ? 'ring-2 ring-inset ring-brand-blue bg-blue-50/30' : ''}`}
+                  !inMonth ? 'bg-[#0B1220]/60 opacity-40' : 'bg-[#162238] hover:bg-[#1C2B46]'
+                } ${isDaySelected ? 'ring-2 ring-inset ring-[#22D3EE] bg-[#22D3EE]/10' : ''}`}
               >
                 {/* Date header inside cell */}
                 <div className="flex items-center justify-between">
                   <span
                     className={`text-xs font-mono font-medium rounded-full w-6 h-6 flex items-center justify-center ${
                       isDayToday
-                        ? 'bg-brand-blue text-white font-bold'
+                        ? 'bg-[#22D3EE] text-[#0B1220] font-bold shadow-sm'
                         : isDaySelected
-                        ? 'bg-navy-900 text-white font-semibold'
+                        ? 'bg-[#22D3EE]/20 text-[#22D3EE] border border-[#22D3EE]/40 font-bold'
                         : inMonth
-                        ? 'text-navy-900'
-                        : 'text-slate-400'
+                        ? 'text-[#F8FAFC]'
+                        : 'text-[#64748B]'
                     }`}
                   >
                     {format(day, 'd')}
                   </span>
                   {dayDocs.length > 0 && (
-                    <span className="text-[10px] font-mono font-semibold text-slate-muted">
+                    <span className="text-[10px] font-mono font-semibold text-[#A8B7CC]">
                       {dayDocs.length} {dayDocs.length === 1 ? 'bill' : 'bills'}
                     </span>
                   )}
@@ -267,7 +267,7 @@ export const CalendarView: React.FC<CalendarViewProps> = ({
                     </button>
                   ))}
                   {dayDocs.length > 3 && (
-                    <span className="text-[9px] text-slate-500 font-medium block text-center">
+                    <span className="text-[9px] text-[#A8B7CC] font-medium block text-center">
                       +{dayDocs.length - 3} more
                     </span>
                   )}
@@ -279,29 +279,29 @@ export const CalendarView: React.FC<CalendarViewProps> = ({
       </div>
 
       {/* Selected Day Inspector Panel */}
-      <div className="financial-card p-5 space-y-4">
-        <div className="flex items-center justify-between border-b border-slate-border pb-3">
+      <div className="bg-[#162238] border border-[#29374D] rounded-xl p-5 space-y-4 shadow-lg">
+        <div className="flex items-center justify-between border-b border-[#29374D] pb-3">
           <div className="flex items-center gap-2">
-            <CalendarIcon className="w-4 h-4 text-brand-blue" />
-            <h3 className="text-sm font-bold text-navy-900">
+            <CalendarIcon className="w-4 h-4 text-[#22D3EE]" />
+            <h3 className="text-sm font-bold text-[#F8FAFC]">
               Schedule for {format(selectedDate, 'EEEE, MMMM d, yyyy')}
             </h3>
             {isToday(selectedDate) && (
-              <span className="text-[10px] px-2 py-0.5 rounded bg-brand-blue-light text-brand-blue font-bold">
+              <span className="text-[10px] px-2 py-0.5 rounded bg-[#22D3EE]/15 text-[#22D3EE] border border-[#22D3EE]/30 font-bold">
                 Today
               </span>
             )}
           </div>
-          <span className="text-xs font-mono text-slate-muted">
+          <span className="text-xs font-mono text-[#A8B7CC]">
             {selectedDocs.length} {selectedDocs.length === 1 ? 'obligation' : 'obligations'}
           </span>
         </div>
 
         {selectedDocs.length === 0 ? (
-          <div className="py-8 text-center text-slate-muted text-xs">
-            <CheckCircle2 className="w-6 h-6 text-emerald-500 mx-auto mb-1.5" />
-            <p className="font-medium text-navy-800">No payment obligations due on this date</p>
-            <p className="text-[11px] text-slate-muted mt-0.5">
+          <div className="py-8 text-center text-[#A8B7CC] text-xs">
+            <CheckCircle2 className="w-6 h-6 text-[#34D399] mx-auto mb-1.5" />
+            <p className="font-medium text-[#F8FAFC]">No payment obligations due on this date</p>
+            <p className="text-[11px] text-[#A8B7CC] mt-0.5">
               Click on any day on the calendar grid to inspect scheduled bills or upload new statements.
             </p>
           </div>
@@ -312,44 +312,44 @@ export const CalendarView: React.FC<CalendarViewProps> = ({
               return (
                 <div
                   key={doc.id}
-                  className="p-3.5 rounded-xl border border-slate-border bg-slate-light/60 flex flex-col justify-between space-y-3 hover:bg-slate-light transition-colors"
+                  className="p-3.5 rounded-xl border border-[#29374D] bg-[#111D32] flex flex-col justify-between space-y-3 hover:border-[#22D3EE]/50 transition-colors"
                 >
                   <div className="flex items-start justify-between gap-2">
                     <div>
                       <div className="flex items-center gap-2">
-                        <span className="font-bold text-navy-900 text-xs">
+                        <span className="font-bold text-[#F8FAFC] text-xs">
                           {doc.vendor || doc.original_name}
                         </span>
                         <span
-                          className={`text-[10px] px-2 py-0.2 rounded font-semibold capitalize ${
+                          className={`text-[10px] px-2 py-0.5 rounded font-semibold capitalize border ${
                             status === 'paid'
-                              ? 'bg-emerald-100 text-emerald-800'
+                              ? 'bg-[#34D399]/15 text-[#34D399] border-[#34D399]/30'
                               : status === 'overdue'
-                              ? 'bg-red-100 text-red-800'
+                              ? 'bg-[#FB7185]/15 text-[#FB7185] border-[#FB7185]/40'
                               : status === 'due_soon'
-                              ? 'bg-amber-100 text-amber-800'
-                              : 'bg-slate-200 text-navy-800'
+                              ? 'bg-[#FBBF24]/15 text-[#FBBF24] border-[#FBBF24]/40'
+                              : 'bg-[#22D3EE]/15 text-[#22D3EE] border-[#22D3EE]/30'
                           }`}
                         >
                           {status.replace(/_/g, ' ')}
                         </span>
                       </div>
-                      <p className="text-[11px] text-slate-muted mt-0.5">
-                        Invoice: <span className="font-mono text-navy-800">{doc.invoice_number || 'None'}</span> • Category: {doc.category || 'Other'}
+                      <p className="text-[11px] text-[#A8B7CC] mt-0.5">
+                        Invoice: <span className="font-mono text-[#F8FAFC]">{doc.invoice_number || 'None'}</span> • Category: {doc.category || 'Other'}
                       </p>
                     </div>
                     <div className="text-right">
-                      <span className="text-sm font-bold font-mono tabular-nums text-navy-900 block">
+                      <span className="text-sm font-bold font-mono tabular-nums text-[#F8FAFC] block">
                         ${(doc.amount || 0).toFixed(2)}
                       </span>
-                      <span className="text-[10px] text-slate-muted font-mono">{doc.currency || 'USD'}</span>
+                      <span className="text-[10px] text-[#A8B7CC] font-mono">{doc.currency || 'USD'}</span>
                     </div>
                   </div>
 
-                  <div className="flex items-center justify-between pt-2 border-t border-slate-200 text-xs">
+                  <div className="flex items-center justify-between pt-2 border-t border-[#29374D] text-xs">
                     <button
                       onClick={() => onOpenReview(doc)}
-                      className="px-2.5 py-1 rounded-lg border border-slate-border bg-white hover:bg-slate-100 text-navy-900 font-semibold transition-colors"
+                      className="px-2.5 py-1 rounded-lg border border-[#29374D] bg-[#162238] hover:bg-[#1C2B46] text-[#F8FAFC] font-semibold transition-colors"
                     >
                       Inspect & Review
                     </button>
@@ -358,7 +358,7 @@ export const CalendarView: React.FC<CalendarViewProps> = ({
                       {status !== 'paid' && onQuickMarkPaid && (
                         <button
                           onClick={() => onQuickMarkPaid(doc)}
-                          className="px-2.5 py-1 rounded-lg bg-green-paid-light text-green-paid border border-green-paid-border hover:bg-green-100 font-semibold transition-colors"
+                          className="px-2.5 py-1 rounded-lg bg-[#34D399]/15 text-[#34D399] border border-[#34D399]/40 hover:bg-[#34D399]/25 font-semibold transition-colors"
                         >
                           Mark Paid
                         </button>
@@ -366,7 +366,7 @@ export const CalendarView: React.FC<CalendarViewProps> = ({
                       {onPrepareReminder && (
                         <button
                           onClick={() => onPrepareReminder(doc)}
-                          className="px-2 py-1 rounded-lg text-slate-600 hover:text-navy-900 hover:bg-slate-200 transition-colors"
+                          className="px-2 py-1 rounded-lg text-[#A8B7CC] hover:text-[#22D3EE] hover:bg-[#162238] transition-colors"
                           title="Schedule Reminder"
                         >
                           <Clock className="w-3.5 h-3.5" />

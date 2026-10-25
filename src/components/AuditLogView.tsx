@@ -47,8 +47,8 @@ export const AuditLogView: React.FC = () => {
         category: 'ai' as EventCategory,
         label: 'Local AI Inference',
         icon: Bot,
-        iconBg: 'bg-indigo-50 text-indigo-600 border border-indigo-200/60',
-        badgeColor: 'bg-indigo-50 text-indigo-700 border-indigo-200',
+        iconBg: 'bg-[#818CF8]/15 text-[#818CF8] border border-[#818CF8]/30',
+        badgeColor: 'bg-[#818CF8]/15 text-[#818CF8] border border-[#818CF8]/30',
       };
     }
     if (act.includes('VERIF') || act.includes('APPROV') || act.includes('UPDATE')) {
@@ -56,8 +56,8 @@ export const AuditLogView: React.FC = () => {
         category: 'verification' as EventCategory,
         label: 'Human Verification',
         icon: CheckCircle2,
-        iconBg: 'bg-emerald-50 text-emerald-600 border border-emerald-200/60',
-        badgeColor: 'bg-emerald-50 text-emerald-700 border-emerald-200',
+        iconBg: 'bg-[#34D399]/15 text-[#34D399] border border-[#34D399]/30',
+        badgeColor: 'bg-[#34D399]/15 text-[#34D399] border border-[#34D399]/30',
       };
     }
     if (act.includes('REMIND')) {
@@ -65,8 +65,8 @@ export const AuditLogView: React.FC = () => {
         category: 'verification' as EventCategory,
         label: 'Payment Reminder',
         icon: Clock,
-        iconBg: 'bg-amber-50 text-amber-600 border border-amber-200/60',
-        badgeColor: 'bg-amber-50 text-amber-700 border-amber-200',
+        iconBg: 'bg-[#FBBF24]/15 text-[#FBBF24] border border-[#FBBF24]/30',
+        badgeColor: 'bg-[#FBBF24]/15 text-[#FBBF24] border border-[#FBBF24]/30',
       };
     }
     if (act.includes('UPLOAD') || act.includes('IMPORT') || act.includes('DOCUMENT')) {
@@ -74,16 +74,16 @@ export const AuditLogView: React.FC = () => {
         category: 'system' as EventCategory,
         label: 'Document Ledger',
         icon: FileText,
-        iconBg: 'bg-blue-50 text-brand-blue border border-blue-200/60',
-        badgeColor: 'bg-blue-50 text-brand-blue border-blue-200',
+        iconBg: 'bg-[#22D3EE]/15 text-[#22D3EE] border border-[#22D3EE]/30',
+        badgeColor: 'bg-[#22D3EE]/15 text-[#22D3EE] border border-[#22D3EE]/30',
       };
     }
     return {
       category: 'system' as EventCategory,
       label: 'Security & System',
       icon: ShieldCheck,
-      iconBg: 'bg-navy-50 text-navy-800 border border-slate-200',
-      badgeColor: 'bg-slate-100 text-slate-700 border-slate-200',
+      iconBg: 'bg-[#111D32] text-[#A8B7CC] border border-[#29374D]',
+      badgeColor: 'bg-[#111D32] text-[#A8B7CC] border border-[#29374D]',
     };
   };
 
@@ -137,12 +137,12 @@ export const AuditLogView: React.FC = () => {
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <div className="flex items-center gap-2">
-            <h1 className="text-xl font-bold text-navy-900 tracking-tight">System Audit Trail</h1>
-            <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-slate-100 text-slate-700 border border-slate-200">
+            <h1 className="text-xl font-bold text-[#F8FAFC] tracking-tight">System Audit Trail</h1>
+            <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-[#111D32] text-[#22D3EE] border border-[#29374D]">
               Immutable SQLite Log
             </span>
           </div>
-          <p className="text-xs text-slate-muted mt-0.5">
+          <p className="text-xs text-[#A8B7CC] mt-0.5">
             Cryptographic ledger tracking all local extractions, human approvals, and system state transitions
           </p>
         </div>
@@ -151,93 +151,93 @@ export const AuditLogView: React.FC = () => {
           <a
             href={SYSTEM_BACKUP_URL}
             download="billsloth-system-backup.json"
-            className="px-3 py-1.5 rounded-lg border border-slate-border bg-white hover:bg-slate-50 text-navy-800 text-xs font-semibold shadow-xs inline-flex items-center gap-1.5 transition-colors focus-visible:ring-2 focus-visible:ring-brand-blue"
+            className="px-3 py-1.5 rounded-lg border border-[#29374D] bg-[#162238] hover:bg-[#1C2B46] text-[#F8FAFC] text-xs font-semibold shadow-sm inline-flex items-center gap-1.5 transition-colors focus-visible:ring-2 focus-visible:ring-[#22D3EE]"
             title="Download full JSON snapshot of database and audit trail"
           >
-            <Download className="w-3.5 h-3.5 text-slate-500" />
+            <Download className="w-3.5 h-3.5 text-[#A8B7CC]" />
             <span>Export Backup</span>
           </a>
           <button
             onClick={loadLogs}
             disabled={loading}
-            className="px-3 py-1.5 rounded-lg border border-slate-border bg-white hover:bg-slate-50 text-navy-800 text-xs font-semibold inline-flex items-center gap-1.5 transition-colors disabled:opacity-50 shadow-xs"
+            className="px-3 py-1.5 rounded-lg border border-[#29374D] bg-[#162238] hover:bg-[#1C2B46] text-[#F8FAFC] text-xs font-semibold inline-flex items-center gap-1.5 transition-colors disabled:opacity-50 shadow-sm"
           >
-            <RefreshCw className={`w-3.5 h-3.5 text-slate-500 ${loading ? 'animate-spin' : ''}`} />
+            <RefreshCw className={`w-3.5 h-3.5 text-[#A8B7CC] ${loading ? 'animate-spin' : ''}`} />
             <span>Refresh</span>
           </button>
         </div>
       </div>
 
-      {/* KPI Cards Row (Matching Reference Image 2 & 3 summary cards) */}
+      {/* KPI Cards Row */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-        <div className="financial-card p-4 flex items-center justify-between">
+        <div className="bg-[#162238] border border-[#29374D] rounded-xl p-4 flex items-center justify-between shadow-lg">
           <div>
-            <span className="text-[11px] font-semibold text-slate-muted uppercase tracking-wider block">
+            <span className="text-[11px] font-semibold text-[#A8B7CC] uppercase tracking-wider block">
               Total Logged Events
             </span>
-            <span className="text-xl font-bold font-mono tabular-nums text-navy-900 mt-0.5 block">
+            <span className="text-xl font-bold font-mono tabular-nums text-[#F8FAFC] mt-0.5 block">
               {logs.length}
             </span>
-            <span className="text-[10px] text-slate-muted block mt-0.5">
-              Recorded in local <code className="text-navy-900 font-mono">audit_logs</code>
+            <span className="text-[10px] text-[#A8B7CC] block mt-0.5">
+              Recorded in local <code className="text-[#22D3EE] font-mono">audit_logs</code>
             </span>
           </div>
-          <div className="p-2.5 rounded-xl bg-navy-900 text-white">
+          <div className="p-2.5 rounded-xl bg-[#111D32] text-[#22D3EE] border border-[#29374D]">
             <Activity className="w-4 h-4" />
           </div>
         </div>
 
-        <div className="financial-card p-4 flex items-center justify-between">
+        <div className="bg-[#162238] border border-[#29374D] rounded-xl p-4 flex items-center justify-between shadow-lg">
           <div>
-            <span className="text-[11px] font-semibold text-slate-muted uppercase tracking-wider block">
+            <span className="text-[11px] font-semibold text-[#A8B7CC] uppercase tracking-wider block">
               Local AI Inferences
             </span>
-            <span className="text-xl font-bold font-mono tabular-nums text-indigo-600 mt-0.5 block">
+            <span className="text-xl font-bold font-mono tabular-nums text-[#818CF8] mt-0.5 block">
               {aiEventsCount}
             </span>
-            <span className="text-[10px] text-slate-muted block mt-0.5">
+            <span className="text-[10px] text-[#A8B7CC] block mt-0.5">
               100% on-device Gemma 2 2B
             </span>
           </div>
-          <div className="p-2.5 rounded-xl bg-indigo-50 text-indigo-600 border border-indigo-100">
+          <div className="p-2.5 rounded-xl bg-[#818CF8]/15 text-[#818CF8] border border-[#818CF8]/30">
             <Cpu className="w-4 h-4" />
           </div>
         </div>
 
-        <div className="financial-card p-4 flex items-center justify-between">
+        <div className="bg-[#162238] border border-[#29374D] rounded-xl p-4 flex items-center justify-between shadow-lg">
           <div>
-            <span className="text-[11px] font-semibold text-slate-muted uppercase tracking-wider block">
+            <span className="text-[11px] font-semibold text-[#A8B7CC] uppercase tracking-wider block">
               Human Sign-Offs
             </span>
-            <span className="text-xl font-bold font-mono tabular-nums text-emerald-600 mt-0.5 block">
+            <span className="text-xl font-bold font-mono tabular-nums text-[#34D399] mt-0.5 block">
               {verifEventsCount}
             </span>
-            <span className="text-[10px] text-slate-muted block mt-0.5">
+            <span className="text-[10px] text-[#A8B7CC] block mt-0.5">
               Zero automated payment without review
             </span>
           </div>
-          <div className="p-2.5 rounded-xl bg-emerald-50 text-emerald-600 border border-emerald-100">
+          <div className="p-2.5 rounded-xl bg-[#34D399]/15 text-[#34D399] border border-[#34D399]/30">
             <CheckCircle2 className="w-4 h-4" />
           </div>
         </div>
       </div>
 
-      {/* Zero-Trust Notice (Sleek, integrated styling matching FinCore) */}
-      <div className="financial-card p-3.5 bg-gradient-to-r from-slate-50 to-white flex items-center justify-between gap-3 text-xs">
+      {/* Zero-Trust Notice */}
+      <div className="bg-[#162238] border border-[#29374D] rounded-xl p-3.5 flex items-center justify-between gap-3 text-xs shadow-lg">
         <div className="flex items-center gap-2.5">
-          <div className="p-2 rounded-lg bg-emerald-100/70 text-emerald-700 shrink-0">
+          <div className="p-2 rounded-lg bg-[#34D399]/15 text-[#34D399] border border-[#34D399]/30 shrink-0">
             <Lock className="w-4 h-4" />
           </div>
           <div>
-            <span className="font-semibold text-navy-900 block text-xs">
+            <span className="font-semibold text-[#F8FAFC] block text-xs">
               Zero-Trust Audit Guarantee
             </span>
-            <span className="text-[11px] text-slate-500">
+            <span className="text-[11px] text-[#A8B7CC]">
               Every document extraction, field change, status transition, and AI response is cryptographically stored on your local disk.
             </span>
           </div>
         </div>
-        <span className="text-[10px] font-mono text-emerald-700 bg-emerald-50 border border-emerald-200 px-2 py-0.5 rounded-full shrink-0 hidden md:inline">
+        <span className="text-[10px] font-mono text-[#34D399] bg-[#34D399]/15 border border-[#34D399]/30 px-2.5 py-0.5 rounded-full shrink-0 hidden md:inline font-semibold">
           Air-Gapped Privacy
         </span>
       </div>
@@ -261,14 +261,14 @@ export const AuditLogView: React.FC = () => {
                 onClick={() => setSelectedCategory(tab.id)}
                 className={`px-3 py-1.5 rounded-lg text-xs font-semibold whitespace-nowrap transition-all flex items-center gap-1.5 ${
                   isActive
-                    ? 'bg-navy-900 text-white shadow-xs'
-                    : 'bg-white border border-slate-border text-slate-600 hover:text-navy-900 hover:bg-slate-50'
+                    ? 'bg-[#22D3EE] text-[#0B1220] font-bold shadow-md'
+                    : 'bg-[#162238] border border-[#29374D] text-[#A8B7CC] hover:text-[#F8FAFC] hover:bg-[#1C2B46]'
                 }`}
               >
                 <span>{tab.label}</span>
                 <span
-                  className={`text-[10px] font-mono px-1.5 py-0.2 rounded-full ${
-                    isActive ? 'bg-white/20 text-white' : 'bg-slate-100 text-slate-600'
+                  className={`text-[10px] font-mono px-1.5 py-0.2 rounded-full font-bold ${
+                    isActive ? 'bg-[#0B1220]/20 text-[#0B1220]' : 'bg-[#111D32] text-[#A8B7CC] border border-[#29374D]'
                   }`}
                 >
                   {tab.count}
@@ -280,34 +280,34 @@ export const AuditLogView: React.FC = () => {
 
         {/* Search Input */}
         <div className="relative sm:w-64">
-          <Search className="w-3.5 h-3.5 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
+          <Search className="w-3.5 h-3.5 text-[#64748B] absolute left-3 top-1/2 -translate-y-1/2" />
           <input
             type="text"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             placeholder="Search audit trail..."
-            className="w-full pl-8 pr-3 py-1.5 text-xs rounded-lg border border-slate-border bg-white text-navy-900 placeholder:text-slate-400 focus:outline-none focus:ring-1 focus:ring-brand-blue focus:border-brand-blue"
+            className="w-full pl-8 pr-3 py-1.5 text-xs rounded-lg border border-[#29374D] bg-[#162238] text-[#F8FAFC] placeholder:text-[#64748B] focus:outline-none focus:border-[#22D3EE]"
           />
         </div>
       </div>
 
-      {/* Activity Feed List (Matching Reference Image 2 'Recent Transactions' & Reference Image 3 'Recent Activity') */}
-      <div className="financial-card overflow-hidden">
+      {/* Activity Feed List */}
+      <div className="bg-[#162238] border border-[#29374D] rounded-xl overflow-hidden shadow-lg">
         {loading ? (
-          <div className="p-12 text-center text-slate-muted text-xs">
-            <div className="w-6 h-6 border-2 border-brand-blue border-t-transparent rounded-full animate-spin mx-auto mb-2" />
+          <div className="p-12 text-center text-[#A8B7CC] text-xs">
+            <div className="w-6 h-6 border-2 border-[#22D3EE] border-t-transparent rounded-full animate-spin mx-auto mb-2" />
             <span>Loading audit records...</span>
           </div>
         ) : filteredLogs.length === 0 ? (
-          <div className="p-12 text-center text-slate-muted text-xs">
-            <Activity className="w-6 h-6 text-slate-300 mx-auto mb-2" />
-            <p className="font-semibold text-navy-900">No matching audit events</p>
-            <p className="text-[11px] text-slate-400 mt-0.5">
+          <div className="p-12 text-center text-[#A8B7CC] text-xs">
+            <Activity className="w-6 h-6 text-[#64748B] mx-auto mb-2" />
+            <p className="font-semibold text-[#F8FAFC]">No matching audit events</p>
+            <p className="text-[11px] text-[#A8B7CC] mt-0.5">
               {searchTerm ? 'Try adjusting your search filter' : 'Activity events will appear here as you interact with bills.'}
             </p>
           </div>
         ) : (
-          <div className="divide-y divide-slate-100">
+          <div className="divide-y divide-[#29374D]">
             {filteredLogs.map((log) => {
               const meta = getEventMeta(log.action);
               const Icon = meta.icon;
@@ -324,7 +324,7 @@ export const AuditLogView: React.FC = () => {
               return (
                 <div
                   key={log.id}
-                  className="p-3.5 sm:p-4 hover:bg-slate-50/70 transition-colors flex items-start gap-3.5"
+                  className="p-3.5 sm:p-4 hover:bg-[#1C2B46] transition-colors flex items-start gap-3.5"
                 >
                   {/* Event Icon Avatar */}
                   <div className={`p-2.5 rounded-xl shrink-0 ${meta.iconBg}`}>
@@ -335,7 +335,7 @@ export const AuditLogView: React.FC = () => {
                   <div className="flex-1 min-w-0">
                     <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1 mb-0.5">
                       <div className="flex items-center gap-2">
-                        <span className="font-bold text-navy-900 text-xs">
+                        <span className="font-bold text-[#F8FAFC] text-xs">
                           {formattedTitle}
                         </span>
                         <span
@@ -344,17 +344,17 @@ export const AuditLogView: React.FC = () => {
                           {log.action}
                         </span>
                         {log.document_id && (
-                          <span className="text-[10px] font-mono font-medium px-1.5 py-0.2 rounded bg-slate-100 text-slate-700 border border-slate-200">
+                          <span className="text-[10px] font-mono font-medium px-1.5 py-0.2 rounded bg-[#111D32] text-[#A8B7CC] border border-[#29374D]">
                             #{log.document_id}
                           </span>
                         )}
                       </div>
-                      <span className="text-[11px] font-mono tabular-nums text-slate-400 shrink-0">
+                      <span className="text-[11px] font-mono tabular-nums text-[#A8B7CC] shrink-0">
                         {formattedDate}
                       </span>
                     </div>
 
-                    <p className="text-xs text-slate-600 leading-relaxed font-normal">
+                    <p className="text-xs text-[#A8B7CC] leading-relaxed font-normal">
                       {formattedDetails}
                     </p>
                   </div>

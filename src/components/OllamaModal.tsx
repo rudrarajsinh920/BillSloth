@@ -40,22 +40,22 @@ export const OllamaModal: React.FC<OllamaModalProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-navy-900/50 backdrop-blur-sm p-4 animate-in fade-in duration-150">
-      <div className="bg-white rounded-xl shadow-2xl border border-slate-border max-w-lg w-full overflow-hidden">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#0B1220]/80 backdrop-blur-md p-4 animate-in fade-in duration-150">
+      <div className="bg-[#162238] rounded-2xl shadow-2xl border border-[#29374D] max-w-lg w-full overflow-hidden">
         {/* Header */}
-        <div className="px-6 py-4 border-b border-slate-border flex items-center justify-between bg-slate-light">
+        <div className="px-6 py-4 border-b border-[#29374D] flex items-center justify-between bg-[#111D32]">
           <div className="flex items-center gap-2.5">
-            <div className="p-2 bg-brand-blue-light text-brand-blue rounded-lg">
+            <div className="p-2 bg-[#22D3EE]/15 text-[#22D3EE] border border-[#22D3EE]/30 rounded-lg">
               <Cpu className="w-5 h-5" />
             </div>
             <div>
-              <h3 className="font-semibold text-navy-900 text-base">Local AI Engine (Ollama)</h3>
-              <p className="text-xs text-slate-muted">Zero-cloud local invoice & receipt parser</p>
+              <h3 className="font-semibold text-[#F8FAFC] text-base">Local AI Engine (Ollama)</h3>
+              <p className="text-xs text-[#A8B7CC]">Zero-cloud local invoice & receipt parser</p>
             </div>
           </div>
           <button
             onClick={onClose}
-            className="text-slate-muted hover:text-navy-900 p-1 rounded-lg transition-colors"
+            className="text-[#A8B7CC] hover:text-[#F8FAFC] p-1 rounded-lg hover:bg-[#1C2B46] transition-colors"
           >
             <X className="w-5 h-5" />
           </button>
@@ -66,58 +66,58 @@ export const OllamaModal: React.FC<OllamaModalProps> = ({
           {/* Status Banner */}
           {status?.available ? (
             <div className="space-y-3">
-              <div className="p-3.5 rounded-lg border border-green-paid-border bg-green-paid-light flex items-start gap-3">
-                <CheckCircle2 className="w-5 h-5 text-green-paid shrink-0 mt-0.5" />
+              <div className="p-3.5 rounded-lg border border-[#34D399]/40 bg-[#111D32] flex items-start gap-3">
+                <CheckCircle2 className="w-5 h-5 text-[#34D399] shrink-0 mt-0.5" />
                 <div>
-                  <p className="text-sm font-semibold text-green-paid">Ollama is Connected & Ready</p>
-                  <p className="text-xs text-navy-700 mt-0.5">
-                    Connected to local daemon at <span className="font-mono">{status.url}</span>.
+                  <p className="text-sm font-semibold text-[#34D399]">Ollama is Connected & Ready</p>
+                  <p className="text-xs text-[#A8B7CC] mt-0.5">
+                    Connected to local daemon at <span className="font-mono text-[#F8FAFC]">{status.url}</span>.
                   </p>
                 </div>
               </div>
 
               {/* Gemma Detection Card */}
               {status.hasGemma ? (
-                <div className="p-3 rounded-lg border border-brand-blue/30 bg-brand-blue-light/50 flex items-start gap-2.5">
-                  <CheckCircle2 className="w-4 h-4 text-brand-blue shrink-0 mt-0.5" />
-                  <div className="text-xs text-navy-800">
-                    <span className="font-semibold text-brand-blue">Gemma Model Detected: </span>
-                    BillSloth will prioritize <span className="font-mono font-medium">{status.activeModel}</span> for invoice field extraction.
+                <div className="p-3 rounded-lg border border-[#22D3EE]/30 bg-[#22D3EE]/10 flex items-start gap-2.5">
+                  <CheckCircle2 className="w-4 h-4 text-[#22D3EE] shrink-0 mt-0.5" />
+                  <div className="text-xs text-[#F8FAFC]">
+                    <span className="font-semibold text-[#22D3EE]">Gemma Model Detected: </span>
+                    BillSloth will prioritize <span className="font-mono font-medium text-[#22D3EE]">{status.activeModel}</span> for invoice field extraction.
                   </div>
                 </div>
               ) : (
-                <div className="p-3 rounded-lg border border-amber-warn-border bg-amber-warn-light flex flex-col gap-2">
+                <div className="p-3 rounded-lg border border-[#FBBF24]/40 bg-[#111D32] flex flex-col gap-2">
                   <div className="flex items-start gap-2.5">
-                    <AlertTriangle className="w-4 h-4 text-amber-warn shrink-0 mt-0.5" />
-                    <div className="text-xs text-navy-800">
-                      <span className="font-semibold text-amber-warn">Gemma Model Not Found: </span>
-                      BillSloth works best with open-weight Gemma 2 models. Fallback model: <span className="font-mono font-medium">{status.activeModel || 'None'}</span>.
+                    <AlertTriangle className="w-4 h-4 text-[#FBBF24] shrink-0 mt-0.5" />
+                    <div className="text-xs text-[#F8FAFC]">
+                      <span className="font-semibold text-[#FBBF24]">Gemma Model Not Found: </span>
+                      BillSloth works best with open-weight Gemma 2 models. Fallback model: <span className="font-mono font-medium text-[#FBBF24]">{status.activeModel || 'None'}</span>.
                     </div>
                   </div>
-                  <div className="bg-navy-900 text-slate-100 p-2.5 rounded-md text-xs font-mono flex items-center justify-between">
+                  <div className="bg-[#0B1220] border border-[#29374D] text-[#22D3EE] p-2.5 rounded-md text-xs font-mono flex items-center justify-between">
                     <span>ollama pull gemma2:2b</span>
-                    <span className="text-[10px] text-slate-400 font-sans">Recommended (1.6GB)</span>
+                    <span className="text-[10px] text-[#A8B7CC] font-sans">Recommended (1.6GB)</span>
                   </div>
                 </div>
               )}
             </div>
           ) : (
-            <div className="p-3.5 rounded-lg border border-amber-warn-border bg-amber-warn-light flex items-start gap-3">
-              <AlertTriangle className="w-5 h-5 text-amber-warn shrink-0 mt-0.5" />
+            <div className="p-3.5 rounded-lg border border-[#FBBF24]/40 bg-[#111D32] flex items-start gap-3">
+              <AlertTriangle className="w-5 h-5 text-[#FBBF24] shrink-0 mt-0.5" />
               <div>
-                <p className="text-sm font-semibold text-amber-warn">Local Ollama Model Offline</p>
-                <p className="text-xs text-navy-700 mt-0.5">
-                  Could not reach local daemon at <span className="font-mono">{status?.url || 'http://127.0.0.1:11434'}</span>.
+                <p className="text-sm font-semibold text-[#FBBF24]">Local Ollama Model Offline</p>
+                <p className="text-xs text-[#A8B7CC] mt-0.5">
+                  Could not reach local daemon at <span className="font-mono text-[#F8FAFC]">{status?.url || 'http://127.0.0.1:11434'}</span>.
                 </p>
               </div>
             </div>
           )}
 
           {/* Privacy Guarantee */}
-          <div className="p-3 rounded-lg border border-slate-border bg-cool-bg flex items-start gap-3">
-            <ShieldCheck className="w-5 h-5 text-brand-blue shrink-0 mt-0.5" />
-            <div className="text-xs text-navy-700 space-y-1">
-              <p className="font-semibold text-navy-900">Privacy & Data Safety Guarantee</p>
+          <div className="p-3 rounded-lg border border-[#29374D] bg-[#111D32] flex items-start gap-3">
+            <ShieldCheck className="w-5 h-5 text-[#34D399] shrink-0 mt-0.5" />
+            <div className="text-xs text-[#A8B7CC] space-y-1">
+              <p className="font-semibold text-[#F8FAFC]">Privacy & Data Safety Guarantee</p>
               <p>
                 BillSloth strictly runs on-device. Scanned documents and receipts are extracted locally via Tesseract OCR and PDF parsers, then structured using local Gemma models. No financial figures ever leave your device.
               </p>
@@ -127,19 +127,19 @@ export const OllamaModal: React.FC<OllamaModalProps> = ({
           {/* Models list or Startup Instructions */}
           {status?.available ? (
             <div className="space-y-2">
-              <h4 className="text-xs font-semibold uppercase tracking-wider text-slate-muted">
+              <h4 className="text-xs font-semibold uppercase tracking-wider text-[#A8B7CC]">
                 Available Local Models ({status.models.length})
               </h4>
               {status.models.length > 0 ? (
-                <div className="border border-slate-border rounded-lg divide-y divide-slate-border max-h-40 overflow-y-auto">
+                <div className="border border-[#29374D] rounded-lg divide-y divide-[#29374D] max-h-40 overflow-y-auto bg-[#111D32]">
                   {status.models.map((model) => (
                     <div
                       key={model}
-                      className="px-3 py-2 flex items-center justify-between text-xs hover:bg-slate-light"
+                      className="px-3 py-2 flex items-center justify-between text-xs hover:bg-[#1C2B46]"
                     >
-                      <span className="font-mono font-medium text-navy-900">{model}</span>
+                      <span className="font-mono font-medium text-[#F8FAFC]">{model}</span>
                       {status.activeModel === model && (
-                        <span className="px-2 py-0.5 rounded text-[10px] font-semibold bg-brand-blue-light text-brand-blue">
+                        <span className="px-2 py-0.5 rounded text-[10px] font-semibold bg-[#22D3EE]/15 text-[#22D3EE] border border-[#22D3EE]/30">
                           Active Default
                         </span>
                       )}
@@ -147,28 +147,28 @@ export const OllamaModal: React.FC<OllamaModalProps> = ({
                   ))}
                 </div>
               ) : (
-                <div className="p-3 border border-dashed border-slate-border rounded-lg text-xs text-slate-muted text-center">
-                  No models installed. Run <span className="font-mono text-navy-900">ollama pull gemma2:2b</span> in your terminal.
+                <div className="p-3 border border-dashed border-[#29374D] rounded-lg text-xs text-[#A8B7CC] text-center">
+                  No models installed. Run <span className="font-mono text-[#22D3EE]">ollama pull gemma2:2b</span> in your terminal.
                 </div>
               )}
             </div>
           ) : (
             <div className="space-y-3">
-              <h4 className="text-xs font-semibold uppercase tracking-wider text-slate-muted">
+              <h4 className="text-xs font-semibold uppercase tracking-wider text-[#A8B7CC]">
                 How to Connect Local Ollama
               </h4>
-              <div className="bg-navy-900 text-slate-100 p-3.5 rounded-lg text-xs font-mono space-y-2">
-                <div className="flex items-center gap-2 text-slate-400 border-b border-navy-700 pb-1.5">
-                  <Terminal className="w-4 h-4" />
+              <div className="bg-[#0B1220] border border-[#29374D] text-[#F8FAFC] p-3.5 rounded-lg text-xs font-mono space-y-2">
+                <div className="flex items-center gap-2 text-[#A8B7CC] border-b border-[#29374D] pb-1.5">
+                  <Terminal className="w-4 h-4 text-[#22D3EE]" />
                   <span>Terminal Command</span>
                 </div>
-                <p className="text-emerald-400"># 1. Start Ollama locally</p>
-                <p>ollama serve</p>
-                <p className="text-emerald-400 mt-2"># 2. Pull recommended Gemma model</p>
-                <p>ollama pull gemma2:2b</p>
+                <p className="text-[#34D399]"># 1. Start Ollama locally</p>
+                <p className="text-[#F8FAFC]">ollama serve</p>
+                <p className="text-[#34D399] mt-2"># 2. Pull recommended Gemma model</p>
+                <p className="text-[#F8FAFC]">ollama pull gemma2:2b</p>
               </div>
-              <p className="text-xs text-slate-muted">
-                Once Ollama is running, click <strong className="text-navy-900">Retry Connection</strong> below.
+              <p className="text-xs text-[#A8B7CC]">
+                Once Ollama is running, click <strong className="text-[#F8FAFC]">Retry Connection</strong> below.
                 In the meantime, you can review and organize bills manually with full functionality!
               </p>
             </div>
@@ -176,12 +176,12 @@ export const OllamaModal: React.FC<OllamaModalProps> = ({
         </div>
 
         {/* Footer */}
-        <div className="px-6 py-3.5 bg-slate-light border-t border-slate-border flex items-center justify-between">
+        <div className="px-6 py-3.5 bg-[#111D32] border-t border-[#29374D] flex items-center justify-between">
           <a
             href="https://ollama.com/download"
             target="_blank"
             rel="noreferrer"
-            className="text-xs text-brand-blue hover:underline inline-flex items-center gap-1 font-medium"
+            className="text-xs text-[#22D3EE] hover:text-[#38BDF8] hover:underline inline-flex items-center gap-1 font-semibold"
           >
             <span>Download Ollama</span>
             <ExternalLink className="w-3 h-3" />
@@ -190,14 +190,14 @@ export const OllamaModal: React.FC<OllamaModalProps> = ({
             <button
               onClick={handleRefresh}
               disabled={refreshing}
-              className="px-3 py-1.5 rounded-lg text-xs font-medium border border-slate-border bg-white hover:bg-slate-100 text-navy-800 inline-flex items-center gap-1.5 transition-colors disabled:opacity-50"
+              className="px-3 py-1.5 rounded-lg text-xs font-semibold border border-[#29374D] bg-[#162238] hover:bg-[#1C2B46] text-[#F8FAFC] inline-flex items-center gap-1.5 transition-colors disabled:opacity-50"
             >
               <RefreshCw className={`w-3.5 h-3.5 ${refreshing ? 'animate-spin' : ''}`} />
               <span>Retry Connection</span>
             </button>
             <button
               onClick={onClose}
-              className="px-3.5 py-1.5 rounded-lg text-xs font-semibold bg-navy-900 hover:bg-navy-800 text-white transition-colors"
+              className="px-4 py-1.5 rounded-lg text-xs font-bold bg-[#22D3EE] hover:bg-[#06B6D4] text-[#0B1220] transition-colors"
             >
               Done
             </button>

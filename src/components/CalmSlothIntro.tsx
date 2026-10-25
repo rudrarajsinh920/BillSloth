@@ -120,13 +120,13 @@ export const CalmSlothIntro: React.FC<CalmSlothIntroProps> = ({ onComplete, onSk
       role="region"
       aria-label="BillSloth Welcome Experience"
       aria-live="polite"
-      className={`fixed inset-0 z-50 flex items-center justify-center bg-[#090D16] text-white select-none transition-opacity duration-400 ease-out overflow-hidden ${
+      className={`fixed inset-0 z-50 flex items-center justify-center bg-[#0B1220] text-white select-none transition-opacity duration-400 ease-out overflow-hidden ${
         isExiting ? 'opacity-0 pointer-events-none' : 'opacity-100'
       }`}
     >
       {/* 1. Cinematic Environment: Midnight Navy with Deep Ambient Halos */}
-      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_50%_35%,rgba(14,165,233,0.14)_0%,rgba(37,99,235,0.10)_35%,rgba(9,13,22,0.98)_80%)] pointer-events-none" />
-      <div className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[520px] h-[520px] rounded-full bg-gradient-to-tr from-blue-600/15 via-cyan-500/10 to-transparent blur-3xl pointer-events-none" />
+      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_50%_35%,rgba(34,211,238,0.15)_0%,rgba(52,211,153,0.08)_35%,rgba(11,18,32,0.98)_80%)] pointer-events-none" />
+      <div className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[520px] h-[520px] rounded-full bg-gradient-to-tr from-[#22D3EE]/15 via-[#34D399]/10 to-transparent blur-3xl pointer-events-none" />
 
       {/* Sparse, drifting ambient light specks */}
       <div className="absolute inset-0 pointer-events-none opacity-25">
@@ -191,15 +191,15 @@ export const CalmSlothIntro: React.FC<CalmSlothIntroProps> = ({ onComplete, onSk
                     : 'opacity-0 scale-75 pointer-events-none'
                 }`}
               >
-                <div className="bg-white/95 text-navy-900 rounded-xl px-2.5 py-1.5 shadow-xl border border-slate-200/90 flex items-center gap-1.5 backdrop-blur-md">
-                  <div className="w-4 h-4 rounded-md bg-blue-100 text-blue-600 flex items-center justify-center shrink-0">
+                <div className="bg-[#162238]/95 text-[#F8FAFC] rounded-xl px-2.5 py-1.5 shadow-xl border border-[#29374D] flex items-center gap-1.5 backdrop-blur-md ring-1 ring-[#22D3EE]/30">
+                  <div className="w-4 h-4 rounded-md bg-[#111D32] text-[#22D3EE] border border-[#29374D] flex items-center justify-center shrink-0">
                     <FileText className="w-2.5 h-2.5" />
                   </div>
                   <div className="text-left">
-                    <span className="text-[9px] font-black text-navy-900 block leading-tight">
+                    <span className="text-[9px] font-black text-[#F8FAFC] block leading-tight">
                       Bill
                     </span>
-                    <span className="text-[8px] font-bold text-amber-700 font-mono block">
+                    <span className="text-[8px] font-bold text-[#FBBF24] font-mono block">
                       $128.50
                     </span>
                   </div>
@@ -216,17 +216,17 @@ export const CalmSlothIntro: React.FC<CalmSlothIntroProps> = ({ onComplete, onSk
                 : 'opacity-0 -translate-x-6 scale-90 pointer-events-none'
             }`}
           >
-            <div className="bg-white/95 text-navy-900 rounded-2xl p-3.5 sm:p-4 shadow-2xl border border-slate-200 text-left ring-2 ring-cyan-400/80 shadow-cyan-500/20 backdrop-blur-md">
+            <div className="bg-[#162238]/95 text-[#F8FAFC] rounded-2xl p-3.5 sm:p-4 shadow-2xl border border-[#29374D] text-left ring-2 ring-[#22D3EE] shadow-[#22D3EE]/20 backdrop-blur-md">
               <div className="flex items-center justify-between gap-2.5">
                 <div className="flex items-center gap-2.5 truncate">
-                  <div className="w-8 h-8 rounded-xl bg-blue-50 text-blue-600 border border-blue-200/70 flex items-center justify-center shrink-0 shadow-2xs">
+                  <div className="w-8 h-8 rounded-xl bg-[#111D32] text-[#22D3EE] border border-[#29374D] flex items-center justify-center shrink-0 shadow-2xs">
                     <FileText className="w-4 h-4" />
                   </div>
                   <div className="truncate">
-                    <span className="text-xs font-bold text-navy-900 block truncate">
+                    <span className="text-xs font-bold text-[#F8FAFC] block truncate">
                       Broadband & Utilities
                     </span>
-                    <span className="text-[10px] text-slate-400 font-medium block">
+                    <span className="text-[10px] text-[#A8B7CC] font-medium block">
                       Sample Illustrative Bill
                     </span>
                   </div>
@@ -234,14 +234,14 @@ export const CalmSlothIntro: React.FC<CalmSlothIntroProps> = ({ onComplete, onSk
 
                 {/* Due Date & Organized Status */}
                 <div className="text-right shrink-0">
-                  <span className="text-sm font-black text-navy-900 font-mono block tabular-nums">
+                  <span className="text-sm font-black text-[#F8FAFC] font-mono block tabular-nums">
                     $128.50
                   </span>
                   <div className="flex items-center gap-1 justify-end mt-0.5">
-                    <span className="text-[9px] font-bold px-1.5 py-0.5 rounded bg-amber-100 text-amber-900">
+                    <span className="text-[9px] font-bold px-1.5 py-0.5 rounded bg-[#FBBF24]/15 text-[#FBBF24] border border-[#FBBF24]/30">
                       Due in 5d
                     </span>
-                    <span className="text-[9px] font-bold px-1.5 py-0.5 rounded bg-emerald-100 text-emerald-800 flex items-center gap-0.5 shadow-2xs">
+                    <span className="text-[9px] font-bold px-1.5 py-0.5 rounded bg-[#34D399]/15 text-[#34D399] border border-[#34D399]/30 flex items-center gap-0.5 shadow-2xs">
                       <CheckCircle2 className="w-2.5 h-2.5" /> Organized
                     </span>
                   </div>
@@ -258,14 +258,14 @@ export const CalmSlothIntro: React.FC<CalmSlothIntroProps> = ({ onComplete, onSk
           }`}
         >
           <div className="flex items-center justify-center gap-2">
-            <h1 className="text-2xl sm:text-3xl font-black tracking-tight text-white">
+            <h1 className="text-2xl sm:text-3xl font-black tracking-tight text-[#F8FAFC]">
               BillSloth
             </h1>
-            <span className="text-[10px] font-black uppercase tracking-wider px-2 py-0.5 rounded-md bg-gradient-to-r from-blue-500/20 to-cyan-500/20 text-cyan-300 border border-cyan-400/30">
+            <span className="text-[10px] font-black uppercase tracking-wider px-2 py-0.5 rounded-md bg-[#22D3EE]/15 text-[#22D3EE] border border-[#22D3EE]/30">
               Local AI
             </span>
           </div>
-          <p className="text-xs font-bold uppercase tracking-widest text-slate-400">
+          <p className="text-xs font-bold uppercase tracking-widest text-[#A8B7CC]">
             SLOW AND STEADY
           </p>
         </div>
@@ -276,20 +276,20 @@ export const CalmSlothIntro: React.FC<CalmSlothIntroProps> = ({ onComplete, onSk
             stage >= 4 ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-3'
           }`}
         >
-          <h2 className="text-base sm:text-lg font-bold tracking-tight text-slate-100">
+          <h2 className="text-base sm:text-lg font-bold tracking-tight text-[#F8FAFC]">
             Bills handled. Peace of mind.
           </h2>
-          <p className="text-xs sm:text-[13px] text-slate-300 max-w-sm mx-auto leading-relaxed font-normal">
+          <p className="text-xs sm:text-[13px] text-[#A8B7CC] max-w-sm mx-auto leading-relaxed font-normal">
             Your bills, organized. Your documents, on your device.
           </p>
 
           {/* Privacy Shield with Device Outline & Subtle Pulsing Glow */}
           <div className="pt-1 flex items-center justify-center">
-            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-emerald-500/15 border border-emerald-400/35 text-emerald-300 text-xs font-semibold shadow-sm animate-shield-glow">
-              <Laptop className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
+            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#34D399]/15 border border-[#34D399]/35 text-[#34D399] text-xs font-semibold shadow-sm animate-shield-glow">
+              <Laptop className="w-3.5 h-3.5 text-[#34D399] shrink-0" />
               <span>On-Device Storage</span>
-              <span className="text-emerald-400/60">•</span>
-              <ShieldCheck className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
+              <span className="text-[#34D399]/60">•</span>
+              <ShieldCheck className="w-3.5 h-3.5 text-[#34D399] shrink-0" />
               <span>Zero Cloud AI Transmission</span>
             </div>
           </div>

@@ -169,7 +169,7 @@ export function App() {
   ).length;
 
   return (
-    <div className="min-h-screen flex bg-cool-bg text-navy-900 font-sans antialiased">
+    <div className="min-h-screen flex bg-[#0B1220] text-[#F8FAFC] font-sans antialiased selection:bg-[#22D3EE]/30 selection:text-[#22D3EE]">
       {/* Left Navigation Sidebar (FinCore & MySign style) */}
       <Sidebar
         activeTab={activeTab}
@@ -343,13 +343,13 @@ export function App() {
 
       {/* Toast Notification */}
       {toast && (
-        <div className="fixed bottom-6 right-6 z-50 flex items-center gap-2 bg-navy-900 text-white px-4 py-2.5 rounded-xl shadow-xl text-xs animate-in slide-in-from-bottom-2">
+        <div className="fixed bottom-6 right-6 z-50 flex items-center gap-2.5 bg-[#162238] text-[#F8FAFC] border border-[#29374D] px-4 py-2.5 rounded-xl shadow-2xl text-xs animate-in slide-in-from-bottom-2">
           {toast.type === 'success' ? (
-            <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
+            <CheckCircle2 className="w-4 h-4 text-[#34D399] shrink-0" />
           ) : (
-            <AlertCircle className="w-4 h-4 text-brand-blue shrink-0" />
+            <AlertCircle className="w-4 h-4 text-[#22D3EE] shrink-0" />
           )}
-          <span>{toast.message}</span>
+          <span className="font-medium">{toast.message}</span>
         </div>
       )}
     </div>

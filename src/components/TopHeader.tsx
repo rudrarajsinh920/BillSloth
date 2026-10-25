@@ -67,27 +67,27 @@ export const TopHeader: React.FC<TopHeaderProps> = ({
   const current = titles[activeTab] || titles.dashboard;
 
   return (
-    <header className="sticky top-0 z-20 bg-white/80 backdrop-blur-xl border-b border-slate-200/80 px-4 sm:px-6 lg:px-8 py-3.5 transition-all">
+    <header className="sticky top-0 z-20 bg-[#111D32] border-b border-[#29374D] px-4 sm:px-6 lg:px-8 py-3.5 transition-all text-[#F8FAFC]">
       <div className="flex items-center justify-between gap-4">
         {/* Left Side: Mobile Menu Button + Page Heading */}
         <div className="flex items-center gap-3">
           <button
             onClick={onOpenMobileSidebar}
-            className="lg:hidden p-2 rounded-xl border border-slate-200/80 text-navy-800 hover:bg-slate-100"
+            className="lg:hidden p-2 rounded-xl border border-[#29374D] text-[#F8FAFC] hover:bg-[#162238]"
             aria-label="Open navigation sidebar"
           >
             <Menu className="w-5 h-5" />
           </button>
           <div>
             <div className="flex items-center gap-2">
-              <h1 className="text-base sm:text-lg font-extrabold tracking-tight leading-tight bg-gradient-to-r from-navy-900 via-indigo-950 to-blue-900 bg-clip-text text-transparent">
+              <h1 className="text-base sm:text-lg font-extrabold tracking-tight leading-tight text-[#F8FAFC]">
                 {current.title}
               </h1>
-              <span className="hidden sm:inline-block text-[10px] font-extrabold px-2 py-0.5 rounded-full bg-indigo-50 text-indigo-700 border border-indigo-200/70 uppercase tracking-wider">
+              <span className="hidden sm:inline-block text-[10px] font-extrabold px-2 py-0.5 rounded-full bg-[#22D3EE]/15 text-[#22D3EE] border border-[#22D3EE]/30 uppercase tracking-wider">
                 {current.tag}
               </span>
             </div>
-            <p className="text-[11px] text-slate-400 hidden sm:block font-medium">
+            <p className="text-[11px] text-[#A8B7CC] hidden sm:block font-medium">
               {current.subtitle}
             </p>
           </div>
@@ -95,14 +95,14 @@ export const TopHeader: React.FC<TopHeaderProps> = ({
 
         {/* Right Side: Omnibar Search, Ask AI, Import CTA, Notification Icon */}
         <div className="flex items-center gap-2 sm:gap-3">
-          {/* Global Search / Ask AI Omnibar (FinCore style with subtle focus glow) */}
+          {/* Global Search / Ask AI Omnibar */}
           <button
             onClick={onOpenAskModal}
-            className="hidden md:flex items-center gap-2.5 px-3.5 py-1.5 rounded-xl bg-slate-100/80 hover:bg-white border border-slate-200 text-slate-500 text-xs w-48 lg:w-64 transition-all shadow-2xs hover:border-indigo-300 hover:shadow-indigo-500/10 group focus:outline-none"
+            className="hidden md:flex items-center gap-2.5 px-3.5 py-1.5 rounded-xl bg-[#162238] hover:bg-[#1C2B46] border border-[#29374D] text-[#A8B7CC] text-xs w-48 lg:w-64 transition-all hover:border-[#22D3EE]/50 hover:text-[#F8FAFC] group focus:outline-none"
           >
-            <Search className="w-3.5 h-3.5 text-slate-400 group-hover:text-indigo-600 transition-colors shrink-0" />
-            <span className="flex-1 text-left truncate text-slate-600 font-medium">Ask AI or search ledger...</span>
-            <kbd className="px-1.5 py-0.5 rounded-md bg-white text-[9px] font-mono text-slate-500 border border-slate-200 shadow-2xs shrink-0 font-bold">
+            <Search className="w-3.5 h-3.5 text-[#A8B7CC] group-hover:text-[#22D3EE] transition-colors shrink-0" />
+            <span className="flex-1 text-left truncate font-medium">Ask AI or search ledger...</span>
+            <kbd className="px-1.5 py-0.5 rounded-md bg-[#0B1220] text-[9px] font-mono text-[#A8B7CC] border border-[#29374D] shrink-0 font-bold">
               ⌘K
             </kbd>
           </button>
@@ -110,50 +110,50 @@ export const TopHeader: React.FC<TopHeaderProps> = ({
           {/* Ask AI Pill Button */}
           <button
             onClick={onOpenAskModal}
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-gradient-to-r from-indigo-50 to-purple-50 hover:from-indigo-100 hover:to-purple-100 text-indigo-700 border border-indigo-200/80 text-xs font-bold shadow-2xs transition-all hover:scale-105 active:scale-95"
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-[#162238] hover:bg-[#1C2B46] text-[#22D3EE] border border-[#29374D] hover:border-[#22D3EE]/50 text-xs font-bold transition-all hover:scale-105 active:scale-95"
             title="Ask BillSloth Assistant (Local Gemma 2 2B)"
           >
-            <Sparkles className="w-3.5 h-3.5 text-indigo-600 animate-pulse-glow" />
+            <Sparkles className="w-3.5 h-3.5 text-[#22D3EE] animate-pulse-glow" />
             <span className="hidden sm:inline">Ask AI</span>
           </button>
 
           {/* Reminders / Notification Bell */}
           <button
             onClick={onNavigateToReminders}
-            className="relative p-2 rounded-xl border border-slate-200 text-slate-600 hover:text-navy-900 hover:bg-slate-100 transition-all hover:scale-105"
+            className="relative p-2 rounded-xl border border-[#29374D] text-[#A8B7CC] hover:text-[#F8FAFC] hover:bg-[#162238] transition-all hover:scale-105"
             title="Pending Reminders & Approvals"
           >
             <BellRing className="w-4 h-4" />
             {pendingRemindersCount > 0 && (
-              <span className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-gradient-to-tr from-indigo-600 to-cyan-500 text-white text-[9px] font-extrabold flex items-center justify-center font-mono shadow-sm shadow-indigo-500/40">
+              <span className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-[#22D3EE] text-[#0B1220] text-[9px] font-black flex items-center justify-center font-mono shadow-sm shadow-[#22D3EE]/40">
                 {pendingRemindersCount}
               </span>
             )}
           </button>
 
-          {/* Quick Import Button with Futuristic Gradient */}
+          {/* Quick Import Button with Electric Cyan Gradient */}
           <button
             onClick={onNavigateToImport}
-            className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-gradient-to-r from-indigo-600 via-blue-600 to-cyan-500 hover:from-indigo-500 hover:via-blue-500 hover:to-cyan-400 text-white text-xs font-bold shadow-md shadow-indigo-500/20 hover:shadow-indigo-500/35 transition-all hover:scale-105 active:scale-95"
+            className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-gradient-to-r from-[#22D3EE] to-[#06B6D4] hover:brightness-110 text-[#0B1220] text-xs font-extrabold shadow-md shadow-[#22D3EE]/25 transition-all hover:scale-105 active:scale-95"
           >
             <UploadCloud className="w-3.5 h-3.5" />
             <span className="hidden sm:inline">Import Bill</span>
           </button>
 
           {/* Profile / Privacy Indicator Badge */}
-          <div className="flex items-center gap-2 pl-2 border-l border-slate-200">
+          <div className="flex items-center gap-2 pl-2 border-l border-[#29374D]">
             <div className="relative">
-              <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-indigo-500 to-cyan-400 p-[1.5px] shadow-xs">
-                <div className="w-full h-full bg-white rounded-full flex items-center justify-center text-sm">
+              <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-[#22D3EE] to-[#34D399] p-[1.5px] shadow-xs">
+                <div className="w-full h-full bg-[#162238] rounded-full flex items-center justify-center text-sm">
                   <span>🦥</span>
                 </div>
               </div>
             </div>
             <div className="hidden xl:block text-left">
-              <span className="text-xs font-extrabold text-navy-900 block leading-tight">
+              <span className="text-xs font-extrabold text-[#F8FAFC] block leading-tight">
                 Local Vault
               </span>
-              <span className="text-[10px] text-emerald-600 font-bold flex items-center gap-0.5">
+              <span className="text-[10px] text-[#34D399] font-bold flex items-center gap-0.5">
                 <ShieldCheck className="w-2.5 h-2.5" /> Air-Gapped
               </span>
             </div>
