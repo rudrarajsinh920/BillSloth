@@ -100,9 +100,10 @@ export const TopHeader: React.FC<TopHeaderProps> = ({
       {/* Microscopic top accent highlight */}
       <div className="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-[#087F8C]/35 to-transparent pointer-events-none" />
 
-      <div className="flex items-center justify-between gap-3 sm:gap-4">
-        {/* Left Side: Mobile Menu Button + Page Heading (Never Wraps) */}
-        <div className="flex items-center gap-3 shrink-0 min-w-0">
+      {/* Aligned Container matching main content max-w-7xl */}
+      <div className="max-w-7xl mx-auto w-full flex items-center justify-between gap-2.5 sm:gap-4">
+        {/* Left Side: Mobile Menu Button + Page Heading (Never Wraps, Never Collides) */}
+        <div className="flex items-center gap-2.5 sm:gap-3 shrink-0 min-w-0">
           <button
             onClick={onOpenMobileSidebar}
             className="lg:hidden p-2 rounded-xl border border-[#DCE4E5] text-[#172A35] hover:bg-[#F7F8F5] transition-colors shrink-0"
@@ -112,7 +113,7 @@ export const TopHeader: React.FC<TopHeaderProps> = ({
           </button>
           <div className="min-w-0">
             <div className="flex items-center gap-2">
-              <h1 className="text-base sm:text-lg font-black tracking-tight text-[#172A35] whitespace-nowrap">
+              <h1 className="text-base sm:text-lg font-black tracking-tight text-[#172A35] whitespace-nowrap truncate">
                 {current.title}
               </h1>
               <span className="hidden sm:inline-flex items-center gap-1.5 text-[10px] font-extrabold px-2.5 py-0.5 rounded-full bg-[#DDF5F6] text-[#087F8C] border border-[#087F8C]/25 uppercase tracking-wider shrink-0 shadow-2xs">
@@ -123,14 +124,14 @@ export const TopHeader: React.FC<TopHeaderProps> = ({
                 {current.tag}
               </span>
             </div>
-            <p className="text-[11px] text-[#526572] hidden md:block truncate max-w-xs xl:max-w-md font-medium mt-0.5">
+            <p className="text-[11px] text-[#526572] hidden xl:block truncate max-w-xs xl:max-w-md font-medium mt-0.5">
               {current.subtitle}
             </p>
           </div>
         </div>
 
         {/* Center: Signature AI Omnibar (Unifies Search + Ask BillSloth) */}
-        <div className="flex-1 max-w-xs sm:max-w-sm md:max-w-md mx-2 hidden sm:block">
+        <div className="flex-1 min-w-[130px] max-w-xs md:max-w-sm mx-2 hidden md:block">
           <button
             onClick={onOpenAskModal}
             className="w-full group flex items-center justify-between gap-2.5 px-3.5 py-1.5 rounded-full bg-[#F7F8F5] hover:bg-white border border-[#DCE4E5] hover:border-[#087F8C]/40 text-[#526572] hover:text-[#172A35] transition-all shadow-2xs hover:shadow-xs cursor-pointer"
@@ -155,17 +156,17 @@ export const TopHeader: React.FC<TopHeaderProps> = ({
           {/* Mobile search trigger */}
           <button
             onClick={onOpenAskModal}
-            className="sm:hidden p-2 rounded-xl border border-[#DCE4E5] text-[#526572] hover:text-[#087F8C] hover:bg-[#F7F8F5] transition-colors"
+            className="md:hidden p-2 rounded-xl border border-[#DCE4E5] text-[#526572] hover:text-[#087F8C] hover:bg-[#F7F8F5] transition-colors"
             title="Search & Ask Assistant"
             aria-label="Search and Ask"
           >
             <Sparkles className="w-4 h-4 text-[#087F8C]" />
           </button>
 
-          {/* AI Engine Status Pill (Interactive) */}
+          {/* AI Engine Status Pill (Interactive, visible on xl) */}
           <button
             onClick={onOpenAiSettings || onOpenAskModal}
-            className="hidden lg:inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full border border-[#DCE4E5] bg-[#F7F8F5] hover:bg-white hover:border-[#087F8C]/40 text-[#526572] hover:text-[#172A35] text-[11px] font-bold transition-all shadow-2xs hover:shadow-xs group cursor-pointer"
+            className="hidden xl:inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full border border-[#DCE4E5] bg-[#F7F8F5] hover:bg-white hover:border-[#087F8C]/40 text-[#526572] hover:text-[#172A35] text-[11px] font-bold transition-all shadow-2xs hover:shadow-xs group cursor-pointer"
             title="Configure AI Assistant Engine (Gemini, Gemma 2B, or Local)"
           >
             <Zap className="w-3 h-3 text-[#087F8C] group-hover:scale-110 transition-transform" />
@@ -193,39 +194,30 @@ export const TopHeader: React.FC<TopHeaderProps> = ({
           {/* Primary Action: Import Bill CTA */}
           <button
             onClick={onNavigateToImport}
-            className="flex items-center gap-1.5 px-3 sm:px-3.5 py-1.5 sm:py-2 rounded-xl bg-[#087F8C] hover:bg-[#066873] text-white text-xs font-black shadow-xs hover:shadow-md transition-all hover:scale-[1.02] active:scale-[0.98] shrink-0"
+            className="flex items-center gap-1.5 px-3 sm:px-3.5 py-1.5 sm:py-2 rounded-xl bg-[#087F8C] hover:bg-[#066873] text-white text-xs font-black shadow-xs hover:shadow-md transition-all hover:scale-[1.02] active:scale-[0.98] shrink-0 whitespace-nowrap"
           >
             <UploadCloud className="w-3.5 h-3.5 sm:w-4 sm:h-4 shrink-0" />
             <span className="hidden sm:inline">Import Bill</span>
           </button>
 
-          {/* Signature Air-Gapped Vault Security Seal */}
+          {/* Signature Air-Gapped Vault Security Seal (Single-line horizontal pill on tablet/desktop) */}
           <div
-            className="hidden xl:flex items-center gap-2 pl-2.5 py-0.5 border-l border-[#DCE4E5] shrink-0"
+            className="hidden sm:flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl bg-[#DDF7EF] border border-[#087F5B]/25 text-[#087F5B] shadow-2xs shrink-0 select-none whitespace-nowrap"
             title="100% On-Device Financial Ledger — Air-Gapped & Encrypted"
           >
-            <div className="flex items-center gap-2 px-2.5 py-1 rounded-xl bg-[#DDF7EF]/80 border border-[#087F5B]/25 shadow-2xs">
-              <span className="text-base select-none">🦥</span>
-              <div className="text-left">
-                <span className="text-[11px] font-extrabold text-[#172A35] block leading-tight">
-                  Local Vault
-                </span>
-                <span className="text-[9px] text-[#087F5B] font-black flex items-center gap-0.5 leading-tight tracking-wider uppercase">
-                  <ShieldCheck className="w-2.5 h-2.5" /> Air-Gapped
-                </span>
-              </div>
-            </div>
+            <span className="text-xs select-none">🦥</span>
+            <ShieldCheck className="w-3.5 h-3.5 text-[#087F5B]" />
+            <span className="text-[10px] font-black text-[#172A35] tracking-tight uppercase">
+              Local Vault
+            </span>
           </div>
 
-          {/* Compact Vault Badge on medium/laptop screens */}
+          {/* Compact Sloth Badge on mobile screens (<640px) */}
           <div
-            className="xl:hidden flex items-center justify-center w-8 h-8 rounded-xl bg-[#DDF7EF] border border-[#087F5B]/25 text-sm shadow-2xs shrink-0 relative"
+            className="sm:hidden flex items-center justify-center w-8 h-8 rounded-xl bg-[#DDF7EF] border border-[#087F5B]/25 text-xs shadow-2xs shrink-0"
             title="Local Vault — 100% Air-Gapped"
           >
-            <span className="select-none">🦥</span>
-            <span className="absolute -bottom-1 -right-1 w-3.5 h-3.5 rounded-full bg-[#087F5B] text-white flex items-center justify-center shadow-xs">
-              <ShieldCheck className="w-2 h-2" />
-            </span>
+            <span className="select-none text-xs">🦥</span>
           </div>
         </div>
       </div>

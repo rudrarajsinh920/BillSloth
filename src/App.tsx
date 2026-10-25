@@ -168,12 +168,17 @@ export function App() {
     (d) => (d.computed_status || d.status) === 'needs_review' || d.is_verified === 0
   ).length;
 
+  const navigateToTab = (tab: NavTab) => {
+    setActiveTab(tab);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
   return (
     <div className="min-h-screen flex bg-[#F7F8F5] text-[#172A35] font-sans antialiased selection:bg-[#DDF5F6] selection:text-[#087F8C]">
       {/* Left Navigation Sidebar */}
       <Sidebar
         activeTab={activeTab}
-        onTabChange={setActiveTab}
+        onTabChange={navigateToTab}
         isOpenMobile={isMobileSidebarOpen}
         onCloseMobile={() => setIsMobileSidebarOpen(false)}
         ollamaStatus={ollamaStatus}
@@ -195,8 +200,8 @@ export function App() {
           activeTab={activeTab}
           onOpenMobileSidebar={() => setIsMobileSidebarOpen(true)}
           onOpenAskModal={() => setIsAskModalOpen(true)}
-          onNavigateToImport={() => setActiveTab('import')}
-          onNavigateToReminders={() => setActiveTab('reminders')}
+          onNavigateToImport={() => navigateToTab('import')}
+          onNavigateToReminders={() => navigateToTab('reminders')}
           pendingRemindersCount={pendingRemindersCount}
           onOpenAiSettings={() => setIsOllamaModalOpen(true)}
         />
@@ -210,12 +215,12 @@ export function App() {
               <p className="mt-1">Connecting to SQLite and verifying local models.</p>
             </div>
           ) : (
-            <>
+            <div key={activeTab} className="animate-view-fade">
               {activeTab === 'dashboard' && (
                 <DashboardView
                   documents={documents}
                   onOpenReview={handleOpenReview}
-                  onNavigate={setActiveTab}
+                  onNavigate={navigateToTab}
                   onQuickMarkPaid={handleQuickMarkPaid}
                   onPrepareReminder={handlePrepareReminder}
                   onOpenOllamaModal={() => setIsOllamaModalOpen(true)}
@@ -230,7 +235,7 @@ export function App() {
                   onQuickMarkPaid={handleQuickMarkPaid}
                   onPrepareReminder={handlePrepareReminder}
                   onDeleteDocument={handleDocumentDeleted}
-                  onNavigateToImport={() => setActiveTab('import')}
+                  onNavigateToImport={() => navigateToTab('import')}
                 />
               )}
 
@@ -267,12 +272,12 @@ export function App() {
               {activeTab === 'digest' && (
                 <WeeklyDigestView
                   onOpenReview={handleOpenReview}
-                  onNavigate={setActiveTab}
+                  onNavigate={navigateToTab}
                 />
               )}
 
               {activeTab === 'audit' && <AuditLogView />}
-            </>
+            </div>
           )}
         </main>
 

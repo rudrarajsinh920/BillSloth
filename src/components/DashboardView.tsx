@@ -523,7 +523,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
             </p>
           </div>
 
-          <div className="flex items-center gap-2 text-[10px] font-semibold text-[#526572]">
+          <div className="flex items-center flex-wrap gap-2.5 sm:gap-3 text-[10px] font-semibold text-[#526572]">
             <span className="flex items-center gap-1">
               <span className="w-2.5 h-2.5 rounded-sm bg-[#F7F8F5] border border-[#DCE4E5]" />
               <span>Clear</span>
@@ -543,8 +543,8 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
           </div>
         </div>
 
-        {/* 30-day interactive matrix blocks */}
-        <div className="grid grid-cols-6 sm:grid-cols-10 md:grid-cols-15 gap-2">
+        {/* 30-day interactive matrix blocks - evenly divided: 5 cols (mobile), 6 cols (tablet), 10 cols (desktop) */}
+        <div className="grid grid-cols-5 sm:grid-cols-6 md:grid-cols-10 gap-2">
           {heatmapDays.map((day, idx) => {
             const isToday = idx === 0;
             const hasBills = day.docs.length > 0;
@@ -633,47 +633,54 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
             </span>
           </div>
 
-          {/* Bar Chart Container */}
-          <div className="space-y-4">
-            <div className="grid grid-cols-4 gap-3 sm:gap-4 h-48 items-end pt-4 pb-2 px-3 bg-[#F7F8F5] rounded-xl border border-[#DCE4E5]">
-              {horizonBreakdown.buckets.map((b) => {
-                const heightPercent = horizonBreakdown.maxAmount > 0
-                  ? Math.max(Math.round((b.amount / horizonBreakdown.maxAmount) * 100), b.amount > 0 ? 14 : 4)
-                  : 4;
+          {/* Bar Chart Container - Separate bar track and label row to completely prevent any text collision */}
+          <div className="space-y-6">
+            <div className="p-4 sm:p-5 bg-[#F7F8F5] rounded-2xl border border-[#DCE4E5]">
+              {/* Bars track */}
+              <div className="grid grid-cols-4 gap-2 sm:gap-4 items-end h-32 sm:h-36 pb-1">
+                {horizonBreakdown.buckets.map((b) => {
+                  const heightPercent = horizonBreakdown.maxAmount > 0
+                    ? Math.max(Math.round((b.amount / horizonBreakdown.maxAmount) * 100), b.amount > 0 ? 12 : 6)
+                    : 6;
 
-                return (
-                  <div key={b.id} className="flex flex-col items-center h-full justify-end group">
-                    {/* Amount Tooltip / Value */}
-                    <span className="text-[11px] font-black font-mono tabular-nums text-[#172A35] mb-1 opacity-90 group-hover:scale-110 transition-transform text-center">
-                      {formatCurrency(b.amount)}
+                  return (
+                    <div key={b.id} className="flex flex-col items-center h-full justify-end group min-w-0">
+                      {/* Amount above bar */}
+                      <span className="text-[10px] sm:text-[11px] font-black font-mono tabular-nums text-[#172A35] mb-1.5 opacity-90 group-hover:scale-105 transition-transform text-center truncate w-full px-0.5">
+                        {formatCurrency(b.amount)}
+                      </span>
+
+                      {/* Visual Bar Pillar */}
+                      <div className="w-full max-w-[48px] sm:max-w-[56px] bg-[#E2E8F0] rounded-t-xl overflow-hidden flex flex-col justify-end h-24 sm:h-28 border border-[#DCE4E5] relative shadow-2xs">
+                        <div
+                          style={{ height: `${heightPercent}%` }}
+                          className={`w-full bg-gradient-to-t ${b.gradient} rounded-t-xl transition-all duration-500 group-hover:brightness-110`}
+                          title={`${b.label}: ${formatCurrency(b.amount)} (${b.count} bills)`}
+                        />
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+
+              {/* Discrete Label Row Underneath */}
+              <div className="grid grid-cols-4 gap-2 sm:gap-4 pt-3 mt-1.5 border-t border-[#DCE4E5]">
+                {horizonBreakdown.buckets.map((b) => (
+                  <div key={b.id} className="text-center min-w-0">
+                    <span className="text-[11px] sm:text-xs font-black text-[#172A35] block truncate leading-tight">
+                      {b.shortLabel}
                     </span>
-
-                    {/* Visual Bar */}
-                    <div className="w-full max-w-[52px] bg-[#E2E8F0] rounded-t-xl overflow-hidden flex flex-col justify-end h-36 border border-[#DCE4E5]">
-                      <div
-                        style={{ height: `${heightPercent}%` }}
-                        className={`w-full bg-gradient-to-t ${b.gradient} rounded-t-xl transition-all duration-300 group-hover:brightness-110 shadow-xs`}
-                        title={`${b.label}: ${formatCurrency(b.amount)} (${b.count} bills)`}
-                      />
-                    </div>
-
-                    {/* Bottom Label & Count */}
-                    <div className="text-center mt-2.5">
-                      <span className="text-[11px] font-extrabold text-[#172A35] block truncate">
-                        {b.shortLabel}
-                      </span>
-                      <span className="text-[10px] text-[#526572] font-mono block font-medium">
-                        {b.count} bill{b.count === 1 ? '' : 's'}
-                      </span>
-                    </div>
+                    <span className="text-[10px] text-[#526572] font-mono block font-medium mt-0.5 leading-tight">
+                      {b.count} bill{b.count === 1 ? '' : 's'}
+                    </span>
                   </div>
-                );
-              })}
+                ))}
+              </div>
             </div>
 
             {/* Segmented Category Progress Bar */}
-            <div>
-              <div className="flex items-center justify-between text-xs mb-1.5">
+            <div className="pt-1">
+              <div className="flex items-center justify-between text-xs mb-2">
                 <span className="font-bold text-[#172A35] flex items-center gap-1.5">
                   <Layers className="w-3.5 h-3.5 text-[#087F8C]" />
                   <span>Category Outflow Share</span>
@@ -682,15 +689,19 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
                   {categoryBreakdown.length} active categories
                 </span>
               </div>
-              <div className="h-3 w-full bg-[#E2E8F0] rounded-full overflow-hidden flex border border-[#DCE4E5]">
-                {categoryBreakdown.map((cat) => (
-                  <div
-                    key={cat.category}
-                    style={{ width: `${Math.max(cat.percentage, 4)}%` }}
-                    className={`${cat.colors.bar} h-full transition-all`}
-                    title={`${cat.category}: ${formatCurrency(cat.amount)} (${cat.percentage}%)`}
-                  />
-                ))}
+              <div className="h-3.5 w-full bg-[#E2E8F0] rounded-full overflow-hidden flex border border-[#DCE4E5]">
+                {categoryBreakdown.length === 0 ? (
+                  <div className="w-full h-full bg-[#E2E8F0]" title="No active category obligations" />
+                ) : (
+                  categoryBreakdown.map((cat) => (
+                    <div
+                      key={cat.category}
+                      style={{ width: `${Math.max(cat.percentage, 4)}%` }}
+                      className={`${cat.colors.bar} h-full transition-all`}
+                      title={`${cat.category}: ${formatCurrency(cat.amount)} (${cat.percentage}%)`}
+                    />
+                  ))
+                )}
               </div>
             </div>
           </div>
