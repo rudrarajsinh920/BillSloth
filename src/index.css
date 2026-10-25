@@ -96,13 +96,13 @@
   animation: gradientShift 6s ease infinite;
 }
 
-/* Signature Walking Sloth (Teddy Walk) Intro Animations */
-@keyframes teddyEntrance {
+/* Signature Walking Sloth (The Calm Sloth) Intro Animations */
+@keyframes slothTravelIn {
   0% {
-    transform: translateX(calc(-50vw - 80px));
+    transform: translateX(calc(-50vw - 160px));
     opacity: 0;
   }
-  6% {
+  8% {
     opacity: 1;
   }
   100% {
@@ -111,18 +111,18 @@
   }
 }
 
-@keyframes teddyStepBob {
+@keyframes slothWaddleBob {
   0% {
     transform: translateY(0px) rotate(0deg);
   }
   16% {
-    transform: translateY(-4px) rotate(-1.5deg);
+    transform: translateY(-5px) rotate(-1.8deg);
   }
   32% {
     transform: translateY(0px) rotate(0deg);
   }
   48% {
-    transform: translateY(-4px) rotate(1.5deg);
+    transform: translateY(-5px) rotate(1.8deg);
   }
   64% {
     transform: translateY(0px) rotate(0deg);
@@ -138,13 +138,13 @@
   }
 }
 
-@keyframes teddyShadowStep {
+@keyframes slothShadowPulse {
   0% {
     transform: scale(0.9);
     opacity: 0.2;
   }
   16% {
-    transform: scale(0.75);
+    transform: scale(0.72);
     opacity: 0.15;
   }
   32% {
@@ -152,7 +152,7 @@
     opacity: 0.45;
   }
   48% {
-    transform: scale(0.75);
+    transform: scale(0.72);
     opacity: 0.15;
   }
   64% {
@@ -173,13 +173,13 @@
   }
 }
 
-@keyframes cardSettleIn {
+@keyframes billCardPresent {
   0% {
-    transform: translateX(-20px) scale(0.92);
+    transform: translateX(-24px) scale(0.88);
     opacity: 0;
   }
-  60% {
-    transform: translateX(3px) scale(1.01);
+  65% {
+    transform: translateX(4px) scale(1.02);
     opacity: 1;
   }
   100% {
@@ -188,33 +188,54 @@
   }
 }
 
-@keyframes shieldGlowPulse {
+@keyframes emeraldAuraPulse {
   0%, 100% {
-    box-shadow: 0 0 0 0 rgba(52, 211, 153, 0.15);
+    box-shadow: 0 0 0 0 rgba(54, 211, 153, 0.12);
   }
   50% {
-    box-shadow: 0 0 12px 2px rgba(52, 211, 153, 0.35);
+    box-shadow: 0 0 18px 4px rgba(54, 211, 153, 0.3);
   }
 }
 
+.animate-sloth-travel {
+  animation: slothTravelIn 1.35s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+.animate-sloth-waddle {
+  animation: slothWaddleBob 1.35s ease-in-out forwards;
+}
+
+.animate-sloth-shadow {
+  animation: slothShadowPulse 1.35s ease-in-out forwards;
+}
+
+.animate-bill-card-present {
+  animation: billCardPresent 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.animate-emerald-aura {
+  animation: emeraldAuraPulse 2.4s ease-in-out infinite;
+}
+
+/* Backward compatibility aliases */
 .animate-teddy-entrance {
-  animation: teddyEntrance 1.35s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  animation: slothTravelIn 1.35s cubic-bezier(0.22, 1, 0.36, 1) forwards;
 }
 
 .animate-teddy-step {
-  animation: teddyStepBob 1.35s ease-in-out forwards;
+  animation: slothWaddleBob 1.35s ease-in-out forwards;
 }
 
 .animate-teddy-shadow-step {
-  animation: teddyShadowStep 1.35s ease-in-out forwards;
+  animation: slothShadowPulse 1.35s ease-in-out forwards;
 }
 
 .animate-card-settle {
-  animation: cardSettleIn 0.55s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  animation: billCardPresent 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 
 .animate-shield-glow {
-  animation: shieldGlowPulse 2s ease-in-out infinite;
+  animation: emeraldAuraPulse 2.4s ease-in-out infinite;
 }
 
 /* Smooth View Transition for Navigation */
