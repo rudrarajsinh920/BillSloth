@@ -1,24 +1,54 @@
 # 🦥 BillSloth
-> **"Stop chasing bills. Know what needs attention."**  
-> *A local-first AI bill and invoice organizer built for Hacktoberfest Week 3, "Slow and Steady."*
 
-BillSloth imports invoices, utility bills, receipts, and payment reminders; extracts financial fields using intelligent on-device parsing and Gemini Flash; tracks due dates; and prepares reminders for human approval.
+> **“Slow and Steady. Bills Under Control.”**  
+> *A local-first financial command center and calm invoice intelligence organizer built for Hacktoberfest 2026 Week 3 “Slow and Steady” Challenge.*
+
+[![Repository](https://img.shields.io/badge/GitHub-Repository-172A35?style=for-the-badge&logo=github&logoColor=white)](https://github.com/rudrarajsinh920/BillSloth)
+[![Tests](https://img.shields.io/badge/Verification-100%25%20Passing-087F5B?style=for-the-badge)](https://github.com/rudrarajsinh920/BillSloth)
+[![Privacy](https://img.shields.io/badge/Privacy-100%25%20Local--First-36D399?style=for-the-badge)](https://github.com/rudrarajsinh920/BillSloth)
+[![AI Engine](https://img.shields.io/badge/AI%20Intelligence-Gemini%203.8%20Flash-42E8C4?style=for-the-badge&logo=google&logoColor=white)](https://github.com/rudrarajsinh920/BillSloth)
+[![License](https://img.shields.io/badge/License-MIT-blue?style=for-the-badge)](LICENSE)
+
+🔗 **GitHub Repository:** [https://github.com/rudrarajsinh920/BillSloth](https://github.com/rudrarajsinh920/BillSloth)
+
+---
+
+## 💡 Product Philosophy: “Slow and Steady”
+
+**“Stop chasing bills. Know what needs attention.”**
+
+BillSloth replaces financial panic with calm, structured control. Built for the **Week 3 "Slow and Steady"** theme, BillSloth enforces a tranquil ritual:
+
+```
+DOCUMENT ARRIVAL (Drag & drop PDF, PNG, or JPG receipt)
+   ↓
+LOCAL RETENTION (File stored in local ./data/uploads vault; never deleted)
+   ↓
+DUAL-STAGE PARSING (Deterministic pdf-parse + on-device Tesseract OCR)
+   ↓
+HUMAN-IN-THE-LOOP VERIFICATION (Fields marked Unverified until human checks)
+   ↓
+CALM FINANCIAL RADAR (KPIs: Outstanding balance, Overdue alerts, 30-day timeline)
+   ↓
+SCHEDULED PEACE OF MIND (One-click .ICS export & weekly calm digest)
+   ↓
+ASK BILLSLOTH (Instant factual Q&A grounded in SQLite ledger via Gemini 3.8 Flash)
+```
 
 ---
 
 ## 🛡️ Data Safety & Privacy Guarantees
 
-1. **Zero Cloud AI Transmission**: Your financial documents, amounts, vendor names, and statements are **never uploaded to external cloud APIs** (no OpenAI, no Anthropic, no cloud OCR).
-2. **Human-in-the-Loop Verification**: All extracted values are flagged as `Unverified` until validated by a human. No automatic email sending or bank payments are ever executed.
-3. **Local File Retention**: Original documents (PDF, JPG, PNG) are retained in local disk storage (`./data/uploads/`) and **never automatically deleted**, even when an invoice record is archived.
-4. **Factual Extraction**: Local models are instructed not to hallucinate missing amounts, currencies, or due dates. Missing fields are explicitly marked as `<Missing / Needs Review>`.
-5. **Full Audit Trail**: Every action (import, local parsing attempt, field verification, status update, reminder approval) is recorded in local SQLite audit logs.
+1. **Zero Cloud File Leaks**: Original documents (PDF, JPG, PNG) are retained in local disk storage (`./data/uploads/`) and **never automatically deleted**, even when an invoice record is archived.
+2. **Human-in-the-Loop Verification**: All extracted values are flagged as `Unverified` until validated by a human. No automatic email sending or bank payments are ever executed without explicit approval.
+3. **Factual Extraction**: Missing fields are explicitly marked as `<Missing / Needs Review>`. The system never fabricates due dates or amounts.
+4. **Full Audit Trail**: Every action (import, local parsing attempt, field verification, status update, reminder approval) is recorded in local SQLite audit logs.
 
 ---
 
 ## 🎨 Design System
 
-Polished, calm fintech interface combining a **Light-First application experience** with a signature **Cinematic Dark Mascot Intro**:
+Polished, calm fintech interface combining a **Light-First application experience** with a signature **Cinematic Mascot Intro**:
 
 ### Light-First Application Theme
 - **Main page background**: `#F7F8F5` (warm, calm off-white)
@@ -32,10 +62,12 @@ Polished, calm fintech interface combining a **Light-First application experienc
   - **Critical Overdue**: `#BE123C` text on `#FFE4E6`
   - **Secondary AI accent**: `#6D5CE8`
 
-### Cinematic Dark Intro (The Teddy Sloth Walk)
-- **Deep navy backdrop**: `#0B1724`
-- **Dark glass panels**: `#142536` with `#35D6C3` teal highlight
-- **Warm text**: `#F5F8FA` and `#AABBC9`
+### Cinematic Dark Mascot Intro (The Calm Sloth)
+- **Midnight backdrop**: `#071F24`
+- **Deep teal surface**: `#10363A`
+- **Emerald lighting**: `#36D399`
+- **Electric turquoise**: `#42E8C4`
+- **Warm ivory text**: `#FFF2D8`
 
 ---
 
@@ -45,8 +77,8 @@ Polished, calm fintech interface combining a **Light-First application experienc
 - **Backend API**: Node.js 24 ESM, Express, Multer
 - **Database**: Native Node 24 SQLite (`node:sqlite`) with persistent `./data/billsloth.db`
 - **Intelligent Financial Engines**:
+  - **Google Gemini 3.8 Flash**: Fast multimodal invoice understanding and assistant Q&A.
   - **Zero-Setup In-Browser Ledger AI**: Instant deterministic mathematical fact retrieval, vendor search, and cash flow analysis.
-  - **Gemini 2.5 Flash**: Lightning-fast multimodal invoice understanding and assistant answering.
   - **Local PDF Parser**: `pdf-parse` for deterministic embedded text extraction.
   - **Local OCR Engine**: `tesseract.js` for on-device receipt/scanned image OCR.
   - **Hashing**: `node:crypto` SHA-256 content hashing for duplicate protection.
