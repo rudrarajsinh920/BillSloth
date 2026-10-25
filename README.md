@@ -1,12 +1,13 @@
 # 🦥 BillSloth
 
 > **“Slow and Steady. Bills Under Control.”**  
-> *A local-first financial command center and calm invoice intelligence organizer built for Hacktoberfest 2026 Week 3 “Slow and Steady” Challenge.*
+> *A local-first financial command center and calm invoice intelligence organizer powered by Google Gemma 4 open-weight models and SQLite ledger grounding. Built for Hacktoberfest 2026 Week 3 “Slow and Steady” Challenge.*
 
 [![Repository](https://img.shields.io/badge/GitHub-Repository-172A35?style=for-the-badge&logo=github&logoColor=white)](https://github.com/rudrarajsinh920/BillSloth)
+[![Open-Weight AI](https://img.shields.io/badge/Open--Weight%20AI-Google%20Gemma%204-42E8C4?style=for-the-badge&logo=google&logoColor=white)](https://github.com/rudrarajsinh920/BillSloth)
+[![Model](https://img.shields.io/badge/Model-gemma--4--26b--a4b--it-087F8C?style=for-the-badge)](https://github.com/rudrarajsinh920/BillSloth)
 [![Tests](https://img.shields.io/badge/Verification-100%25%20Passing-087F5B?style=for-the-badge)](https://github.com/rudrarajsinh920/BillSloth)
-[![Privacy](https://img.shields.io/badge/Privacy-100%25%20Local--First-36D399?style=for-the-badge)](https://github.com/rudrarajsinh920/BillSloth)
-[![AI Engine](https://img.shields.io/badge/AI%20Intelligence-Gemini%203.8%20Flash-42E8C4?style=for-the-badge&logo=google&logoColor=white)](https://github.com/rudrarajsinh920/BillSloth)
+[![Database](https://img.shields.io/badge/Ledger-Local%20SQLite%20WAL-36D399?style=for-the-badge&logo=sqlite&logoColor=white)](https://github.com/rudrarajsinh920/BillSloth)
 [![License](https://img.shields.io/badge/License-MIT-blue?style=for-the-badge)](LICENSE)
 
 🔗 **GitHub Repository:** [https://github.com/rudrarajsinh920/BillSloth](https://github.com/rudrarajsinh920/BillSloth)
@@ -26,23 +27,73 @@ LOCAL RETENTION (File stored in local ./data/uploads vault; never deleted)
    ↓
 DUAL-STAGE PARSING (Deterministic pdf-parse + on-device Tesseract OCR)
    ↓
+OPEN-WEIGHT AI EXTRACTION (Google Gemma 4 structures vendor, amount, due date)
+   ↓
 HUMAN-IN-THE-LOOP VERIFICATION (Fields marked Unverified until human checks)
    ↓
 CALM FINANCIAL RADAR (KPIs: Outstanding balance, Overdue alerts, 30-day timeline)
    ↓
 SCHEDULED PEACE OF MIND (One-click .ICS export & weekly calm digest)
    ↓
-ASK BILLSLOTH (Instant factual Q&A grounded in SQLite ledger via Gemini 3.8 Flash)
+ASK BILLSLOTH (Factual Q&A grounded in SQLite ledger via Google Gemma 4)
 ```
 
 ---
 
-## 🛡️ Data Safety & Privacy Guarantees
+## 🤖 Google Gemma Open-Weight AI Architecture
 
-1. **Zero Cloud File Leaks**: Original documents (PDF, JPG, PNG) are retained in local disk storage (`./data/uploads/`) and **never automatically deleted**, even when an invoice record is archived.
-2. **Human-in-the-Loop Verification**: All extracted values are flagged as `Unverified` until validated by a human. No automatic email sending or bank payments are ever executed without explicit approval.
-3. **Factual Extraction**: Missing fields are explicitly marked as `<Missing / Needs Review>`. The system never fabricates due dates or amounts.
-4. **Full Audit Trail**: Every action (import, local parsing attempt, field verification, status update, reminder approval) is recorded in local SQLite audit logs.
+BillSloth integrates **Google Gemma 4** (`gemma-4-26b-a4b-it` and `gemma-4-31b-it`) as its core intelligence engine. Gemma is Google's state-of-the-art family of lightweight, open-weight models built from the same research and technology used for Gemini.
+
+### Why Gemma Without Ollama?
+Running local 26B/31B LLM weights on everyday laptops via Ollama requires 16GB–32GB of VRAM, massive multi-gigabyte downloads, and continuous background daemon management. 
+
+BillSloth solves this with an elegant, zero-friction architecture:
+1. **Hosted Open-Weight Inference via Secure Express Proxy**:
+   - The Express backend (`server/gemma.ts`) communicates directly with Google's hosted Gemma API endpoints using standard REST `generateContent`.
+   - **Zero GPU requirements**, zero gigabyte downloads, and zero local daemon crashes.
+2. **Backend-Only Secrets (Zero Secrets in React)**:
+   - All API keys (`GEMINI_API_KEY`) and model configurations (`AI_MODEL`) are kept strictly on the backend inside `.env`.
+   - The Vite/React client **never** receives API keys, eliminating risk of token leaks.
+3. **Deterministic SQLite Grounding (Zero Arithmetic Hallucinations)**:
+   - LLMs struggle with multi-invoice mathematical aggregation. BillSloth precomputes exact sums, overdue counts, and 7-day deadlines directly in SQLite and injects them as verified facts into Gemma's context window.
+   - Gemma synthesizes, categorizes, and explains the financial posture without ever guessing numbers.
+4. **Native Chain-of-Thought Filtering**:
+   - Gemma 4 employs internal chain-of-thought reasoning (`"thought": true`). BillSloth's backend isolates internal thoughts from user-facing responses, providing clean, executive-level financial reports.
+5. **Strict No-Silent-Fallback Guarantee**:
+   - If Gemma encounters an error or reaches a quota, BillSloth **never** silently swaps to closed models. It explicitly reports the Gemma status and falls back to deterministic local ledger rules if offline.
+
+```
+┌────────────────────────────────────────────────────────┐
+│                   React + Vite Client                  │
+│       (Zero API Keys • Clean UI • Telemetry Badges)    │
+└───────────────────────────┬────────────────────────────┘
+                            │ POST /api/ai/ask
+                            ▼
+┌────────────────────────────────────────────────────────┐
+│                  Express Node.js API                   │
+│  ┌──────────────────────┐    ┌──────────────────────┐  │
+│  │   SQLite Database    │    │   server/gemma.ts    │  │
+│  │  (Exact Math Totals) │───▶│ (Gemma 4 Proxy Hub)  │  │
+│  └──────────────────────┘    └──────────┬───────────┘  │
+└─────────────────────────────────────────┼──────────────┘
+                                          │ REST HTTPS
+                                          ▼
+                      ┌──────────────────────────────────────┐
+                      │    Google AI Studio / Gemma API      │
+                      │  • gemma-4-26b-a4b-it (Default)      │
+                      │  • gemma-4-31b-it (Configurable)     │
+                      └──────────────────────────────────────┘
+```
+
+---
+
+## 🛡️ Data Safety & Privacy Disclosures
+
+1. **Local File Vault**: Original documents (PDF, JPG, PNG) are retained in local disk storage (`./data/uploads/`) and **never automatically deleted**, even when an invoice record is archived.
+2. **Hosted Inference Transparency**: When AI features are invoked, relevant prompt metadata and OCR text are sent securely to Google's hosted Gemma API endpoint. BillSloth does not claim to be air-gapped when cloud AI is active.
+3. **Local SQLite Ledger**: All financial balances, audit history, vendor lists, and payment records remain stored exclusively in your local `./data/billsloth.db` database.
+4. **Human-in-the-Loop Verification**: All extracted values are flagged as `Unverified` until validated by a human. No automatic email sending or bank payments are ever executed without explicit approval.
+5. **Full Audit Trail**: Every action (import, local parsing attempt, field verification, status update, reminder approval) is recorded in local SQLite audit logs.
 
 ---
 
@@ -60,7 +111,7 @@ Polished, calm fintech interface combining a **Light-First application experienc
   - **Success / Verified**: `#087F5B` text on `#DDF7EF`
   - **Upcoming Deadlines**: `#854D0E` text on `#FFF0CC`
   - **Critical Overdue**: `#BE123C` text on `#FFE4E6`
-  - **Secondary AI accent**: `#6D5CE8`
+  - **Gemma Open-Weight AI Accent**: `#087F8C`
 
 ### Cinematic Dark Mascot Intro (The Calm Sloth)
 - **Midnight backdrop**: `#071F24`
@@ -75,10 +126,11 @@ Polished, calm fintech interface combining a **Light-First application experienc
 
 - **Frontend**: React 18, TypeScript, Vite, Tailwind CSS, Lucide React
 - **Backend API**: Node.js 24 ESM, Express, Multer
-- **Database**: Native Node 24 SQLite (`node:sqlite`) with persistent `./data/billsloth.db`
-- **Intelligent Financial Engines**:
-  - **Google Gemini 3.8 Flash**: Fast multimodal invoice understanding and assistant Q&A.
-  - **Zero-Setup In-Browser Ledger AI**: Instant deterministic mathematical fact retrieval, vendor search, and cash flow analysis.
+- **Database**: Native Node 24 SQLite (`better-sqlite3`) with persistent `./data/billsloth.db`
+- **AI Intelligence**:
+  - **Google Gemma 4 (`gemma-4-26b-a4b-it`)**: Google's open-weight instruction-tuned model for deep document reasoning and conversational financial assistance.
+  - **Local Deterministic Ledger Assistant**: Instant offline mathematical fact retrieval, vendor search, and cash flow analysis.
+- **Document Processing**:
   - **Local PDF Parser**: `pdf-parse` for deterministic embedded text extraction.
   - **Local OCR Engine**: `tesseract.js` for on-device receipt/scanned image OCR.
   - **Hashing**: `node:crypto` SHA-256 content hashing for duplicate protection.
@@ -91,94 +143,34 @@ Polished, calm fintech interface combining a **Light-First application experienc
    - **Digital PDFs**: Embedded text extracted directly via `pdf-parse`.
    - **Scanned Receipts & Images (PNG/JPG)**: Extracted on-device via local `tesseract.js` worker.
    - **100% Privacy by Default**: Local file vault retaining original documents safely on your machine.
-2. **Deterministic Structuring & Grounding**:
+2. **Gemma-Powered Structuring & Grounding**:
    - Extracts: Vendor, Invoice Number, Amount, Currency, Issue Date, Due Date, Category, Payment Status.
    - Non-hallucinatory: Missing fields return `null` and are flagged for human review.
 
 ### Validation & Advisory Confidence
 - **Grounding Heuristic**: Verifies extracted values against source text.
 - **Validation Flags**: Automatically flags `MISSING_DUE_DATE`, `MISSING_AMOUNT`, `MISSING_VENDOR`, `MISSING_INVOICE_NUMBER`, `INCONSISTENT_DATES`, and `UNVERIFIED`.
-- **Advisory Status**: Confidence values are documented as advisory cues to guide human attention, not proof of correctness.
-
-### Duplicate Protection & Audit Trail
-- **SHA-256 Content Hashing**: Identical file imports return `HTTP 409 Conflict` with the matched document ID and upload timestamp.
-- **Controlled Force Re-import**: Bypassed only through explicit `?force=true` query parameter.
+- **Duplicate Protection**: Identical file imports return `HTTP 409 Conflict`.
 - **Granular Human Audit Logging**: Editing fields generates `HUMAN_FIELD_CORRECTION` audit logs recording `{ original, corrected }` value pairs in SQLite.
-
-### 4. Verification Results (QA Matrix)
-| Check | Scope | Result |
-| :--- | :--- | :--- |
-| **Local Environment** | SQLite database online, in-browser intelligence active | **PASS** |
-| **Test A (Digital PDF)** | Acme Cloud Hosting, TEST-INV-001, $150.00, 2026-11-01, 2026-11-20 | **PASS** |
-| **Test B (Scanned Image)** | City Water and Power, SCAN-9021, $88.50, local OCR (94% conf) | **PASS** |
-| **Test C (Missing Fields)** | Missing due date & invoice number returned as null with flags | **PASS** |
-| **Test D (Duplicate Protection)** | Second upload blocked with HTTP 409; force bypass returns 201 | **PASS** |
-| **Test E (Human Review)** | Corrections recorded in audit log; requires human approval | **PASS** |
-| **Test F (Persistence)** | Documents, flags, and audit logs persist across server restart | **PASS** |
-| **Test G (Deterministic QA)** | Ledger AI answers balance, due dates, and vendor queries without error | **PASS** |
-| **Type Check (`tsc --noEmit`)** | Full codebase TypeScript typecheck | **PASS (0 errors)** |
-| **Lint (`eslint .`)** | Full codebase ESLint inspection | **PASS (0 errors)** |
-| **Production Build (`vite build`)** | Production bundle compile & minify | **PASS (0 errors)** |
-
-### ⚠️ Known Limitation: Scanned Multi-Page PDFs
-- **Scanned Multi-Page Image PDFs**: Scanned image-only PDFs lacking native embedded text streams currently return empty text because rendering PDF pages to image tensors requires native rasterization libraries (e.g. `poppler` or `pdf2pic`), which were intentionally omitted to maintain a zero-native-dependency Windows environment.
-- **Workaround**: Users can upload individual scanned pages as PNG or JPG images, which are immediately processed by local Tesseract OCR and Gemini 3.8 Flash.
 
 ---
 
-## 📦 Phase 1 Foundation Features
+## 🧪 Verification Results (Live QA Matrix)
 
-### 1. Dashboard
-- **Summary KPI Cards**: Total Outstanding balance, Overdue amount, Due in 7 Days, and Needs Review count.
-- **Categorized Sections**:
-  - **Overdue Invoices**: Visual red alert with days overdue, amount, vendor, and quick "Mark Paid" / "Prepare Reminder" actions.
-  - **Due Soon (Next 7–14 Days)**: Amber badge, countdown, and upcoming cash flow schedule.
-  - **Needs Human Review**: Amber callout highlighting unverified or missing extracted fields with a "Review & Verify" CTA.
-  - **Settled & Paid**: Archived list of completed payments with payment references and timestamps.
-
-### 2. Document Import Screen
-- Drag-and-drop zone supporting **PDF**, **JPG**, and **PNG** (up to 25MB).
-- Privacy pledge badge: *"100% Local-First Processing — Documents never leave this device."*
-- Immediate local disk indexing to `./data/uploads/`.
-- Instant transition to review drawer upon import.
-
-### 3. Invoice Details Review Form
-- Vendor / Payee input (with Unverified / Verified badge indicator).
-- Invoice / Bill Number input (with Missing / Not Found tag).
-- Amount & Currency selector (USD, EUR, GBP, CAD, AUD, JPY, CHF).
-- Category selector (Utilities, Software/SaaS, Rent/Lease, Telecom, Insurance, Supplies, Professional Services, Taxes, Other).
-- Issue Date and Payment Due Date pickers.
-- Workflow status selector (Needs Review, Due Soon, Overdue, Approved, Paid).
-- Human verification checkbox (*"Mark as Verified — Approved by Human"*).
-- Private notes and payment references (e.g. Card ending in 4108, ACH confirmation).
-- On-demand AI invoice extraction trigger with immediate feedback.
-- Document audit trail showing timeline of changes.
-
-### 4. Document Ledger
-- Search bar (by vendor, invoice number, notes).
-- Status filter pills: *All Bills*, *Needs Review*, *Due Soon*, *Overdue*, *Paid*.
-- Category filter dropdown.
-- Sort controls by Due Date, Amount, or Vendor (ASC/DESC).
-- Monospace tabular financial figures.
-- Row action triggers: Mark Paid, Prepare Reminder, Review Details, Archive Record.
-
-### 5. Reminders & Approvals Hub
-- Human-in-the-loop reminder drafts awaiting approval.
-- Actions: **Edit**, **Approve**, **Discard**.
-- **Export .ICS Calendar File**: Downloads standard RFC 5545 calendar event for any approved reminder.
-- Copy text memo to clipboard.
-- Prepare custom reminder linked to any bill.
-
-### 6. Weekly Financial Calm Digest
-- "Slow and steady" financial calm forecast.
-- Summary of cash flow needs for the upcoming week.
-- Checklist of overdue invoices and unverified bills.
-- Exportable Markdown digest for personal notes, offline journals, or task managers.
-
-### 7. Clear States & Intelligence Controls
-- AI Settings modal supporting Gemini Flash and In-Browser intelligence.
-- Illustrative Sample Data toggle (*"Load Sample Data"* / *"Clear Sample Data"*).
-- Loading states and responsive notifications.
+| Test Case | Scope & Description | Model / Engine | Result |
+| :--- | :--- | :--- | :--- |
+| **Gemma 4 Live Inference** | Live financial Q&A grounded with SQLite metrics | `gemma-4-26b-a4b-it` | **PASS (HTTP 200)** |
+| **Correspondence Drafting** | Formal payment extension request with invoice refs | `gemma-4-26b-a4b-it` | **PASS (HTTP 200)** |
+| **Local Environment** | SQLite database online, zero secrets in React client | Express + Node 24 | **PASS** |
+| **Test A (Digital PDF)** | Acme Cloud Hosting, TEST-INV-001, $150.00, 2026-11-20 | Local pdf-parse | **PASS** |
+| **Test B (Scanned Image)** | City Water and Power, SCAN-9021, $88.50, local OCR | Local Tesseract OCR | **PASS (94% conf)** |
+| **Test C (Missing Fields)** | Missing due date & invoice number returned as null | Validation Flags | **PASS** |
+| **Test D (Duplicate Protection)**| Second upload blocked with HTTP 409 Conflict | SHA-256 Checksum | **PASS** |
+| **Test E (Human Review)** | Corrections recorded in audit log; requires sign-off | SQLite Audit Trail | **PASS** |
+| **Test F (Persistence)** | Documents and audit logs persist across restart | SQLite DB | **PASS** |
+| **Type Check (`tsc --noEmit`)** | Full codebase TypeScript typecheck | TypeScript 5.7 | **PASS (0 errors)** |
+| **Lint (`eslint .`)** | Full codebase ESLint inspection | ESLint 9 | **PASS (0 errors)** |
+| **Production Build (`vite build`)**| Full production bundle compile & minify | Vite 6 | **PASS (0 errors)** |
 
 ---
 
@@ -189,28 +181,46 @@ Polished, calm fintech interface combining a **Light-First application experienc
 npm install
 ```
 
-### 2. Start Local Development
+### 2. Configure Environment (.env)
+Copy the example configuration file:
+```bash
+cp .env.example .env
+```
+Open `.env` and add your Google AI Studio API key:
+```env
+PORT=3001
+GEMINI_API_KEY=your_google_api_key_here
+AI_MODEL=gemma-4-26b-a4b-it
+```
+*(Get a free key at [https://aistudio.google.com/](https://aistudio.google.com/). Compatible with `gemma-4-26b-a4b-it` and `gemma-4-31b-it`).*
+
+### 3. Start Local Development
 ```bash
 npm run dev
 ```
-- **Web UI**: [http://localhost:5173](http://localhost:5173) (Vite frontend proxied to API)
-- **Local API**: [http://127.0.0.1:3001](http://127.0.0.1:3001)
+- **Web UI**: [http://localhost:5173](http://localhost:5173) (Vite frontend)
+- **Backend API**: [http://127.0.0.1:3001](http://127.0.0.1:3001) (Express server)
 
-### 3. Type Check & Lint
+### 4. Run Verification Suite
 ```bash
+# Verify TypeScript types
 npm run typecheck
-npm run lint
-```
 
-### 4. Build for Production
-```bash
+# Verify Code Quality
+npm run lint
+
+# Compile Production Build
 npm run build
-npm run server:start
 ```
 
 ---
 
-## 🦥 Zero-Friction AI Intelligence
-BillSloth provides instant, zero-setup financial intelligence out of the box:
-- **In-Browser Deterministic Ledger AI**: Automatically active with zero downloads or servers. Answers balance queries, overdue alerts, and category totals with mathematical precision directly from your SQLite database.
-- **Google Gemini 2.5 Flash**: Option to plug in a free Gemini API key in AI Settings for conversational invoice understanding and deep parsing.
+## 🦥 Features Overview
+
+* **Command Center Dashboard**: Live KPIs (Total Outstanding, Overdue sum, Due Soon radar, Needs Review counter), 30-day cash radar, maturity heatmap, and overdue urgency banners.
+* **Document Ingestion Portal**: Drag-and-drop PDF and image statement intake with automated SHA-256 deduplication and Tesseract OCR.
+* **Side-by-Side Review Drawer**: Split-screen document inspection comparing original uploads against AI-extracted fields before approving to the books.
+* **Invoices & Bills Ledger**: Multi-column sorting, vendor search, category filters, and CSV accounting export.
+* **Action Reminders**: Calendar integration with standard RFC 5545 `.ICS` file export.
+* **Weekly Financial Calm Digest**: Executive cash flow checklist and exportable Markdown report.
+* **Ask BillSloth Assistant**: Natural language Q&A and email correspondence powered by Google Gemma 4.
