@@ -71,13 +71,12 @@ export interface AuditLogItem {
   timestamp: string;
 }
 
-export interface OllamaStatus {
+export interface AiEngineStatus {
   available: boolean;
-  url: string;
-  models: string[];
-  activeModel: string | null;
-  hasGemma?: boolean;
-  recommendedGemmaModel?: string;
+  engine: string;
+  url?: string;
+  models?: string[];
+  activeModel?: string | null;
   error?: string;
 }
 

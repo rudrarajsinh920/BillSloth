@@ -3,7 +3,7 @@ import { DocumentItem } from '../types';
 const STORAGE_KEY_GEMINI = 'billsloth_gemini_api_key';
 const STORAGE_KEY_ENGINE = 'billsloth_ai_engine';
 
-export type AiEngineType = 'gemini' | 'ollama' | 'browser';
+export type AiEngineType = 'gemini' | 'browser';
 
 export function getGeminiApiKey(): string {
   if (typeof window === 'undefined') return '';
@@ -25,7 +25,7 @@ export function setGeminiApiKey(key: string): void {
 export function getActiveAiEngine(): AiEngineType {
   if (typeof window === 'undefined') return 'browser';
   const stored = localStorage.getItem(STORAGE_KEY_ENGINE) as AiEngineType | null;
-  if (stored && ['gemini', 'ollama', 'browser'].includes(stored)) {
+  if (stored && ['gemini', 'browser'].includes(stored)) {
     return stored;
   }
   // Auto-default to Gemini if API key is provided, otherwise browser engine

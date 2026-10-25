@@ -5,7 +5,6 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { initDb, UPLOADS_DIR, db } from './db.js';
 import { seedSampleData } from './sampleData.js';
-import { startOllamaDaemon, checkOllamaStatus } from './ollama.js';
 import routes from './routes.js';
 
 const __filename = fileURLToPath(import.meta.url);
@@ -29,7 +28,7 @@ initDb();
 const countStmt = db.prepare('SELECT COUNT(*) as count FROM documents');
 const countRes = countStmt.get() as { count: number };
 if (countRes.count === 0) {
-  console.log('🦥 Seeding illustrative sample data for Hacktoberfest evaluation...');
+  console.log('🦥 Seeding illustrative sample data for evaluation...');
   seedSampleData();
 }
 
@@ -47,27 +46,13 @@ if (fs.existsSync(DIST_DIR)) {
   });
 }
 
-
-app.listen(PORT, '127.0.0.1', async () => {
+app.listen(PORT, '127.0.0.1', () => {
   console.log(`\n🦥 ===============================================`);
   console.log(`   BillSloth Local Backend is running!`);
   console.log(`   URL: http://127.0.0.1:${PORT}`);
   console.log(`   Local Data Storage: ./data/billsloth.db`);
   console.log(`   Local Uploads: ./data/uploads`);
-  console.log(`   Privacy: 100% Local • Zero Cloud Transmission`);
+  console.log(`   AI Engine: Gemini Flash / In-Browser Reasoning`);
+  console.log(`   Privacy: 100% Local Ledger • Zero Cloud Leaks`);
   console.log(`===============================================\n`);
-
-  // Automatically start local Ollama daemon if installed
-  try {
-    const ollamaResult = await startOllamaDaemon();
-    if (ollamaResult.started) {
-      const status = await checkOllamaStatus();
-      console.log(`🦥 Ollama Status: ONLINE (Active Model: ${status.activeModel || 'None detected'})`);
-    } else {
-      console.log(`🦥 Ollama Status: STANDBY (${ollamaResult.error || 'Daemon offline'})`);
-    }
-  } catch (err: unknown) {
-    const msg = err instanceof Error ? err.message : String(err);
-    console.log(`🦥 Ollama Status: STANDBY (${msg})`);
-  }
 });

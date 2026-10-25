@@ -17,22 +17,17 @@ import {
   BarChart3,
   Calendar,
   Lock,
-  Zap,
 } from 'lucide-react';
 import { DocumentItem } from '../types';
 import { NavTab } from './Sidebar';
 import { StatusBadge, VerifiedBadge, SampleDataBadge, ExtractionTelemetryBadge } from './StatusBadge';
 import { format, parseISO, differenceInDays, addDays, isSameDay } from 'date-fns';
-import { startOllamaDaemonRequest } from '../api/client';
-
 interface DashboardViewProps {
   documents: DocumentItem[];
   onOpenReview: (doc: DocumentItem) => void;
   onNavigate: (tab: NavTab) => void;
   onQuickMarkPaid: (doc: DocumentItem) => void;
   onPrepareReminder: (doc: DocumentItem) => void;
-  onOpenOllamaModal: () => void;
-  ollamaAvailable: boolean;
 }
 
 export const getVendorColor = (vendor: string = '') => {
@@ -58,27 +53,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
   onNavigate,
   onQuickMarkPaid,
   onPrepareReminder,
-  onOpenOllamaModal,
-  ollamaAvailable,
 }) => {
-  const [startingOllama, setStartingOllama] = useState(false);
-
-  const handleAutoStartOllama = async () => {
-    setStartingOllama(true);
-    try {
-      const res = await startOllamaDaemonRequest();
-      if (res.success) {
-        window.location.reload();
-      } else if (onOpenOllamaModal) {
-        onOpenOllamaModal();
-      }
-    } catch {
-      if (onOpenOllamaModal) onOpenOllamaModal();
-    } finally {
-      setStartingOllama(false);
-    }
-  };
-
   const [selectedHeatmapDay, setSelectedHeatmapDay] = useState<{
     date: Date;
     docs: DocumentItem[];
@@ -376,47 +351,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
         </div>
       </div>
 
-      {/* Local AI Engine Notice */}
-      {!ollamaAvailable && (
-        <div className="financial-card p-4 border-l-4 border-l-[#087F8C] flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs bg-white">
-          <div className="flex items-start sm:items-center gap-3">
-            <div className="p-2 rounded-xl bg-[#DDF5F6] text-[#087F8C] shrink-0">
-              <Cpu className="w-4 h-4" />
-            </div>
-            <div>
-              <span className="font-bold text-[#172A35]">Local AI Engine on Standby.</span>{' '}
-              <span className="text-[#526572]">
-                All ledger management, categorization, and calculations are active. Connect your local Ollama runtime to enable Gemma 2 2B document extraction.
-              </span>
-            </div>
-          </div>
-          <div className="flex items-center gap-2.5 self-start sm:self-auto shrink-0">
-            <button
-              onClick={handleAutoStartOllama}
-              disabled={startingOllama}
-              className="px-3 py-1.5 rounded-xl bg-[#087F8C] hover:bg-[#066873] text-white font-bold transition-all shadow-xs flex items-center gap-1.5 disabled:opacity-50 cursor-pointer text-xs"
-            >
-              {startingOllama ? (
-                <>
-                  <div className="w-3 h-3 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                  <span>Starting...</span>
-                </>
-              ) : (
-                <>
-                  <Zap className="w-3.5 h-3.5" />
-                  <span>Start Ollama</span>
-                </>
-              )}
-            </button>
-            <button
-              onClick={onOpenOllamaModal}
-              className="text-xs font-bold text-[#087F8C] hover:text-[#066873] hover:underline"
-            >
-              Guide →
-            </button>
-          </div>
-        </div>
-      )}
+
 
       {/* 4 High-Contrast Light KPI Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">

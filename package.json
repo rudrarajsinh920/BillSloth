@@ -12,7 +12,6 @@
     "typecheck": "tsc --noEmit",
     "lint": "eslint .",
     "server:start": "tsx server/index.ts",
-    "ollama:start": "ollama serve",
     "preview": "vite preview"
   },
   "dependencies": {

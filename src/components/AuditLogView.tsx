@@ -42,7 +42,7 @@ export const AuditLogView: React.FC = () => {
 
   const getEventMeta = (action: string) => {
     const act = action.toUpperCase();
-    if (act.includes('AI') || act.includes('OLLAMA') || act.includes('EXTRACT')) {
+    if (act.includes('AI') || act.includes('EXTRACT') || act.includes('INFER')) {
       return {
         category: 'ai' as EventCategory,
         label: 'Local AI Inference',

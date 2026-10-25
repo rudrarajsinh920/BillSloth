@@ -14,17 +14,22 @@ import {
   Lock,
   Settings,
 } from 'lucide-react';
-import { OllamaStatus } from '../types';
 
-export type NavTab = 'dashboard' | 'documents' | 'calendar' | 'import' | 'reminders' | 'digest' | 'audit';
+export type NavTab =
+  | 'dashboard'
+  | 'documents'
+  | 'calendar'
+  | 'import'
+  | 'reminders'
+  | 'digest'
+  | 'audit';
 
 interface SidebarProps {
   activeTab: NavTab;
   onTabChange: (tab: NavTab) => void;
   isOpenMobile: boolean;
   onCloseMobile: () => void;
-  ollamaStatus: OllamaStatus | null;
-  onOpenOllamaModal: () => void;
+  onOpenAiSettings?: () => void;
   onOpenAskModal: () => void;
   pendingRemindersCount: number;
   needsReviewCount: number;
@@ -40,8 +45,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
   onTabChange,
   isOpenMobile,
   onCloseMobile,
-  ollamaStatus,
-  onOpenOllamaModal,
+  onOpenAiSettings,
   onOpenAskModal,
   pendingRemindersCount,
   needsReviewCount,
@@ -236,9 +240,9 @@ export const Sidebar: React.FC<SidebarProps> = ({
       <div className="p-4 border-t border-[#DCE4E5] space-y-3 shrink-0 bg-white">
         {/* Assistant Quick Access & Configuration Card */}
         <div
-          onClick={onOpenOllamaModal}
+          onClick={onOpenAiSettings}
           className="p-3.5 rounded-xl border border-[#DCE4E5] bg-[#F7F8F5] hover:border-[#087F8C]/50 hover:bg-white hover:shadow-xs cursor-pointer transition-all relative overflow-hidden group"
-          title={ollamaStatus?.available ? "BillSloth Assistant (Local Engine Connected)" : "Assistant Settings & Model Configuration"}
+          title="Assistant Settings & Model Configuration"
         >
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2.5">

@@ -9,14 +9,14 @@ import { RemindersView } from './components/RemindersView';
 import { WeeklyDigestView } from './components/WeeklyDigestView';
 import { AuditLogView } from './components/AuditLogView';
 import { ReviewModal } from './components/ReviewModal';
-import { OllamaModal } from './components/OllamaModal';
+import { AiSettingsModal } from './components/AiSettingsModal';
 import { AskAssistantModal } from './components/AskAssistantModal';
 import { CalmSlothIntro } from './components/CalmSlothIntro';
-import { DocumentItem, ReminderItem, OllamaStatus } from './types';
+import { DocumentItem, ReminderItem, AiEngineStatus } from './types';
 import {
   fetchDocuments,
   fetchReminders,
-  fetchOllamaStatus,
+  fetchAiEngineStatus,
   updateDocument,
   createReminder,
   loadSampleData,
@@ -29,8 +29,8 @@ export function App() {
   const [activeTab, setActiveTab] = useState<NavTab>('dashboard');
   const [documents, setDocuments] = useState<DocumentItem[]>([]);
   const [reminders, setReminders] = useState<ReminderItem[]>([]);
-  const [ollamaStatus, setOllamaStatus] = useState<OllamaStatus | null>(null);
-  const [isOllamaModalOpen, setIsOllamaModalOpen] = useState(false);
+  const [aiEngineStatus, setAiEngineStatus] = useState<AiEngineStatus | null>(null);
+  const [isAiSettingsModalOpen, setIsAiSettingsModalOpen] = useState(false);
   const [isAskModalOpen, setIsAskModalOpen] = useState(false);
   const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
 
@@ -56,11 +56,11 @@ export function App() {
       const [docs, rems, aiStatus] = await Promise.all([
         fetchDocuments(),
         fetchReminders(),
-        fetchOllamaStatus(),
+        fetchAiEngineStatus(),
       ]);
       setDocuments(docs);
       setReminders(rems);
-      setOllamaStatus(aiStatus);
+      setAiEngineStatus(aiStatus);
     } catch (err: unknown) {
       console.error('Failed to load BillSloth data:', err);
     } finally {
@@ -181,8 +181,7 @@ export function App() {
         onTabChange={navigateToTab}
         isOpenMobile={isMobileSidebarOpen}
         onCloseMobile={() => setIsMobileSidebarOpen(false)}
-        ollamaStatus={ollamaStatus}
-        onOpenOllamaModal={() => setIsOllamaModalOpen(true)}
+        onOpenAiSettings={() => setIsAiSettingsModalOpen(true)}
         onOpenAskModal={() => setIsAskModalOpen(true)}
         pendingRemindersCount={pendingRemindersCount}
         needsReviewCount={needsReviewCount}
@@ -203,7 +202,7 @@ export function App() {
           onNavigateToImport={() => navigateToTab('import')}
           onNavigateToReminders={() => navigateToTab('reminders')}
           pendingRemindersCount={pendingRemindersCount}
-          onOpenAiSettings={() => setIsOllamaModalOpen(true)}
+          onOpenAiSettings={() => setIsAiSettingsModalOpen(true)}
         />
 
         {/* Content Body */}
@@ -212,7 +211,7 @@ export function App() {
             <div className="py-24 text-center text-[#526572] text-xs">
               <div className="w-8 h-8 border-2 border-[#087F8C] border-t-transparent rounded-full animate-spin mx-auto mb-3" />
               <p className="font-semibold text-[#172A35] text-sm">Opening Local Financial Ledger...</p>
-              <p className="mt-1">Connecting to SQLite and verifying local models.</p>
+              <p className="mt-1">Connecting to SQLite local database.</p>
             </div>
           ) : (
             <div key={activeTab} className="animate-view-fade">
@@ -223,8 +222,6 @@ export function App() {
                   onNavigate={navigateToTab}
                   onQuickMarkPaid={handleQuickMarkPaid}
                   onPrepareReminder={handlePrepareReminder}
-                  onOpenOllamaModal={() => setIsOllamaModalOpen(true)}
-                  ollamaAvailable={!!ollamaStatus?.available}
                 />
               )}
 
@@ -255,8 +252,6 @@ export function App() {
                     showToast(`Imported ${newDoc.original_name} to local vault.`);
                   }}
                   onOpenReview={handleOpenReview}
-                  ollamaAvailable={!!ollamaStatus?.available}
-                  onOpenOllamaModal={() => setIsOllamaModalOpen(true)}
                 />
               )}
 
@@ -290,11 +285,11 @@ export function App() {
               <span className="text-[#526572]">Local-First Financial Intelligence</span>
             </div>
             <div className="flex items-center gap-3 text-[11px] text-[#526572]">
-              <span>100% Air-Gapped Privacy</span>
+              <span>100% Local Ledger</span>
               <span className="text-[#DCE4E5]">•</span>
-              <span>Zero Cloud AI</span>
+              <span>Cloud Gemini Flash</span>
               <span className="text-[#DCE4E5]">•</span>
-              <span>On-Device Gemma 2B</span>
+              <span>Zero-Setup In-Browser AI</span>
             </div>
           </div>
         </footer>
@@ -310,32 +305,26 @@ export function App() {
         }}
         onDocumentUpdated={handleDocumentUpdated}
         onDocumentDeleted={handleDocumentDeleted}
-        ollamaAvailable={!!ollamaStatus?.available}
-        onOpenOllamaModal={() => setIsOllamaModalOpen(true)}
       />
 
-      {/* Ollama Local Engine Modal */}
-      <OllamaModal
-        isOpen={isOllamaModalOpen}
-        onClose={() => setIsOllamaModalOpen(false)}
-        status={ollamaStatus}
+      {/* AI Settings Modal */}
+      <AiSettingsModal
+        isOpen={isAiSettingsModalOpen}
+        onClose={() => setIsAiSettingsModalOpen(false)}
+        status={aiEngineStatus}
         onRefresh={async () => {
-          const s = await fetchOllamaStatus();
-          setOllamaStatus(s);
-          if (s.available) {
-            showToast('Ollama local model connected!');
-          }
+          const s = await fetchAiEngineStatus();
+          setAiEngineStatus(s);
         }}
       />
 
-      {/* Ask BillSloth On-Device AI Assistant Modal */}
+      {/* Ask BillSloth AI Assistant Modal */}
       <AskAssistantModal
         isOpen={isAskModalOpen}
         onClose={() => setIsAskModalOpen(false)}
-        ollamaAvailable={!!ollamaStatus?.available}
-        onOpenOllamaModal={() => {
+        onOpenAiSettings={() => {
           setIsAskModalOpen(false);
-          setIsOllamaModalOpen(true);
+          setIsAiSettingsModalOpen(true);
         }}
       />
 

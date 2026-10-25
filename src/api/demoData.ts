@@ -219,7 +219,7 @@ export const DEMO_AUDIT_LOGS: AuditLogItem[] = [
     timestamp: new Date(Date.now() - 3600000).toISOString(),
     action: 'LOCAL_AI_READY',
     document_id: null,
-    details: 'Connected to local Ollama inference runtime (model: gemma2:2b).',
+    details: 'Connected to AI inference runtime and local ledger intelligence.',
   },
   {
     id: 'demo_audit_3',

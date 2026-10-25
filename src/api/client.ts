@@ -2,7 +2,7 @@ import {
   DocumentItem,
   ReminderItem,
   AuditLogItem,
-  OllamaStatus,
+  AiEngineStatus,
   WeeklyDigestData,
 } from '../types';
 import {
@@ -116,7 +116,7 @@ export async function uploadDocument(file: File, force = false): Promise<UploadR
       raw_text: `Extracted preview for uploaded document: ${file.name}`,
       extraction_metadata: JSON.stringify({
         source: 'browser_preview',
-        model_used: 'gemma2:2b (local)',
+        model_used: 'Local / Gemini',
       }),
       payment_reference: null,
       notes: 'Imported in client session preview.',
@@ -130,8 +130,8 @@ export async function uploadDocument(file: File, force = false): Promise<UploadR
       extraction_info: {
         method: 'pdf_text',
         ocr_confidence: 95,
-        model_used: 'gemma2:2b',
-        is_gemma: true,
+        model_used: 'Smart Local',
+        is_gemma: false,
         validation_flags: [],
       },
     };
@@ -345,44 +345,18 @@ export async function fetchAuditLogs(): Promise<AuditLogItem[]> {
   }
 }
 
-export async function startOllamaDaemonRequest(): Promise<{
-  success: boolean;
-  status: OllamaStatus;
-  error?: string;
-}> {
-  try {
-    const res = await fetch(`${API_BASE}/ollama/start`, { method: 'POST' });
-    if (!res.ok) throw new Error(`HTTP error ${res.status}`);
-    return await res.json();
-  } catch (err: unknown) {
-    const msg = err instanceof Error ? err.message : String(err);
-    return {
-      success: false,
-      status: {
-        available: false,
-        url: 'http://127.0.0.1:11434',
-        activeModel: null,
-        models: [],
-        hasGemma: false,
-        recommendedGemmaModel: 'gemma2:2b',
-        error: msg,
-      },
-      error: msg,
-    };
-  }
-}
-
-export async function fetchOllamaStatus(): Promise<OllamaStatus> {
+export async function fetchAiEngineStatus(): Promise<AiEngineStatus> {
   try {
     const res = await fetch(`${API_BASE}/ai/status`);
-    if (!res.ok) throw new Error('Failed to query local AI status');
+    if (!res.ok) throw new Error('Failed to query AI status');
     return res.json();
   } catch {
     return {
-      available: false,
-      url: 'http://127.0.0.1:11434',
-      activeModel: null,
-      models: [],
+      available: true,
+      engine: getActiveAiEngine(),
+      url: 'https://generativelanguage.googleapis.com',
+      models: ['gemini-2.5-flash', 'gemini-1.5-flash'],
+      activeModel: 'gemini-2.5-flash',
     };
   }
 }

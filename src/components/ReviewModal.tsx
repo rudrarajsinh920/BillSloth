@@ -3,7 +3,6 @@ import {
   X,
   CheckCircle2,
   AlertTriangle,
-  Cpu,
   Save,
   Trash2,
   FileText,
@@ -25,8 +24,6 @@ interface ReviewModalProps {
   onClose: () => void;
   onDocumentUpdated: (doc: DocumentItem) => void;
   onDocumentDeleted: (id: string) => void;
-  ollamaAvailable: boolean;
-  onOpenOllamaModal: () => void;
 }
 
 const CATEGORIES: BillCategory[] = [
@@ -49,8 +46,6 @@ export const ReviewModal: React.FC<ReviewModalProps> = ({
   onClose,
   onDocumentUpdated,
   onDocumentDeleted,
-  ollamaAvailable,
-  onOpenOllamaModal,
 }) => {
   const [doc, setDoc] = useState<DocumentItem | null>(null);
   const [loading, setLoading] = useState(false);
@@ -154,7 +149,7 @@ export const ReviewModal: React.FC<ReviewModalProps> = ({
     }
   };
 
-  const handleExtractWithOllama = async () => {
+  const handleExtractWithAI = async () => {
     if (!doc) return;
     setExtracting(true);
     setExtractionMsg(null);
@@ -162,17 +157,10 @@ export const ReviewModal: React.FC<ReviewModalProps> = ({
     try {
       const res = await extractDocumentFields(doc.id, rawText || undefined);
       if (!res.success) {
-        if (res.reason === 'OLLAMA_OFFLINE') {
-          setExtractionMsg({
-            type: 'warn',
-            text: 'Ollama is offline. Automatic AI extraction is paused. Review and edit fields manually, or start Ollama locally.',
-          });
-        } else {
-          setExtractionMsg({
-            type: 'error',
-            text: res.message || 'Extraction failed.',
-          });
-        }
+        setExtractionMsg({
+          type: 'error',
+          text: res.message || 'Extraction failed.',
+        });
         return;
       }
 
@@ -181,7 +169,7 @@ export const ReviewModal: React.FC<ReviewModalProps> = ({
         onDocumentUpdated(res.data);
         setExtractionMsg({
           type: 'success',
-          text: 'Fields extracted locally with Ollama. Review them below and check "Verify" once confirmed.',
+          text: 'Fields extracted successfully with BillSloth AI. Review them below and check "Verify" once confirmed.',
         });
       }
     } catch (err: unknown) {
@@ -643,35 +631,22 @@ export const ReviewModal: React.FC<ReviewModalProps> = ({
               <div className="border border-[#DCE4E5] rounded-xl p-4 bg-[#F7F8F5] space-y-3">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2 text-xs font-semibold text-[#172A35]">
-                    <Cpu className="w-4 h-4 text-[#087F8C]" />
-                    <span>Local Document Text & Ollama Extraction</span>
+                    <Sparkles className="w-4 h-4 text-[#087F8C]" />
+                    <span>Document Text & Structured AI Extraction</span>
                   </div>
                   <button
-                    onClick={handleExtractWithOllama}
+                    onClick={handleExtractWithAI}
                     disabled={extracting}
-                    className="px-3 py-1.5 rounded-lg bg-[#087F8C] hover:bg-[#066873] text-white text-xs font-bold inline-flex items-center gap-1.5 transition-colors disabled:opacity-50 shadow-xs"
+                    className="px-3 py-1.5 rounded-lg bg-[#087F8C] hover:bg-[#066873] text-white text-xs font-bold inline-flex items-center gap-1.5 transition-colors disabled:opacity-50 shadow-xs cursor-pointer"
                   >
                     {extracting ? (
                       <div className="w-3.5 h-3.5 border-2 border-white border-t-transparent rounded-full animate-spin" />
                     ) : (
                       <Sparkles className="w-3.5 h-3.5 text-white" />
                     )}
-                    <span>Run Local AI Extraction</span>
+                    <span>Run AI Extraction</span>
                   </button>
                 </div>
-
-                {!ollamaAvailable && (
-                  <p className="text-xs text-[#854D0E] flex items-center gap-1.5">
-                    <AlertTriangle className="w-3.5 h-3.5 shrink-0" />
-                    <span>
-                      Ollama is currently offline. You can edit the text or values manually, or{' '}
-                      <button onClick={onOpenOllamaModal} className="underline font-semibold">
-                        connect Ollama
-                      </button>
-                      . AI will not be falsely simulated.
-                    </span>
-                  </p>
-                )}
 
                 <textarea
                   value={rawText}

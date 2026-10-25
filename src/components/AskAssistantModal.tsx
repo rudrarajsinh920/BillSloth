@@ -5,8 +5,7 @@ import { askAiAssistant } from '../api/client';
 interface AskAssistantModalProps {
   isOpen: boolean;
   onClose: () => void;
-  ollamaAvailable: boolean;
-  onOpenOllamaModal: () => void;
+  onOpenAiSettings?: () => void;
 }
 
 interface ChatMessage {
@@ -29,7 +28,7 @@ const PRESET_QUESTIONS = [
 export const AskAssistantModal: React.FC<AskAssistantModalProps> = ({
   isOpen,
   onClose,
-  onOpenOllamaModal,
+  onOpenAiSettings,
 }) => {
   const [query, setQuery] = useState('');
   const [loading, setLoading] = useState(false);
@@ -129,7 +128,7 @@ export const AskAssistantModal: React.FC<AskAssistantModalProps> = ({
 
           <div className="flex items-center gap-1.5">
             <button
-              onClick={onOpenOllamaModal}
+              onClick={onOpenAiSettings}
               title="Assistant Settings & AI Configuration"
               className="p-1.5 rounded-lg border border-[#DCE4E5] bg-white hover:bg-[#F7F8F5] text-[#526572] hover:text-[#087F8C] text-xs font-semibold inline-flex items-center gap-1.5 transition-colors focus-visible:ring-2 focus-visible:ring-[#087F8C] focus-visible:outline-none"
             >

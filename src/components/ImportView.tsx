@@ -4,7 +4,7 @@ import {
   ShieldCheck,
   CheckCircle2,
   AlertCircle,
-  Cpu,
+  Sparkles,
   ArrowRight,
   HardDrive,
   FileCheck,
@@ -17,15 +17,11 @@ import { ExtractionTelemetryBadge } from './StatusBadge';
 interface ImportViewProps {
   onDocumentImported: (doc: DocumentItem) => void;
   onOpenReview: (doc: DocumentItem) => void;
-  ollamaAvailable: boolean;
-  onOpenOllamaModal: () => void;
 }
 
 export const ImportView: React.FC<ImportViewProps> = ({
   onDocumentImported,
   onOpenReview,
-  ollamaAvailable,
-  onOpenOllamaModal,
 }) => {
   const [isDragging, setIsDragging] = useState(false);
   const [uploading, setUploading] = useState(false);
@@ -129,9 +125,9 @@ export const ImportView: React.FC<ImportViewProps> = ({
             </span>
           </div>
           <p className="text-[#526572] leading-relaxed">
-            Your bills and invoices are never sent to external cloud AI endpoints.
+            Your bills and invoices are never sent to external cloud AI endpoints without your consent.
             Files are retained in your local <code className="px-1.5 py-0.5 bg-[#F7F8F5] border border-[#DCE4E5] rounded text-[#087F8C] font-mono text-[11px]">./data/uploads/</code> folder.
-            Text is parsed with local PDF extraction and on-device Tesseract OCR, followed by structured extraction using your local Ollama model.
+            Text is parsed with local PDF extraction and on-device Tesseract OCR, followed by structured AI field extraction.
           </p>
         </div>
       </div>
@@ -295,21 +291,11 @@ export const ImportView: React.FC<ImportViewProps> = ({
 
         <div className="bg-white border border-[#DCE4E5] rounded-xl p-4 space-y-2 shadow-xs">
           <div className="flex items-center gap-2 text-xs font-semibold text-[#172A35]">
-            <Cpu className="w-4 h-4 text-[#854D0E]" />
-            <span>Open-Weight Local AI</span>
+            <Sparkles className="w-4 h-4 text-[#087F8C]" />
+            <span>AI Field Structuring</span>
           </div>
           <p className="text-xs text-[#526572] leading-relaxed">
-            {ollamaAvailable ? (
-              <span>Local model is active. Fields are parsed factually without inventing missing numbers.</span>
-            ) : (
-              <span>
-                Ollama is offline.{' '}
-                <button onClick={onOpenOllamaModal} className="text-[#087F8C] font-semibold hover:underline">
-                  Connect local model
-                </button>{' '}
-                or review fields manually.
-              </span>
-            )}
+            Invoice vendor, due date, invoice number, and amounts are automatically parsed and structured for review.
           </p>
         </div>
 

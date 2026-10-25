@@ -37,8 +37,6 @@ export const TopHeader: React.FC<TopHeaderProps> = ({
         const eng = getActiveAiEngine();
         if (eng === 'gemini') {
           setEngineLabel('Gemini');
-        } else if (eng === 'ollama') {
-          setEngineLabel('Gemma 2B');
         } else {
           setEngineLabel('Smart AI');
         }
@@ -167,7 +165,7 @@ export const TopHeader: React.FC<TopHeaderProps> = ({
           <button
             onClick={onOpenAiSettings || onOpenAskModal}
             className="hidden xl:inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full border border-[#DCE4E5] bg-[#F7F8F5] hover:bg-white hover:border-[#087F8C]/40 text-[#526572] hover:text-[#172A35] text-[11px] font-bold transition-all shadow-2xs hover:shadow-xs group cursor-pointer"
-            title="Configure AI Assistant Engine (Gemini, Gemma 2B, or Local)"
+            title="Configure AI Assistant Engine (Gemini Flash or Smart In-Browser)"
           >
             <Zap className="w-3 h-3 text-[#087F8C] group-hover:scale-110 transition-transform" />
             <span className="font-mono text-[10px] uppercase tracking-wider">{engineLabel}</span>
