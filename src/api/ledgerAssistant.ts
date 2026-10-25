@@ -376,16 +376,26 @@ export function answerLedgerQuestion(rawQuery: string, bills: LedgerBill[]): Ass
       intent: 'total_balance',
       matchedCount: unpaid.length,
       answer: [
-        `**Total Outstanding Commitments:**`,
+        `### Executive Financial Summary`,
         ``,
-        `Your total unpaid balance is **$${totalUnpaid.toFixed(2)} USD** across ${unpaid.length} active ${unpaid.length === 1 ? 'bill' : 'bills'}:`,
-        `• **Overdue**: $${overdueTotal.toFixed(2)} (${overdue.length} ${overdue.length === 1 ? 'bill' : 'bills'})`,
-        `• **Due in Next 7 Days**: $${dueSoonTotal.toFixed(2)} (${dueSoon.length} ${dueSoon.length === 1 ? 'bill' : 'bills'})`,
-        pending.length > 0 ? `• **Pending Review**: $${pendingTotal.toFixed(2)} (${pending.length} ${pending.length === 1 ? 'bill' : 'bills'})` : '',
+        `Your total unpaid commitments across active bills amount to **$${totalUnpaid.toFixed(2)} USD** (${unpaid.length} ${unpaid.length === 1 ? 'bill' : 'bills'}).`,
         ``,
-        paid.length > 0
-          ? `*Settled Archive:* ${paid.length} ${paid.length === 1 ? 'bill totaling' : 'bills totaling'} $${paid.reduce((s, b) => s + (b.amount || 0), 0).toFixed(2)} USD have already been settled.`
-          : '',
+        `**Status Breakdown:**`,
+        `• **Overdue Obligations**: $${overdueTotal.toFixed(2)} USD (${overdue.length} ${overdue.length === 1 ? 'bill' : 'bills'})${overdue.length > 0 ? ' ⚠️ *Requires urgent attention*' : ''}`,
+        `• **Due in Next 7 Days**: $${dueSoonTotal.toFixed(2)} USD (${dueSoon.length} ${dueSoon.length === 1 ? 'bill' : 'bills'})`,
+        pending.length > 0 ? `• **Pending Human Review**: $${pendingTotal.toFixed(2)} USD (${pending.length} ${pending.length === 1 ? 'bill' : 'bills'})` : '',
+        paid.length > 0 ? `• **Settled / Paid to Date**: $${paid.reduce((s, b) => s + (b.amount || 0), 0).toFixed(2)} USD (${paid.length} bills archive)` : '',
+        ``,
+        `**Itemized Active Ledger:**`,
+        ...unpaid.map(
+          (b, idx) =>
+            `${idx + 1}. **${b.vendor || 'Unknown Vendor'}** — **$${(b.amount || 0).toFixed(2)} ${b.currency || 'USD'}** | Due: **${b.due_date || 'No Date'}** | Status: *${formatStatus(b.computed_status || b.status)}* (${b.category || 'General'})`
+        ),
+        ``,
+        `**Recommended Action:**`,
+        overdue.length > 0
+          ? `1. Address the **${overdue.length} overdue bill(s)** immediately to avoid service interruptions or vendor penalties.\n2. Review any unverified documents in **Invoices & Bills Ledger** to confirm line-item accuracy.`
+          : `All bills are either up to date or settled. Check your 30-day cash radar for upcoming commitments.`,
       ]
         .filter(Boolean)
         .join('\n'),
@@ -417,14 +427,18 @@ export function answerLedgerQuestion(rawQuery: string, bills: LedgerBill[]): Ass
       intent: 'overdue_bills',
       matchedCount: overdue.length,
       answer: [
-        `**Overdue Bills (${overdue.length} ${overdue.length === 1 ? 'bill' : 'bills'} totaling $${total.toFixed(2)} USD):**`,
+        `### ⚠️ Overdue Bills Urgent Action Report`,
         ``,
+        `You have **${overdue.length} ${overdue.length === 1 ? 'bill' : 'bills'} currently past due**, representing an immediate obligation of **$${total.toFixed(2)} USD**.`,
+        ``,
+        `**Itemized Overdue Statements:**`,
         ...overdue.map(
-          (b) =>
-            `• **${b.vendor || b.original_name || 'Unknown Vendor'}**: $${(b.amount || 0).toFixed(2)} ${b.currency || 'USD'}\n  Due: ${b.due_date || 'Past Due'} | Invoice: ${b.invoice_number || 'N/A'} | Category: ${b.category || 'Other'}`
+          (b, idx) =>
+            `${idx + 1}. **${b.vendor || b.original_name || 'Unknown Vendor'}**\n   • Amount: **$${(b.amount || 0).toFixed(2)} ${b.currency || 'USD'}**\n   • Due Date: **${b.due_date || 'Past Due'}**\n   • Invoice Number: \`${b.invoice_number || 'N/A'}\`\n   • Category: ${b.category || 'Other'}\n   • Notes: ${b.notes || 'None recorded'}`
         ),
         ``,
-        `Action: Open **Invoices & Bills Ledger** to inspect payment details.`,
+        `**Urgent Next Steps:**`,
+        `1. Settle these statements immediately or request a temporary payment extension (ask me: *"Draft an email requesting an extension for ${overdue[0]?.vendor || 'vendor'}"*).\n2. Mark as Paid in the **Invoices & Bills Ledger** once settled so they no longer count towards your overdue liabilities.`,
       ].join('\n'),
     };
   }
@@ -449,7 +463,7 @@ export function answerLedgerQuestion(rawQuery: string, bills: LedgerBill[]): Ass
       return {
         intent: 'upcoming_bills',
         matchedCount: 0,
-        answer: `You have **no bills due in the next 7 days**. Your nearest obligations are scheduled further out or already settled.`,
+        answer: `### 7-Day Cash Radar\n\nYou currently have **no bills due in the next 7 days**. All upcoming obligations are either scheduled beyond next week or have already been settled.`,
       };
     }
 
@@ -457,14 +471,18 @@ export function answerLedgerQuestion(rawQuery: string, bills: LedgerBill[]): Ass
       intent: 'upcoming_bills',
       matchedCount: dueSoon.length,
       answer: [
-        `**Upcoming Bills Due in the Next 7 Days (${dueSoon.length} ${dueSoon.length === 1 ? 'bill' : 'bills'} totaling $${total.toFixed(2)} USD):**`,
+        `### 7-Day Cash Flow Commitment`,
         ``,
+        `You have **${dueSoon.length} ${dueSoon.length === 1 ? 'bill' : 'bills'} due within the next 7 days**, requiring **$${total.toFixed(2)} USD** in near-term liquidity:`,
+        ``,
+        `**Detailed Schedule:**`,
         ...dueSoon.map(
-          (b) =>
-            `• **${b.vendor || b.original_name || 'Unknown Vendor'}**: $${(b.amount || 0).toFixed(2)} ${b.currency || 'USD'}\n  Due Date: ${b.due_date || 'Within 7 days'} | Category: ${b.category || 'General'}${b.invoice_number ? ` | Invoice: ${b.invoice_number}` : ''}`
+          (b, idx) =>
+            `${idx + 1}. **${b.vendor || b.original_name || 'Unknown Vendor'}** — **$${(b.amount || 0).toFixed(2)} ${b.currency || 'USD'}**\n   • Deadline: **${b.due_date || 'Within 7 days'}**\n   • Invoice Ref: \`${b.invoice_number || 'N/A'}\` | Category: ${b.category || 'General'}\n   • Verification: ${b.is_verified === 1 ? 'Verified ✅' : 'Pending Review ⚠️'}`
         ),
         ``,
-        `Cash flow required this week: **$${total.toFixed(2)} USD**.`,
+        `**Cash Flow Recommendation:**`,
+        `Ensure your checking account has at least **$${total.toFixed(2)} USD** reserved before these deadlines. You can export an .ICS calendar reminder directly from the **Action Reminders** view.`,
       ].join('\n'),
     };
   }

@@ -303,10 +303,10 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
                 <span>Air-Gapped Vault</span>
               </span>
 
-              {/* Local Gemma badge */}
+              {/* Intelligent AI Engine badge */}
               <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-[#DDF5F6] text-[#087F8C] border border-[#087F8C]/30">
                 <Cpu className="w-3.5 h-3.5 text-[#087F8C]" />
-                <span>Gemma 2:2B On-Device</span>
+                <span>Gemini 3.8 Flash AI</span>
               </span>
 
               {/* Zero cloud guarantee */}
@@ -324,7 +324,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
                   BillSloth Command Center
                 </h1>
                 <p className="text-xs text-[#526572] mt-0.5 max-w-xl leading-relaxed">
-                  "Stop chasing bills. Know what needs attention." Organized on-device with open-weight Gemma 2 2B models and calm human verification gates.
+                  "Stop chasing bills. Know what needs attention." Organized on-device with privacy-first intelligence and calm human verification gates.
                 </p>
               </div>
             </div>

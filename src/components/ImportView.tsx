@@ -261,7 +261,6 @@ export const ImportView: React.FC<ImportViewProps> = ({
               method={recentUpload.extraction_method}
               ocrConfidence={recentUpload.ocr_confidence}
               modelUsed={recentInfo?.model_used}
-              isGemma={recentInfo?.is_gemma}
             />
             {recentUpload.amount !== null && (
               <span className="px-2 py-0.5 rounded bg-[#DDF7EF] text-[#087F5B] border border-[#087F5B]/30 font-mono tabular-nums font-semibold">

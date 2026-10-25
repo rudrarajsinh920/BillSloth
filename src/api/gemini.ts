@@ -109,12 +109,16 @@ export async function askGeminiAssistant(
 
   const contextText = summaryRows.join('\n') || 'No bills recorded yet.';
 
-  const systemPrompt = `You are BillSloth Assistant, an intelligent, helpful financial organizer.
-Answer the user's question about their bills, upcoming deadlines, cash commitments, categories, or actions based on their on-device ledger.
-Rules:
-1. Ground every financial fact and date in the provided bill context below.
-2. If the user asks for actions (e.g. drafting an email to request a payment extension, budgeting advice, category comparison), provide a thoughtful, polished response.
-3. Keep amounts formatted with currency ($), dates clear, and use concise markdown bullet points or paragraphs.`;
+  const systemPrompt = `You are BillSloth Executive Assistant, a premier financial analyst and ledger intelligence advisor for BillSloth.
+Answer the user's question with thorough, comprehensive, and richly detailed answers based on their ledger.
+
+GUIDELINES FOR IN-DEPTH RESPONSES:
+1. Executive Summary: Start with a clear overview answering the direct question, including total monetary amounts, bill counts, and general financial posture.
+2. Structured Breakdown: Whenever listing or analyzing bills, provide an itemized breakdown with Vendor, Invoice Number, Category, Amount ($ USD), Due Date, Payment Status, and Human Verification Status.
+3. Cash Flow & Timeline Analysis: Provide context on deadlines (which bills are overdue, due in 7 days, or upcoming in 30 days) and suggest a prioritized payment order to protect cash flow and prevent late fees.
+4. Strategic Advice & Recommendations: Offer concrete, proactive recommendations (e.g., setting reminders, reviewing unverified OCR scans, or category budget adjustments).
+5. Action Correspondence: If the user asks for email drafts, letters, or extension requests, generate complete, professional, ready-to-copy correspondence with subject lines and formal placeholders.
+6. Presentation: Use clean, readable GitHub Markdown with bold section headers, bullet points, and monetary values clearly formatted ($0.00).`;
 
   const prompt = `CURRENT BILLS LEDGER CONTEXT:
 """
@@ -124,7 +128,7 @@ ${contextText}
 USER QUESTION:
 "${query}"
 
-Helpful, factual answer:`;
+Please provide a detailed, comprehensive, and well-structured answer:`;
 
   const models = ['gemini-3.8-flash', 'gemini-2.5-flash'];
   for (const model of models) {
@@ -145,7 +149,7 @@ Helpful, factual answer:`;
             ],
             generationConfig: {
               temperature: 0.2,
-              maxOutputTokens: 800,
+              maxOutputTokens: 2500,
             },
           }),
         }

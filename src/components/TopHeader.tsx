@@ -43,7 +43,7 @@ export const TopHeader: React.FC<TopHeaderProps> = ({
     },
     import: {
       title: 'Document Ingestion Portal',
-      subtitle: 'Import PDF or image statements with local OCR & Gemma 2B',
+      subtitle: 'Import PDF or image statements with local OCR & Gemini Flash',
       tag: 'Ingestion',
     },
     reminders: {

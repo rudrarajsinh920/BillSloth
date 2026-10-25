@@ -150,10 +150,8 @@ router.get('/ai/status', async (_req: Request, res: Response) => {
     available: true,
     engine: 'gemini',
     url: 'https://generativelanguage.googleapis.com',
-    models: ['gemini-2.5-flash', 'gemini-1.5-flash'],
-    activeModel: 'gemini-2.5-flash',
-    hasGemma: false,
-    recommendedGemmaModel: 'gemini-2.5-flash',
+    models: ['gemini-3.8-flash', 'gemini-2.5-flash'],
+    activeModel: 'gemini-3.8-flash',
   });
 });
 

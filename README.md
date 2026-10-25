@@ -122,7 +122,7 @@ Polished, calm fintech interface combining a **Light-First application experienc
 
 ### ⚠️ Known Limitation: Scanned Multi-Page PDFs
 - **Scanned Multi-Page Image PDFs**: Scanned image-only PDFs lacking native embedded text streams currently return empty text because rendering PDF pages to image tensors requires native rasterization libraries (e.g. `poppler` or `pdf2pic`), which were intentionally omitted to maintain a zero-native-dependency Windows environment.
-- **Workaround**: Users can upload individual scanned pages as PNG or JPG images, which are immediately processed by local Tesseract OCR and Gemma 2.
+- **Workaround**: Users can upload individual scanned pages as PNG or JPG images, which are immediately processed by local Tesseract OCR and Gemini 3.8 Flash.
 
 ---
 

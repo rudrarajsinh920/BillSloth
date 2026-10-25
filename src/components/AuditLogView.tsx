@@ -196,7 +196,7 @@ export const AuditLogView: React.FC = () => {
               {aiEventsCount}
             </span>
             <span className="text-[10px] text-[#526572] block mt-0.5">
-              100% on-device Gemma 2 2B
+              Gemini 3.8 & Local Ledger
             </span>
           </div>
           <div className="p-2.5 rounded-xl bg-[#EDE9FE] text-[#6D5CE8] border border-[#6D5CE8]/30">

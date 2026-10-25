@@ -134,7 +134,7 @@ export interface ExtractionTelemetryBadgeProps {
   method?: string | null;
   ocrConfidence?: number | null;
   modelUsed?: string | null;
-  isGemma?: boolean;
+  isAi?: boolean;
   size?: 'xs' | 'sm' | 'md';
 }
 
@@ -142,7 +142,7 @@ export const ExtractionTelemetryBadge: React.FC<ExtractionTelemetryBadgeProps> =
   method,
   ocrConfidence,
   modelUsed,
-  isGemma,
+  isAi: _isAi,
   size = 'sm',
 }) => {
   const isXs = size === 'xs';
@@ -183,11 +183,11 @@ export const ExtractionTelemetryBadge: React.FC<ExtractionTelemetryBadgeProps> =
       {/* Local AI Model Badge */}
       {modelUsed && (
         <span
-          title={`Structured locally with ${modelUsed} on your device`}
+          title={`Structured with ${modelUsed}`}
           className={`inline-flex items-center gap-1 rounded-md border border-[#087F8C]/30 bg-[#DDF5F6] text-[#087F8C] font-medium ${sizeClasses}`}
         >
           <Cpu className={isXs ? 'w-2.5 h-2.5 text-[#087F8C]' : 'w-3 h-3 text-[#087F8C]'} />
-          <span>{isGemma || /gemma/i.test(modelUsed) ? 'Gemma 2' : modelUsed}</span>
+          <span>{modelUsed}</span>
         </span>
       )}
     </div>

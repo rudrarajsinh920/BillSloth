@@ -127,46 +127,94 @@ export const AskAssistantModal: React.FC<AskAssistantModalProps> = ({
     setTimeout(() => inputRef.current?.focus(), 50);
   };
 
-  // Simple, clean markdown-like formatter for paragraphs, lists, and bold text
+  // Clean, comprehensive markdown formatter for headings, lists, bold text, and code
   const renderFormattedMessage = (text: string) => {
     const lines = text.split('\n');
     return (
-      <div className="space-y-1.5 leading-relaxed">
+      <div className="space-y-1.5 leading-relaxed text-xs">
         {lines.map((line, idx) => {
-          if (!line.trim()) {
-            return <div key={idx} className="h-1" />;
+          const trimmed = line.trim();
+          if (!trimmed) {
+            return <div key={idx} className="h-1.5" />;
           }
 
-          // Bullet line
-          const isBullet = line.trim().startsWith('* ') || line.trim().startsWith('- ') || line.trim().startsWith('• ');
-          const content = isBullet ? line.trim().replace(/^[*•-]\s+/, '') : line;
-
-          // Render bold formatting
-          const parts = content.split(/(\*\*.*?\*\*)/g);
-          const renderedLine = parts.map((part, pIdx) => {
-            if (part.startsWith('**') && part.endsWith('**')) {
-              return (
-                <strong key={pIdx} className="font-bold text-[#172A35]">
-                  {part.slice(2, -2)}
-                </strong>
-              );
-            }
-            return part;
-          });
-
-          if (isBullet) {
+          // Headers
+          if (trimmed.startsWith('### ')) {
             return (
-              <div key={idx} className="flex items-start gap-2 pl-1">
-                <span className="text-[#087F8C] font-bold text-xs shrink-0 select-none">•</span>
-                <span className="flex-1">{renderedLine}</span>
+              <h4 key={idx} className="font-black text-[#172A35] text-sm pt-2 pb-0.5 border-b border-[#DCE4E5]/60 flex items-center gap-1.5">
+                {trimmed.replace(/^###\s+/, '')}
+              </h4>
+            );
+          }
+          if (trimmed.startsWith('## ')) {
+            return (
+              <h3 key={idx} className="font-black text-[#172A35] text-base pt-2 pb-1 border-b border-[#DCE4E5] flex items-center gap-2">
+                {trimmed.replace(/^##\s+/, '')}
+              </h3>
+            );
+          }
+
+          // Numbered list items (e.g., "1. ")
+          const numMatch = trimmed.match(/^(\d+)\.\s+(.*)$/);
+          if (numMatch) {
+            const num = numMatch[1];
+            const content = numMatch[2];
+            return (
+              <div key={idx} className="flex items-start gap-2 pl-0.5 my-1">
+                <span className="inline-flex items-center justify-center w-4 h-4 rounded-full bg-[#DDF5F6] text-[#087F8C] font-mono font-bold text-[10px] shrink-0 select-none mt-0.5">
+                  {num}
+                </span>
+                <span className="flex-1">{formatInline(content)}</span>
               </div>
             );
           }
 
-          return <p key={idx}>{renderedLine}</p>;
+          // Bullet line
+          const isBullet = trimmed.startsWith('* ') || trimmed.startsWith('- ') || trimmed.startsWith('• ');
+          if (isBullet) {
+            const content = trimmed.replace(/^[*•-]\s+/, '');
+            const isSubBullet = line.startsWith('   ') || line.startsWith('\t');
+            return (
+              <div key={idx} className={`flex items-start gap-2 ${isSubBullet ? 'pl-5 text-[#526572]' : 'pl-1'}`}>
+                <span className="text-[#087F8C] font-bold text-xs shrink-0 select-none mt-0.5">•</span>
+                <span className="flex-1">{formatInline(content)}</span>
+              </div>
+            );
+          }
+
+          return <p key={idx}>{formatInline(line)}</p>;
         })}
       </div>
     );
+  };
+
+  const formatInline = (content: string) => {
+    // Process code `...` and bold **...** and italics *...*
+    const parts = content.split(/(`[^`]+`|\*\*[^*]+\*\*|\*[^*]+\*)/g);
+    return parts.map((part, pIdx) => {
+      if (part.startsWith('`') && part.endsWith('`') && part.length > 2) {
+        return (
+          <code key={pIdx} className="px-1.5 py-0.5 mx-0.5 rounded bg-[#F1F5F9] text-[#172A35] font-mono text-[11px] font-semibold border border-[#CBD5E1]">
+            {part.slice(1, -1)}
+          </code>
+        );
+      }
+      if (part.startsWith('**') && part.endsWith('**') && part.length > 4) {
+        return (
+          <strong key={pIdx} className="font-bold text-[#172A35]">
+            {part.slice(2, -2)}
+          </strong>
+        );
+      }
+      if (part.startsWith('*') && part.endsWith('*') && part.length > 2) {
+        return (
+          <em key={pIdx} className="italic text-[#526572]">
+            {part.slice(1, -1)}
+          </em>
+        );
+      }
+      return part;
+    });
   };
 
   return (

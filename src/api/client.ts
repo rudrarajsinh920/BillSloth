@@ -39,6 +39,9 @@ export async function fetchDocuments(params?: {
     const res = await fetch(`${API_BASE}/documents?${query.toString()}`);
     if (!res.ok) throw new Error('API offline');
     const json = await res.json();
+    if (json.data && !params?.status && !params?.category && !params?.search) {
+      localDocsStore = json.data;
+    }
     return json.data || [];
   } catch {
     // Graceful fallback for static hosted environments (e.g. Vercel demo)
@@ -69,7 +72,7 @@ export interface UploadResponse {
     method: string;
     ocr_confidence: number;
     model_used: string | null;
-    is_gemma: boolean;
+    is_ai?: boolean;
     validation_flags: string[];
   };
 }
@@ -131,7 +134,7 @@ export async function uploadDocument(file: File, force = false): Promise<UploadR
         method: 'pdf_text',
         ocr_confidence: 95,
         model_used: 'Smart Local',
-        is_gemma: false,
+        is_ai: false,
         validation_flags: [],
       },
     };
@@ -382,6 +385,19 @@ export async function clearSampleData(): Promise<void> {
 export async function askAiAssistant(query: string): Promise<{ answer: string; intent?: string }> {
   const engine = getActiveAiEngine();
   const geminiKey = getGeminiApiKey();
+
+  // Ensure documents are up to date from backend if connected
+  try {
+    const docRes = await fetch(`${API_BASE}/documents`);
+    if (docRes.ok) {
+      const docJson = await docRes.json();
+      if (Array.isArray(docJson.data) && docJson.data.length > 0) {
+        localDocsStore = docJson.data;
+      }
+    }
+  } catch {
+    // Offline or static hosted mode, use existing localDocsStore
+  }
 
   // 1. If Gemini engine is active and key is configured
   if ((engine === 'gemini' || geminiKey) && geminiKey) {
