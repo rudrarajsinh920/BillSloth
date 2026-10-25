@@ -21,6 +21,7 @@ import {
   testGeminiApiKey,
   AiEngineType,
 } from '../api/gemini';
+import { startOllamaDaemonRequest } from '../api/client';
 
 interface OllamaModalProps {
   isOpen: boolean;
@@ -45,6 +46,27 @@ export const OllamaModal: React.FC<OllamaModalProps> = ({
     error?: string;
   }>({ tested: false });
   const [refreshing, setRefreshing] = useState(false);
+  const [startingOllama, setStartingOllama] = useState(false);
+  const [startOllamaError, setStartOllamaError] = useState<string | null>(null);
+
+  const handleStartOllama = async () => {
+    setStartingOllama(true);
+    setStartOllamaError(null);
+    try {
+      const res = await startOllamaDaemonRequest();
+      if (res.success) {
+        await onRefresh();
+        handleSelectEngine('ollama');
+      } else {
+        setStartOllamaError(res.error || 'Could not start Ollama automatically.');
+      }
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : String(err);
+      setStartOllamaError(msg);
+    } finally {
+      setStartingOllama(false);
+    }
+  };
 
   // Load latest state when modal opens
   useEffect(() => {
@@ -344,6 +366,42 @@ export const OllamaModal: React.FC<OllamaModalProps> = ({
                       </p>
                     </div>
                   </div>
+
+                  {/* One-Click Auto-Start CTA */}
+                  <div className="p-4 rounded-xl border border-[#087F8C]/30 bg-[#DDF5F6]/70 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 shadow-2xs">
+                    <div>
+                      <div className="flex items-center gap-1.5 font-bold text-xs text-[#087F8C]">
+                        <Zap className="w-3.5 h-3.5" />
+                        <span>One-Click Auto-Start</span>
+                      </div>
+                      <p className="text-[11px] text-[#526572] mt-0.5">
+                        Launch your local background Ollama daemon with zero terminal commands.
+                      </p>
+                    </div>
+                    <button
+                      onClick={handleStartOllama}
+                      disabled={startingOllama}
+                      className="px-3.5 py-2 rounded-xl bg-[#087F8C] hover:bg-[#066873] text-white text-xs font-bold transition-all shadow-xs flex items-center gap-1.5 shrink-0 disabled:opacity-50 cursor-pointer"
+                    >
+                      {startingOllama ? (
+                        <>
+                          <div className="w-3.5 h-3.5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                          <span>Starting Ollama...</span>
+                        </>
+                      ) : (
+                        <>
+                          <Zap className="w-3.5 h-3.5" />
+                          <span>Start Ollama Automatically</span>
+                        </>
+                      )}
+                    </button>
+                  </div>
+
+                  {startOllamaError && (
+                    <div className="p-3 rounded-lg bg-[#FFE4E6] border border-[#BE123C]/30 text-[#BE123C] text-xs">
+                      {startOllamaError}
+                    </div>
+                  )}
 
                   <div className="bg-[#F7F8F5] border border-[#DCE4E5] text-[#172A35] p-3.5 rounded-lg text-xs font-mono space-y-2">
                     <div className="flex items-center gap-2 text-[#526572] border-b border-[#DCE4E5] pb-1.5">

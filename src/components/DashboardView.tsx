@@ -17,11 +17,13 @@ import {
   BarChart3,
   Calendar,
   Lock,
+  Zap,
 } from 'lucide-react';
 import { DocumentItem } from '../types';
 import { NavTab } from './Sidebar';
 import { StatusBadge, VerifiedBadge, SampleDataBadge, ExtractionTelemetryBadge } from './StatusBadge';
 import { format, parseISO, differenceInDays, addDays, isSameDay } from 'date-fns';
+import { startOllamaDaemonRequest } from '../api/client';
 
 interface DashboardViewProps {
   documents: DocumentItem[];
@@ -59,6 +61,24 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
   onOpenOllamaModal,
   ollamaAvailable,
 }) => {
+  const [startingOllama, setStartingOllama] = useState(false);
+
+  const handleAutoStartOllama = async () => {
+    setStartingOllama(true);
+    try {
+      const res = await startOllamaDaemonRequest();
+      if (res.success) {
+        window.location.reload();
+      } else if (onOpenOllamaModal) {
+        onOpenOllamaModal();
+      }
+    } catch {
+      if (onOpenOllamaModal) onOpenOllamaModal();
+    } finally {
+      setStartingOllama(false);
+    }
+  };
+
   const [selectedHeatmapDay, setSelectedHeatmapDay] = useState<{
     date: Date;
     docs: DocumentItem[];
@@ -370,12 +390,31 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
               </span>
             </div>
           </div>
-          <button
-            onClick={onOpenOllamaModal}
-            className="text-xs font-bold text-[#087F8C] hover:text-[#066873] hover:underline shrink-0 self-start sm:self-auto"
-          >
-            Connection Guide →
-          </button>
+          <div className="flex items-center gap-2.5 self-start sm:self-auto shrink-0">
+            <button
+              onClick={handleAutoStartOllama}
+              disabled={startingOllama}
+              className="px-3 py-1.5 rounded-xl bg-[#087F8C] hover:bg-[#066873] text-white font-bold transition-all shadow-xs flex items-center gap-1.5 disabled:opacity-50 cursor-pointer text-xs"
+            >
+              {startingOllama ? (
+                <>
+                  <div className="w-3 h-3 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                  <span>Starting...</span>
+                </>
+              ) : (
+                <>
+                  <Zap className="w-3.5 h-3.5" />
+                  <span>Start Ollama</span>
+                </>
+              )}
+            </button>
+            <button
+              onClick={onOpenOllamaModal}
+              className="text-xs font-bold text-[#087F8C] hover:text-[#066873] hover:underline"
+            >
+              Guide →
+            </button>
+          </div>
         </div>
       )}
 

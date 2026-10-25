@@ -2,7 +2,7 @@ import { Router, Request, Response } from 'express';
 import multer from 'multer';
 import path from 'path';
 import { db, logAudit, UPLOADS_DIR } from './db.js';
-import { checkOllamaStatus, extractWithLocalOllama, askBillSlothAssistant } from './ollama.js';
+import { checkOllamaStatus, startOllamaDaemon, extractWithLocalOllama, askBillSlothAssistant } from './ollama.js';
 import { seedSampleData, clearSampleData } from './sampleData.js';
 import { answerLedgerQuestion, LedgerBill } from '../src/api/ledgerAssistant.js';
 import { format, isPast, isToday, differenceInDays } from 'date-fns';
@@ -111,6 +111,22 @@ router.get('/health', (_req: Request, res: Response) => {
 router.get('/ai/status', async (_req: Request, res: Response) => {
   const status = await checkOllamaStatus();
   res.json(status);
+});
+
+// Trigger automatic start of local Ollama background daemon
+router.post('/ollama/start', async (_req: Request, res: Response) => {
+  try {
+    const result = await startOllamaDaemon();
+    const status = await checkOllamaStatus();
+    res.json({
+      success: result.started,
+      status,
+      error: result.error,
+    });
+  } catch (err: unknown) {
+    const msg = err instanceof Error ? err.message : String(err);
+    res.status(500).json({ success: false, error: msg });
+  }
 });
 
 // -------------------------------------------------------------

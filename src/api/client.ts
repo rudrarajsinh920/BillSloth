@@ -345,6 +345,33 @@ export async function fetchAuditLogs(): Promise<AuditLogItem[]> {
   }
 }
 
+export async function startOllamaDaemonRequest(): Promise<{
+  success: boolean;
+  status: OllamaStatus;
+  error?: string;
+}> {
+  try {
+    const res = await fetch(`${API_BASE}/ollama/start`, { method: 'POST' });
+    if (!res.ok) throw new Error(`HTTP error ${res.status}`);
+    return await res.json();
+  } catch (err: unknown) {
+    const msg = err instanceof Error ? err.message : String(err);
+    return {
+      success: false,
+      status: {
+        available: false,
+        url: 'http://127.0.0.1:11434',
+        activeModel: null,
+        models: [],
+        hasGemma: false,
+        recommendedGemmaModel: 'gemma2:2b',
+        error: msg,
+      },
+      error: msg,
+    };
+  }
+}
+
 export async function fetchOllamaStatus(): Promise<OllamaStatus> {
   try {
     const res = await fetch(`${API_BASE}/ai/status`);

@@ -1,3 +1,13 @@
+import { spawn, execSync, ChildProcess } from 'node:child_process';
+import fs from 'node:fs';
+import path from 'node:path';
+
+let activeOllamaProcess: ChildProcess | null = null;
+
+export function getActiveOllamaProcess(): ChildProcess | null {
+  return activeOllamaProcess;
+}
+
 export interface OllamaStatus {
   available: boolean;
   url: string;
@@ -41,15 +51,116 @@ export function isGemma(modelName: string): boolean {
   return /gemma/i.test(modelName);
 }
 
+export function findOllamaExecutable(): string | null {
+  // 1. Explicit environment variable
+  if (process.env.OLLAMA_PATH && fs.existsSync(process.env.OLLAMA_PATH)) {
+    return process.env.OLLAMA_PATH;
+  }
+
+  // 2. Windows standard paths
+  if (process.platform === 'win32') {
+    const localAppData = process.env.LOCALAPPDATA || '';
+    if (localAppData) {
+      const standardWinPath = path.join(localAppData, 'Programs', 'Ollama', 'ollama.exe');
+      if (fs.existsSync(standardWinPath)) return standardWinPath;
+    }
+    const progFiles = process.env.ProgramFiles || '';
+    if (progFiles) {
+      const pfPath = path.join(progFiles, 'Ollama', 'ollama.exe');
+      if (fs.existsSync(pfPath)) return pfPath;
+    }
+  }
+
+  // 3. macOS standard paths
+  if (process.platform === 'darwin') {
+    const macPaths = [
+      '/usr/local/bin/ollama',
+      '/opt/homebrew/bin/ollama',
+      '/Applications/Ollama.app/Contents/Resources/ollama',
+    ];
+    for (const p of macPaths) {
+      if (fs.existsSync(p)) return p;
+    }
+  }
+
+  // 4. Linux standard paths
+  if (process.platform === 'linux') {
+    const linuxPaths = ['/usr/local/bin/ollama', '/usr/bin/ollama', '/bin/ollama'];
+    for (const p of linuxPaths) {
+      if (fs.existsSync(p)) return p;
+    }
+  }
+
+  // 5. System PATH lookup
+  try {
+    const lookupCmd = process.platform === 'win32' ? 'where.exe ollama' : 'which ollama';
+    const result = execSync(lookupCmd, { encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'] }).trim();
+    const firstLine = result.split(/[\r\n]+/)[0]?.trim();
+    if (firstLine && fs.existsSync(firstLine)) return firstLine;
+  } catch {
+    // Not found in system PATH
+  }
+
+  return null;
+}
+
+export async function startOllamaDaemon(): Promise<{ started: boolean; error?: string }> {
+  // Check if Ollama is already active and responding
+  const currentStatus = await checkOllamaStatus();
+  if (currentStatus.available) {
+    return { started: true };
+  }
+
+  const exePath = findOllamaExecutable();
+  if (!exePath) {
+    return {
+      started: false,
+      error: 'Ollama executable was not found on this computer. Please install Ollama or ensure it is in PATH.',
+    };
+  }
+
+  try {
+    console.log(`🦥 Automatically launching local Ollama daemon (${exePath} serve)...`);
+    const child = spawn(exePath, ['serve'], {
+      detached: true,
+      env: process.env,
+      stdio: 'ignore',
+      windowsHide: true,
+    });
+    child.unref();
+    activeOllamaProcess = child;
+
+    // Poll until ready (up to 12 seconds to account for GPU initialization)
+    const startTime = Date.now();
+    while (Date.now() - startTime < 12000) {
+      await new Promise((resolve) => setTimeout(resolve, 500));
+      const status = await checkOllamaStatus(3000);
+      if (status.available) {
+        console.log(`🦥 Ollama daemon is now ONLINE at ${status.url}! Active model: ${status.activeModel || 'None'}`);
+        return { started: true };
+      }
+    }
+
+    return {
+      started: false,
+      error: 'Ollama process started but port 11434 did not respond within timeout.',
+    };
+  } catch (err: unknown) {
+    const msg = err instanceof Error ? err.message : String(err);
+    console.warn(`🦥 Could not auto-start Ollama: ${msg}`);
+    return { started: false, error: msg };
+  }
+}
+
 /**
  * Checks local Ollama server status and available models.
  * Never calls any external or cloud API.
  */
-export async function checkOllamaStatus(): Promise<OllamaStatus> {
+export async function checkOllamaStatus(timeoutMs = 3000): Promise<OllamaStatus> {
   const host = getOllamaHost();
   try {
     const controller = new AbortController();
-    const timeout = setTimeout(() => controller.abort(), 2000);
+    const timeout = setTimeout(() => controller.abort(), timeoutMs);
 
     const res = await fetch(`${host}/api/tags`, {
       method: 'GET',

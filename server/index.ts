@@ -5,6 +5,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { initDb, UPLOADS_DIR, db } from './db.js';
 import { seedSampleData } from './sampleData.js';
+import { startOllamaDaemon, checkOllamaStatus } from './ollama.js';
 import routes from './routes.js';
 
 const __filename = fileURLToPath(import.meta.url);
@@ -47,13 +48,26 @@ if (fs.existsSync(DIST_DIR)) {
 }
 
 
-app.listen(PORT, '127.0.0.1', () => {
+app.listen(PORT, '127.0.0.1', async () => {
   console.log(`\n🦥 ===============================================`);
   console.log(`   BillSloth Local Backend is running!`);
   console.log(`   URL: http://127.0.0.1:${PORT}`);
   console.log(`   Local Data Storage: ./data/billsloth.db`);
   console.log(`   Local Uploads: ./data/uploads`);
-  console.log(`   Ollama Integration: http://127.0.0.1:11434`);
   console.log(`   Privacy: 100% Local • Zero Cloud Transmission`);
   console.log(`===============================================\n`);
+
+  // Automatically start local Ollama daemon if installed
+  try {
+    const ollamaResult = await startOllamaDaemon();
+    if (ollamaResult.started) {
+      const status = await checkOllamaStatus();
+      console.log(`🦥 Ollama Status: ONLINE (Active Model: ${status.activeModel || 'None detected'})`);
+    } else {
+      console.log(`🦥 Ollama Status: STANDBY (${ollamaResult.error || 'Daemon offline'})`);
+    }
+  } catch (err: unknown) {
+    const msg = err instanceof Error ? err.message : String(err);
+    console.log(`🦥 Ollama Status: STANDBY (${msg})`);
+  }
 });
