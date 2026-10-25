@@ -120,19 +120,19 @@ export const CalmSlothIntro: React.FC<CalmSlothIntroProps> = ({ onComplete, onSk
       role="region"
       aria-label="BillSloth Welcome Experience"
       aria-live="polite"
-      className={`fixed inset-0 z-50 flex items-center justify-center bg-[#0B1220] text-white select-none transition-opacity duration-400 ease-out overflow-hidden ${
+      className={`fixed inset-0 z-50 flex items-center justify-center bg-[#0B1724] text-[#F5F8FA] select-none transition-opacity duration-400 ease-out overflow-hidden ${
         isExiting ? 'opacity-0 pointer-events-none' : 'opacity-100'
       }`}
     >
-      {/* 1. Cinematic Environment: Midnight Navy with Deep Ambient Halos */}
-      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_50%_35%,rgba(34,211,238,0.15)_0%,rgba(52,211,153,0.08)_35%,rgba(11,18,32,0.98)_80%)] pointer-events-none" />
-      <div className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[520px] h-[520px] rounded-full bg-gradient-to-tr from-[#22D3EE]/15 via-[#34D399]/10 to-transparent blur-3xl pointer-events-none" />
+      {/* 1. Cinematic Environment: Deep Navy with Teal Highlight Ambient Halos */}
+      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_50%_35%,rgba(53,214,195,0.16)_0%,rgba(8,127,91,0.08)_35%,rgba(11,23,36,0.98)_80%)] pointer-events-none" />
+      <div className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[520px] h-[520px] rounded-full bg-gradient-to-tr from-[#35D6C3]/15 via-[#087F5B]/10 to-transparent blur-3xl pointer-events-none" />
 
       {/* Sparse, drifting ambient light specks */}
       <div className="absolute inset-0 pointer-events-none opacity-25">
-        <span className="absolute top-1/4 left-1/5 w-1.5 h-1.5 rounded-full bg-cyan-300 animate-pulse-glow" />
-        <span className="absolute top-2/3 right-1/4 w-2 h-2 rounded-full bg-blue-400 animate-pulse-glow" style={{ animationDelay: '1.2s' }} />
-        <span className="absolute bottom-1/4 left-1/3 w-1 h-1 rounded-full bg-indigo-300 animate-pulse-glow" style={{ animationDelay: '0.6s' }} />
+        <span className="absolute top-1/4 left-1/5 w-1.5 h-1.5 rounded-full bg-[#35D6C3] animate-pulse-glow" />
+        <span className="absolute top-2/3 right-1/4 w-2 h-2 rounded-full bg-[#087F8C] animate-pulse-glow" style={{ animationDelay: '1.2s' }} />
+        <span className="absolute bottom-1/4 left-1/3 w-1 h-1 rounded-full bg-[#6D5CE8] animate-pulse-glow" style={{ animationDelay: '0.6s' }} />
       </div>
 
       {/* Top Bar: Skip Button with visible focus state */}
@@ -141,10 +141,10 @@ export const CalmSlothIntro: React.FC<CalmSlothIntroProps> = ({ onComplete, onSk
           onClick={handleSkip}
           autoFocus
           aria-label="Skip introduction and enter dashboard immediately"
-          className="group flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-white/10 hover:bg-white/20 border border-white/15 text-xs text-slate-300 hover:text-white font-medium backdrop-blur-md transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-cyan-400"
+          className="group flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-white/10 hover:bg-white/20 border border-white/15 text-xs text-[#AABBC9] hover:text-[#F5F8FA] font-medium backdrop-blur-md transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-[#35D6C3]"
         >
           <span>Skip</span>
-          <X className="w-3.5 h-3.5 text-slate-400 group-hover:text-white transition-colors" />
+          <X className="w-3.5 h-3.5 text-[#AABBC9] group-hover:text-[#F5F8FA] transition-colors" />
         </button>
       </div>
 
@@ -159,8 +159,8 @@ export const CalmSlothIntro: React.FC<CalmSlothIntroProps> = ({ onComplete, onSk
             } ${stage === 1 ? 'animate-teddy-entrance' : ''}`}
           >
             <div className={`relative ${stage === 1 ? 'animate-teddy-step' : 'animate-float-gentle'}`}>
-              {/* Mascot Avatar Ring with Electric-Cyan Edge */}
-              <div className="w-28 h-28 sm:w-36 sm:h-36 rounded-full p-[2.5px] bg-gradient-to-b from-cyan-400/35 via-blue-500/25 to-transparent shadow-2xl shadow-blue-950/70 relative overflow-hidden bg-[#0F172A] mx-auto">
+              {/* Mascot Avatar Ring with Teal-Highlight Edge */}
+              <div className="w-28 h-28 sm:w-36 sm:h-36 rounded-full p-[2.5px] bg-gradient-to-b from-[#35D6C3]/40 via-[#087F8C]/25 to-transparent shadow-2xl shadow-black/70 relative overflow-hidden bg-[#142536] mx-auto">
                 {!imgError ? (
                   <img
                     src="/sloth-avatar.png"
@@ -191,12 +191,12 @@ export const CalmSlothIntro: React.FC<CalmSlothIntroProps> = ({ onComplete, onSk
                     : 'opacity-0 scale-75 pointer-events-none'
                 }`}
               >
-                <div className="bg-[#162238]/95 text-[#F8FAFC] rounded-xl px-2.5 py-1.5 shadow-xl border border-[#29374D] flex items-center gap-1.5 backdrop-blur-md ring-1 ring-[#22D3EE]/30">
-                  <div className="w-4 h-4 rounded-md bg-[#111D32] text-[#22D3EE] border border-[#29374D] flex items-center justify-center shrink-0">
+                <div className="bg-[#142536]/95 text-[#F5F8FA] rounded-xl px-2.5 py-1.5 shadow-xl border border-[#29374D] flex items-center gap-1.5 backdrop-blur-md ring-1 ring-[#35D6C3]/40">
+                  <div className="w-4 h-4 rounded-md bg-[#0B1724] text-[#35D6C3] border border-[#29374D] flex items-center justify-center shrink-0">
                     <FileText className="w-2.5 h-2.5" />
                   </div>
                   <div className="text-left">
-                    <span className="text-[9px] font-black text-[#F8FAFC] block leading-tight">
+                    <span className="text-[9px] font-black text-[#F5F8FA] block leading-tight">
                       Bill
                     </span>
                     <span className="text-[8px] font-bold text-[#FBBF24] font-mono block">
@@ -216,17 +216,17 @@ export const CalmSlothIntro: React.FC<CalmSlothIntroProps> = ({ onComplete, onSk
                 : 'opacity-0 -translate-x-6 scale-90 pointer-events-none'
             }`}
           >
-            <div className="bg-[#162238]/95 text-[#F8FAFC] rounded-2xl p-3.5 sm:p-4 shadow-2xl border border-[#29374D] text-left ring-2 ring-[#22D3EE] shadow-[#22D3EE]/20 backdrop-blur-md">
+            <div className="bg-[#142536]/95 text-[#F5F8FA] rounded-2xl p-3.5 sm:p-4 shadow-2xl border border-[#29374D] text-left ring-2 ring-[#35D6C3] shadow-[#35D6C3]/20 backdrop-blur-md">
               <div className="flex items-center justify-between gap-2.5">
                 <div className="flex items-center gap-2.5 truncate">
-                  <div className="w-8 h-8 rounded-xl bg-[#111D32] text-[#22D3EE] border border-[#29374D] flex items-center justify-center shrink-0 shadow-2xs">
+                  <div className="w-8 h-8 rounded-xl bg-[#0B1724] text-[#35D6C3] border border-[#29374D] flex items-center justify-center shrink-0 shadow-2xs">
                     <FileText className="w-4 h-4" />
                   </div>
                   <div className="truncate">
-                    <span className="text-xs font-bold text-[#F8FAFC] block truncate">
+                    <span className="text-xs font-bold text-[#F5F8FA] block truncate">
                       Broadband & Utilities
                     </span>
-                    <span className="text-[10px] text-[#A8B7CC] font-medium block">
+                    <span className="text-[10px] text-[#AABBC9] font-medium block">
                       Sample Illustrative Bill
                     </span>
                   </div>
@@ -234,7 +234,7 @@ export const CalmSlothIntro: React.FC<CalmSlothIntroProps> = ({ onComplete, onSk
 
                 {/* Due Date & Organized Status */}
                 <div className="text-right shrink-0">
-                  <span className="text-sm font-black text-[#F8FAFC] font-mono block tabular-nums">
+                  <span className="text-sm font-black text-[#F5F8FA] font-mono block tabular-nums">
                     $128.50
                   </span>
                   <div className="flex items-center gap-1 justify-end mt-0.5">
@@ -258,14 +258,14 @@ export const CalmSlothIntro: React.FC<CalmSlothIntroProps> = ({ onComplete, onSk
           }`}
         >
           <div className="flex items-center justify-center gap-2">
-            <h1 className="text-2xl sm:text-3xl font-black tracking-tight text-[#F8FAFC]">
+            <h1 className="text-2xl sm:text-3xl font-black tracking-tight text-[#F5F8FA]">
               BillSloth
             </h1>
-            <span className="text-[10px] font-black uppercase tracking-wider px-2 py-0.5 rounded-md bg-[#22D3EE]/15 text-[#22D3EE] border border-[#22D3EE]/30">
+            <span className="text-[10px] font-black uppercase tracking-wider px-2 py-0.5 rounded-md bg-[#35D6C3]/15 text-[#35D6C3] border border-[#35D6C3]/30">
               Local AI
             </span>
           </div>
-          <p className="text-xs font-bold uppercase tracking-widest text-[#A8B7CC]">
+          <p className="text-xs font-bold uppercase tracking-widest text-[#AABBC9]">
             SLOW AND STEADY
           </p>
         </div>
@@ -276,20 +276,20 @@ export const CalmSlothIntro: React.FC<CalmSlothIntroProps> = ({ onComplete, onSk
             stage >= 4 ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-3'
           }`}
         >
-          <h2 className="text-base sm:text-lg font-bold tracking-tight text-[#F8FAFC]">
+          <h2 className="text-base sm:text-lg font-bold tracking-tight text-[#F5F8FA]">
             Bills handled. Peace of mind.
           </h2>
-          <p className="text-xs sm:text-[13px] text-[#A8B7CC] max-w-sm mx-auto leading-relaxed font-normal">
+          <p className="text-xs sm:text-[13px] text-[#AABBC9] max-w-sm mx-auto leading-relaxed font-normal">
             Your bills, organized. Your documents, on your device.
           </p>
 
           {/* Privacy Shield with Device Outline & Subtle Pulsing Glow */}
           <div className="pt-1 flex items-center justify-center">
-            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#34D399]/15 border border-[#34D399]/35 text-[#34D399] text-xs font-semibold shadow-sm animate-shield-glow">
-              <Laptop className="w-3.5 h-3.5 text-[#34D399] shrink-0" />
+            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#35D6C3]/15 border border-[#35D6C3]/35 text-[#35D6C3] text-xs font-semibold shadow-sm animate-shield-glow">
+              <Laptop className="w-3.5 h-3.5 text-[#35D6C3] shrink-0" />
               <span>On-Device Storage</span>
-              <span className="text-[#34D399]/60">•</span>
-              <ShieldCheck className="w-3.5 h-3.5 text-[#34D399] shrink-0" />
+              <span className="text-[#35D6C3]/60">•</span>
+              <ShieldCheck className="w-3.5 h-3.5 text-[#35D6C3] shrink-0" />
               <span>Zero Cloud AI Transmission</span>
             </div>
           </div>
@@ -299,22 +299,22 @@ export const CalmSlothIntro: React.FC<CalmSlothIntroProps> = ({ onComplete, onSk
         <div className="mt-5 flex items-center justify-center gap-2">
           <span
             className={`w-2 h-2 rounded-full transition-all duration-500 ${
-              stage >= 1 ? 'bg-cyan-400 scale-100' : 'bg-white/20 scale-75'
+              stage >= 1 ? 'bg-[#35D6C3] scale-100' : 'bg-white/20 scale-75'
             }`}
           />
           <span
             className={`w-2 h-2 rounded-full transition-all duration-500 ${
-              stage >= 2 ? 'bg-cyan-400 scale-100' : 'bg-white/20 scale-75'
+              stage >= 2 ? 'bg-[#35D6C3] scale-100' : 'bg-white/20 scale-75'
             }`}
           />
           <span
             className={`w-2 h-2 rounded-full transition-all duration-500 ${
-              stage >= 3 ? 'bg-blue-400 scale-100' : 'bg-white/20 scale-75'
+              stage >= 3 ? 'bg-[#087F8C] scale-100' : 'bg-white/20 scale-75'
             }`}
           />
           <span
             className={`w-2 h-2 rounded-full transition-all duration-500 ${
-              stage >= 4 ? 'bg-emerald-400 scale-100' : 'bg-white/20 scale-75'
+              stage >= 4 ? 'bg-[#34D399] scale-100' : 'bg-white/20 scale-75'
             }`}
           />
         </div>

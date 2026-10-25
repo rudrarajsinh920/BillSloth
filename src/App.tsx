@@ -169,8 +169,8 @@ export function App() {
   ).length;
 
   return (
-    <div className="min-h-screen flex bg-[#0B1220] text-[#F8FAFC] font-sans antialiased selection:bg-[#22D3EE]/30 selection:text-[#22D3EE]">
-      {/* Left Navigation Sidebar (FinCore & MySign style) */}
+    <div className="min-h-screen flex bg-[#F7F8F5] text-[#172A35] font-sans antialiased selection:bg-[#DDF5F6] selection:text-[#087F8C]">
+      {/* Left Navigation Sidebar */}
       <Sidebar
         activeTab={activeTab}
         onTabChange={setActiveTab}
@@ -204,9 +204,9 @@ export function App() {
         {/* Content Body */}
         <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
           {loading ? (
-            <div className="py-24 text-center text-slate-muted text-xs">
-              <div className="w-8 h-8 border-2 border-brand-blue border-t-transparent rounded-full animate-spin mx-auto mb-3" />
-              <p className="font-semibold text-navy-900 text-sm">Opening Local Financial Ledger...</p>
+            <div className="py-24 text-center text-[#526572] text-xs">
+              <div className="w-8 h-8 border-2 border-[#087F8C] border-t-transparent rounded-full animate-spin mx-auto mb-3" />
+              <p className="font-semibold text-[#172A35] text-sm">Opening Local Financial Ledger...</p>
               <p className="mt-1">Connecting to SQLite and verifying local models.</p>
             </div>
           ) : (
@@ -277,18 +277,18 @@ export function App() {
         </main>
 
         {/* Minimalist Professional Footer */}
-        <footer className="bg-white border-t border-slate-border py-4 px-6 text-xs text-slate-muted mt-auto">
+        <footer className="bg-[#FFFFFF] border-t border-[#DCE4E5] py-4 px-6 text-xs text-[#526572] mt-auto">
           <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-3">
             <div className="flex items-center gap-2">
-              <span className="font-bold text-navy-900">🦥 BillSloth</span>
-              <span className="text-slate-300">•</span>
-              <span className="text-slate-500">Local-First Financial Intelligence</span>
+              <span className="font-bold text-[#172A35]">🦥 BillSloth</span>
+              <span className="text-[#DCE4E5]">•</span>
+              <span className="text-[#526572]">Local-First Financial Intelligence</span>
             </div>
-            <div className="flex items-center gap-3 text-[11px] text-slate-400">
+            <div className="flex items-center gap-3 text-[11px] text-[#526572]">
               <span>100% Air-Gapped Privacy</span>
-              <span className="text-slate-300">•</span>
+              <span className="text-[#DCE4E5]">•</span>
               <span>Zero Cloud AI</span>
-              <span className="text-slate-300">•</span>
+              <span className="text-[#DCE4E5]">•</span>
               <span>On-Device Gemma 2B</span>
             </div>
           </div>
@@ -344,11 +344,11 @@ export function App() {
 
       {/* Toast Notification */}
       {toast && (
-        <div className="fixed bottom-6 right-6 z-50 flex items-center gap-2.5 bg-[#162238] text-[#F8FAFC] border border-[#29374D] px-4 py-2.5 rounded-xl shadow-2xl text-xs animate-in slide-in-from-bottom-2">
+        <div className="fixed bottom-6 right-6 z-50 flex items-center gap-2.5 bg-[#FFFFFF] text-[#172A35] border border-[#DCE4E5] px-4 py-2.5 rounded-xl shadow-xl text-xs animate-in slide-in-from-bottom-2">
           {toast.type === 'success' ? (
-            <CheckCircle2 className="w-4 h-4 text-[#34D399] shrink-0" />
+            <CheckCircle2 className="w-4 h-4 text-[#087F5B] shrink-0" />
           ) : (
-            <AlertCircle className="w-4 h-4 text-[#22D3EE] shrink-0" />
+            <AlertCircle className="w-4 h-4 text-[#087F8C] shrink-0" />
           )}
           <span className="font-medium">{toast.message}</span>
         </div>

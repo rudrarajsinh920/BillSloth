@@ -111,17 +111,17 @@ export const AskAssistantModal: React.FC<AskAssistantModalProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#0B1220]/80 backdrop-blur-md p-4 animate-in fade-in duration-150">
-      <div className="bg-[#162238] rounded-2xl shadow-2xl border border-[#29374D] max-w-2xl w-full h-[85vh] flex flex-col overflow-hidden">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-xs p-4 animate-in fade-in duration-150">
+      <div className="bg-white rounded-2xl shadow-2xl border border-[#DCE4E5] max-w-2xl w-full h-[85vh] flex flex-col overflow-hidden text-[#172A35]">
         {/* Header */}
-        <div className="px-6 py-4 border-b border-[#29374D] flex items-center justify-between bg-[#111D32] shrink-0">
+        <div className="px-6 py-4 border-b border-[#DCE4E5] flex items-center justify-between bg-[#F7F8F5] shrink-0">
           <div className="flex items-center gap-3">
-            <div className="p-2 rounded-lg bg-[#162238] text-[#22D3EE] border border-[#29374D]">
-              <Sparkles className="w-5 h-5 text-[#FBBF24]" />
+            <div className="p-2 rounded-lg bg-white text-[#087F8C] border border-[#DCE4E5]">
+              <Sparkles className="w-5 h-5 text-[#6D5CE8]" />
             </div>
             <div>
-              <h3 className="font-bold text-[#F8FAFC] text-base leading-tight">Ask BillSloth</h3>
-              <p className="text-xs text-[#A8B7CC] mt-0.5">
+              <h3 className="font-bold text-[#172A35] text-base leading-tight">Ask BillSloth</h3>
+              <p className="text-xs text-[#526572] mt-0.5">
                 Financial intelligence & factual analysis over your ledger
               </p>
             </div>
@@ -131,7 +131,7 @@ export const AskAssistantModal: React.FC<AskAssistantModalProps> = ({
             <button
               onClick={onOpenOllamaModal}
               title="Assistant Settings & AI Configuration"
-              className="p-1.5 rounded-lg border border-[#29374D] bg-[#162238] hover:bg-[#1C2B46] text-[#A8B7CC] hover:text-[#22D3EE] text-xs font-semibold inline-flex items-center gap-1.5 transition-colors focus-visible:ring-2 focus-visible:ring-[#22D3EE] focus-visible:outline-none"
+              className="p-1.5 rounded-lg border border-[#DCE4E5] bg-white hover:bg-[#F7F8F5] text-[#526572] hover:text-[#087F8C] text-xs font-semibold inline-flex items-center gap-1.5 transition-colors focus-visible:ring-2 focus-visible:ring-[#087F8C] focus-visible:outline-none"
             >
               <Settings2 className="w-4 h-4" />
               <span className="hidden sm:inline">Settings</span>
@@ -139,7 +139,7 @@ export const AskAssistantModal: React.FC<AskAssistantModalProps> = ({
             <button
               onClick={onClose}
               aria-label="Close assistant dialog"
-              className="text-[#A8B7CC] hover:text-[#F8FAFC] p-1.5 rounded-lg hover:bg-[#1C2B46] transition-colors focus-visible:ring-2 focus-visible:ring-[#22D3EE] focus-visible:outline-none"
+              className="text-[#526572] hover:text-[#172A35] p-1.5 rounded-lg hover:bg-white transition-colors focus-visible:ring-2 focus-visible:ring-[#087F8C] focus-visible:outline-none"
             >
               <X className="w-5 h-5" />
             </button>
@@ -147,7 +147,7 @@ export const AskAssistantModal: React.FC<AskAssistantModalProps> = ({
         </div>
 
         {/* Messages List */}
-        <div className="flex-1 overflow-y-auto p-6 space-y-4 bg-[#0B1220]">
+        <div className="flex-1 overflow-y-auto p-6 space-y-4 bg-[#F7F8F5]">
           {messages.map((m) => {
             const isUser = m.role === 'user';
             return (
@@ -158,31 +158,31 @@ export const AskAssistantModal: React.FC<AskAssistantModalProps> = ({
                 <div
                   className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 text-xs font-bold ${
                     isUser
-                      ? 'bg-[#22D3EE] text-[#0B1220]'
-                      : 'bg-[#111D32] border border-[#29374D] text-[#22D3EE]'
+                      ? 'bg-[#087F8C] text-white shadow-xs'
+                      : 'bg-white border border-[#DCE4E5] text-[#087F8C]'
                   }`}
                 >
-                  {isUser ? <User className="w-4 h-4" /> : <Bot className="w-4 h-4 text-[#FBBF24]" />}
+                  {isUser ? <User className="w-4 h-4" /> : <Bot className="w-4 h-4 text-[#6D5CE8]" />}
                 </div>
 
                 <div className={`max-w-[80%] space-y-1 ${isUser ? 'items-end' : ''}`}>
                   <div
                     className={`p-3.5 rounded-xl text-xs leading-relaxed ${
                       isUser
-                        ? 'bg-[#22D3EE] text-[#0B1220] font-medium rounded-tr-none shadow-md'
+                        ? 'bg-[#087F8C] text-white font-medium rounded-tr-none shadow-xs'
                         : m.isError
-                        ? 'bg-[#FB7185]/15 border border-[#FB7185]/30 text-[#FB7185] shadow-md rounded-tl-none whitespace-pre-wrap'
-                        : 'bg-[#162238] border border-[#29374D] text-[#F8FAFC] shadow-md rounded-tl-none whitespace-pre-wrap'
+                        ? 'bg-[#FFE4E6] border border-[#BE123C]/30 text-[#BE123C] shadow-xs rounded-tl-none whitespace-pre-wrap'
+                        : 'bg-white border border-[#DCE4E5] text-[#172A35] shadow-xs rounded-tl-none whitespace-pre-wrap'
                     }`}
                   >
                     {m.text}
                   </div>
-                  <div className={`flex items-center gap-2 text-[10px] text-[#A8B7CC] px-1 ${isUser ? 'justify-end' : ''}`}>
+                  <div className={`flex items-center gap-2 text-[10px] text-[#526572] px-1 ${isUser ? 'justify-end' : ''}`}>
                     <span>{m.timestamp}</span>
                     {m.isError && (
                       <button
                         onClick={handleRetry}
-                        className="inline-flex items-center gap-0.5 text-[#22D3EE] hover:underline font-semibold ml-1"
+                        className="inline-flex items-center gap-0.5 text-[#087F8C] hover:underline font-semibold ml-1"
                       >
                         <RotateCcw className="w-2.5 h-2.5" /> Retry
                       </button>
@@ -195,11 +195,11 @@ export const AskAssistantModal: React.FC<AskAssistantModalProps> = ({
 
           {loading && (
             <div className="flex items-start gap-3">
-              <div className="w-8 h-8 rounded-lg bg-[#111D32] border border-[#29374D] text-[#22D3EE] flex items-center justify-center shrink-0">
-                <Bot className="w-4 h-4 text-[#FBBF24]" />
+              <div className="w-8 h-8 rounded-lg bg-white border border-[#DCE4E5] text-[#087F8C] flex items-center justify-center shrink-0">
+                <Bot className="w-4 h-4 text-[#6D5CE8]" />
               </div>
-              <div className="p-3.5 rounded-xl bg-[#162238] border border-[#29374D] text-xs text-[#A8B7CC] shadow-md rounded-tl-none flex items-center gap-2">
-                <div className="w-3.5 h-3.5 border-2 border-[#22D3EE] border-t-transparent rounded-full animate-spin" />
+              <div className="p-3.5 rounded-xl bg-white border border-[#DCE4E5] text-xs text-[#526572] shadow-xs rounded-tl-none flex items-center gap-2">
+                <div className="w-3.5 h-3.5 border-2 border-[#087F8C] border-t-transparent rounded-full animate-spin" />
                 <span>Checking your ledger records...</span>
               </div>
             </div>
@@ -209,9 +209,9 @@ export const AskAssistantModal: React.FC<AskAssistantModalProps> = ({
         </div>
 
         {/* Preset Prompt Suggestions */}
-        <div className="px-6 py-2.5 bg-[#111D32] border-t border-[#29374D] shrink-0 overflow-x-auto">
+        <div className="px-6 py-2.5 bg-[#F7F8F5] border-t border-[#DCE4E5] shrink-0 overflow-x-auto">
           <div className="flex items-center gap-1.5 whitespace-nowrap">
-            <span className="text-[10px] font-semibold text-[#A8B7CC] uppercase tracking-wider mr-1">
+            <span className="text-[10px] font-semibold text-[#526572] uppercase tracking-wider mr-1">
               Suggested:
             </span>
             {PRESET_QUESTIONS.map((q) => (
@@ -219,7 +219,7 @@ export const AskAssistantModal: React.FC<AskAssistantModalProps> = ({
                 key={q}
                 onClick={() => handleSend(q)}
                 disabled={loading}
-                className="px-2.5 py-1 rounded-full border border-[#29374D] bg-[#162238] hover:bg-[#1C2B46] hover:border-[#22D3EE]/50 text-[11px] text-[#F8FAFC] transition-colors disabled:opacity-50"
+                className="px-2.5 py-1 rounded-full border border-[#DCE4E5] bg-white hover:bg-[#DDF5F6] hover:border-[#087F8C]/40 text-[11px] text-[#172A35] transition-colors disabled:opacity-50"
               >
                 {q}
               </button>
@@ -233,7 +233,7 @@ export const AskAssistantModal: React.FC<AskAssistantModalProps> = ({
             e.preventDefault();
             handleSend(query);
           }}
-          className="p-4 bg-[#111D32] border-t border-[#29374D] flex items-center gap-2 shrink-0"
+          className="p-4 bg-white border-t border-[#DCE4E5] flex items-center gap-2 shrink-0"
         >
           <input
             type="text"
@@ -241,13 +241,13 @@ export const AskAssistantModal: React.FC<AskAssistantModalProps> = ({
             onChange={(e) => setQuery(e.target.value)}
             placeholder="Ask about vendors, due dates, cash flow, or drafting payment emails..."
             disabled={loading}
-            className="flex-1 px-4 py-2.5 text-xs rounded-xl border border-[#29374D] bg-[#162238] text-[#F8FAFC] placeholder:text-[#64748B] focus:border-[#22D3EE] focus:outline-none"
+            className="flex-1 px-4 py-2.5 text-xs rounded-xl border border-[#DCE4E5] bg-[#F7F8F5] text-[#172A35] placeholder:text-[#94A3B8] focus:border-[#087F8C] focus:bg-white focus:outline-none"
           />
           <button
             type="submit"
             disabled={!query.trim() || loading}
             aria-label="Send question"
-            className="px-4 py-2.5 rounded-xl bg-[#22D3EE] hover:bg-[#06B6D4] text-[#0B1220] text-xs font-bold shadow-md inline-flex items-center gap-1.5 transition-colors disabled:opacity-50 focus-visible:ring-2 focus-visible:ring-[#22D3EE] focus-visible:outline-none"
+            className="px-4 py-2.5 rounded-xl bg-[#087F8C] hover:bg-[#066873] text-white text-xs font-bold shadow-xs inline-flex items-center gap-1.5 transition-colors disabled:opacity-50 focus-visible:ring-2 focus-visible:ring-[#087F8C] focus-visible:outline-none"
           >
             <Send className="w-4 h-4" />
             <span className="hidden sm:inline">Ask</span>

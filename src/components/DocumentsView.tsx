@@ -113,18 +113,18 @@ export const DocumentsView: React.FC<DocumentsViewProps> = ({
   };
 
   const formatDueDate = (dateStr: string | null) => {
-    if (!dateStr) return <span className="text-[#A8B7CC]">No due date</span>;
+    if (!dateStr) return <span className="text-[#526572]">No due date</span>;
     try {
       const date = parseISO(dateStr);
       const daysDiff = differenceInDays(date, new Date());
-      let badgeClass = 'text-[#F8FAFC] font-medium';
-      if (daysDiff < 0) badgeClass = 'text-[#FB7185] font-bold';
-      else if (daysDiff <= 7) badgeClass = 'text-[#FBBF24] font-bold';
+      let badgeClass = 'text-[#172A35] font-medium';
+      if (daysDiff < 0) badgeClass = 'text-[#BE123C] font-bold';
+      else if (daysDiff <= 7) badgeClass = 'text-[#854D0E] font-bold';
 
       return (
         <span className={badgeClass}>
           {format(date, 'MMM d, yyyy')}
-          <span className="text-[11px] block text-[#A8B7CC] font-normal">
+          <span className="text-[11px] block text-[#526572] font-normal">
             {daysDiff < 0
               ? `${Math.abs(daysDiff)}d overdue`
               : daysDiff === 0
@@ -145,45 +145,45 @@ export const DocumentsView: React.FC<DocumentsViewProps> = ({
       label: 'All Bills',
       count: documents.length,
       icon: FileText,
-      activeColor: 'border-[#22D3EE] text-[#22D3EE] bg-[#162238]',
+      activeColor: 'border-[#087F8C] text-[#087F8C] bg-[#DDF5F6]',
     },
     {
       id: 'needs_review',
       label: 'Needs Review',
       count: documents.filter((d) => (d.computed_status || d.status) === 'needs_review' || d.is_verified === 0).length,
       icon: Eye,
-      activeColor: 'border-[#FBBF24] text-[#FBBF24] bg-[#FBBF24]/10',
+      activeColor: 'border-[#854D0E] text-[#854D0E] bg-[#FFF0CC]',
     },
     {
       id: 'due_soon',
       label: 'Due Soon',
       count: documents.filter((d) => (d.computed_status || d.status) === 'due_soon').length,
       icon: Clock,
-      activeColor: 'border-[#22D3EE] text-[#22D3EE] bg-[#22D3EE]/10',
+      activeColor: 'border-[#854D0E] text-[#854D0E] bg-[#FFF0CC]',
     },
     {
       id: 'overdue',
       label: 'Overdue',
       count: documents.filter((d) => (d.computed_status || d.status) === 'overdue').length,
       icon: AlertCircle,
-      activeColor: 'border-[#FB7185] text-[#FB7185] bg-[#FB7185]/10',
+      activeColor: 'border-[#BE123C] text-[#BE123C] bg-[#FFE4E6]',
     },
     {
       id: 'paid',
       label: 'Paid',
       count: documents.filter((d) => (d.computed_status || d.status) === 'paid').length,
       icon: CheckCircle2,
-      activeColor: 'border-[#34D399] text-[#34D399] bg-[#34D399]/10',
+      activeColor: 'border-[#087F5B] text-[#087F5B] bg-[#DDF7EF]',
     },
   ];
 
   return (
-    <div className="space-y-6 animate-in fade-in duration-150 text-[#F8FAFC]">
+    <div className="space-y-6 animate-in fade-in duration-150 text-[#172A35]">
       {/* Top Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-xl font-bold text-[#F8FAFC] tracking-tight">Bills & Invoices Ledger</h1>
-          <p className="text-xs text-[#A8B7CC] mt-1">
+          <h1 className="text-xl font-bold text-[#172A35] tracking-tight">Bills & Invoices Ledger</h1>
+          <p className="text-xs text-[#526572] mt-1">
             Complete on-device ledger with verified amounts, payment terms, and categories
           </p>
         </div>
@@ -191,15 +191,15 @@ export const DocumentsView: React.FC<DocumentsViewProps> = ({
           <a
             href={CSV_EXPORT_URL}
             download="billsloth-invoices.csv"
-            className="px-3 py-2 rounded-xl border border-[#29374D] bg-[#162238] hover:bg-[#1C2B46] text-[#A8B7CC] hover:text-[#F8FAFC] text-xs font-semibold shadow-sm inline-flex items-center gap-1.5 transition-colors focus-visible:ring-2 focus-visible:ring-[#22D3EE]"
+            className="px-3 py-2 rounded-xl border border-[#DCE4E5] bg-white hover:bg-[#F7F8F5] text-[#526572] hover:text-[#172A35] text-xs font-semibold shadow-xs inline-flex items-center gap-1.5 transition-colors focus-visible:ring-2 focus-visible:ring-[#087F8C]"
             title="Download complete accounting records as CSV"
           >
-            <Download className="w-3.5 h-3.5 text-[#22D3EE]" />
+            <Download className="w-3.5 h-3.5 text-[#087F8C]" />
             <span>Export CSV</span>
           </a>
           <button
             onClick={onNavigateToImport}
-            className="px-4 py-2 rounded-xl bg-gradient-to-r from-[#22D3EE] to-[#06B6D4] text-[#0B1220] text-xs font-black shadow-md shadow-[#22D3EE]/25 inline-flex items-center gap-1.5 transition-all hover:brightness-110 active:scale-95 focus-visible:ring-2 focus-visible:ring-[#22D3EE] focus-visible:outline-none"
+            className="px-4 py-2 rounded-xl bg-[#087F8C] hover:bg-[#066873] text-white text-xs font-bold shadow-sm inline-flex items-center gap-1.5 transition-all hover:scale-105 active:scale-95 focus-visible:ring-2 focus-visible:ring-[#087F8C] focus-visible:outline-none"
           >
             <FileText className="w-4 h-4" />
             <span>Import New Bill</span>
@@ -216,19 +216,19 @@ export const DocumentsView: React.FC<DocumentsViewProps> = ({
             <button
               key={tab.id}
               onClick={() => setSelectedStatus(tab.id)}
-              className={`p-3 rounded-xl border text-left transition-all flex items-center justify-between focus-visible:ring-2 focus-visible:ring-[#22D3EE] focus-visible:outline-none ${
+              className={`p-3 rounded-xl border text-left transition-all flex items-center justify-between focus-visible:ring-2 focus-visible:ring-[#087F8C] focus-visible:outline-none ${
                 isActive
-                  ? `${tab.activeColor} shadow-sm`
-                  : 'border-[#29374D] bg-[#111D32] text-[#A8B7CC] hover:border-[#3E516D] hover:text-[#F8FAFC]'
+                  ? `${tab.activeColor} shadow-xs font-bold`
+                  : 'border-[#DCE4E5] bg-white text-[#526572] hover:border-[#087F8C]/40 hover:text-[#172A35]'
               }`}
             >
               <div className="flex items-center gap-2 truncate">
                 <Icon className="w-4 h-4 shrink-0" />
-                <span className="text-xs font-semibold truncate">{tab.label}</span>
+                <span className="text-xs truncate">{tab.label}</span>
               </div>
               <span
                 className={`text-xs font-bold font-mono tabular-nums px-2 py-0.5 rounded-full ${
-                  isActive ? 'bg-[#0B1220] border border-current text-current' : 'bg-[#162238] text-[#A8B7CC] border border-[#29374D]'
+                  isActive ? 'bg-white border border-current text-current' : 'bg-[#F7F8F5] text-[#526572] border border-[#DCE4E5]'
                 }`}
               >
                 {tab.count}
@@ -242,18 +242,18 @@ export const DocumentsView: React.FC<DocumentsViewProps> = ({
       <div className="financial-card p-4 flex flex-col md:flex-row items-center justify-between gap-3">
         {/* Search Input */}
         <div className="relative w-full md:w-80">
-          <Search className="w-4 h-4 text-[#A8B7CC] absolute left-3 top-2.5" />
+          <Search className="w-4 h-4 text-[#526572] absolute left-3 top-2.5" />
           <input
             type="text"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             placeholder="Search vendor, invoice #, notes..."
-            className="w-full pl-9 pr-8 py-2 text-xs rounded-xl border border-[#29374D] bg-[#111D32] text-[#F8FAFC] placeholder-[#64748B] focus:border-[#22D3EE] focus:ring-1 focus:ring-[#22D3EE] focus-visible:outline-none"
+            className="w-full pl-9 pr-8 py-2 text-xs rounded-xl border border-[#DCE4E5] bg-[#F7F8F5] text-[#172A35] placeholder-[#94A3B8] focus:border-[#087F8C] focus:bg-white focus:ring-1 focus:ring-[#087F8C] focus-visible:outline-none"
           />
           {searchTerm && (
             <button
               onClick={() => setSearchTerm('')}
-              className="absolute right-2.5 top-2.5 text-[#A8B7CC] hover:text-[#F8FAFC]"
+              className="absolute right-2.5 top-2.5 text-[#526572] hover:text-[#172A35]"
               aria-label="Clear search"
             >
               <X className="w-3.5 h-3.5" />
@@ -263,36 +263,36 @@ export const DocumentsView: React.FC<DocumentsViewProps> = ({
 
         {/* Category & Sort controls */}
         <div className="flex flex-wrap items-center gap-2.5 w-full md:w-auto justify-between md:justify-end">
-          <div className="flex items-center gap-1.5 text-xs text-[#A8B7CC]">
-            <Filter className="w-3.5 h-3.5 text-[#22D3EE]" />
+          <div className="flex items-center gap-1.5 text-xs text-[#526572]">
+            <Filter className="w-3.5 h-3.5 text-[#087F8C]" />
             <select
               value={selectedCategory}
               onChange={(e) => setSelectedCategory(e.target.value)}
-              className="px-2.5 py-1.5 text-xs rounded-xl border border-[#29374D] bg-[#111D32] text-[#F8FAFC] focus:border-[#22D3EE] focus-visible:outline-none"
+              className="px-2.5 py-1.5 text-xs rounded-xl border border-[#DCE4E5] bg-[#F7F8F5] text-[#172A35] focus:border-[#087F8C] focus-visible:outline-none"
             >
               {CATEGORIES.map((cat) => (
-                <option key={cat} value={cat} className="bg-[#111D32] text-[#F8FAFC]">
+                <option key={cat} value={cat} className="bg-white text-[#172A35]">
                   {cat === 'All' ? 'All Categories' : cat}
                 </option>
               ))}
             </select>
           </div>
 
-          <div className="flex items-center gap-1.5 text-xs text-[#A8B7CC]">
-            <ArrowUpDown className="w-3.5 h-3.5 text-[#22D3EE]" />
+          <div className="flex items-center gap-1.5 text-xs text-[#526572]">
+            <ArrowUpDown className="w-3.5 h-3.5 text-[#087F8C]" />
             <select
               value={sortBy}
               onChange={(e) => setSortBy(e.target.value as 'due_date' | 'amount' | 'vendor')}
-              className="px-2.5 py-1.5 text-xs rounded-xl border border-[#29374D] bg-[#111D32] text-[#F8FAFC] focus:border-[#22D3EE] focus-visible:outline-none"
+              className="px-2.5 py-1.5 text-xs rounded-xl border border-[#DCE4E5] bg-[#F7F8F5] text-[#172A35] focus:border-[#087F8C] focus-visible:outline-none"
             >
-              <option value="due_date" className="bg-[#111D32] text-[#F8FAFC]">Due Date</option>
-              <option value="amount" className="bg-[#111D32] text-[#F8FAFC]">Amount</option>
-              <option value="vendor" className="bg-[#111D32] text-[#F8FAFC]">Vendor</option>
+              <option value="due_date" className="bg-white text-[#172A35]">Due Date</option>
+              <option value="amount" className="bg-white text-[#172A35]">Amount</option>
+              <option value="vendor" className="bg-white text-[#172A35]">Vendor</option>
             </select>
             <button
               onClick={() => setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc')}
               title={`Switch to ${sortOrder === 'asc' ? 'descending' : 'ascending'}`}
-              className="px-2.5 py-1.5 rounded-xl border border-[#29374D] bg-[#111D32] text-xs text-[#F8FAFC] hover:bg-[#1C2B46] font-mono focus-visible:ring-2 focus-visible:ring-[#22D3EE] focus-visible:outline-none"
+              className="px-2.5 py-1.5 rounded-xl border border-[#DCE4E5] bg-[#F7F8F5] text-xs text-[#172A35] hover:bg-white font-mono focus-visible:ring-2 focus-visible:ring-[#087F8C] focus-visible:outline-none"
             >
               {sortOrder === 'asc' ? 'ASC' : 'DESC'}
             </button>
@@ -302,9 +302,9 @@ export const DocumentsView: React.FC<DocumentsViewProps> = ({
 
       {/* Main Content: Desktop Table + Mobile Cards */}
       {filteredDocuments.length === 0 ? (
-        <div className="financial-card p-12 text-center text-[#A8B7CC] text-xs">
-          <AlertCircle className="w-8 h-8 text-[#22D3EE] mx-auto mb-2 opacity-80" />
-          <p className="font-semibold text-[#F8FAFC] text-sm">No Bills Found</p>
+        <div className="financial-card p-12 text-center text-[#526572] text-xs">
+          <AlertCircle className="w-8 h-8 text-[#087F8C] mx-auto mb-2 opacity-80" />
+          <p className="font-semibold text-[#172A35] text-sm">No Bills Found</p>
           <p className="mt-1">Try adjusting your filters or import a new document.</p>
         </div>
       ) : (
@@ -318,7 +318,7 @@ export const DocumentsView: React.FC<DocumentsViewProps> = ({
                 <div
                   key={doc.id}
                   onClick={() => onOpenReview(doc)}
-                  className="financial-card p-4 space-y-3 cursor-pointer active:bg-[#1C2B46] transition-colors"
+                  className="financial-card p-4 space-y-3 cursor-pointer active:bg-[#F7F8F5] transition-colors"
                 >
                   {/* Top line: Avatar + Vendor + Status badge */}
                   <div className="flex items-center justify-between gap-2">
@@ -330,12 +330,12 @@ export const DocumentsView: React.FC<DocumentsViewProps> = ({
                       </div>
                       <div className="truncate">
                         <div className="flex items-center gap-1.5 flex-wrap">
-                          <span className="font-bold text-sm text-[#F8FAFC] truncate">
+                          <span className="font-bold text-sm text-[#172A35] truncate">
                             {doc.vendor || '<Unknown Vendor>'}
                           </span>
                           {doc.is_sample === 1 && <SampleDataBadge />}
                         </div>
-                        <span className="text-[11px] text-[#A8B7CC] truncate block">
+                        <span className="text-[11px] text-[#526572] truncate block">
                           {doc.category}
                         </span>
                       </div>
@@ -344,22 +344,22 @@ export const DocumentsView: React.FC<DocumentsViewProps> = ({
                   </div>
 
                   {/* Middle Strip: 3-Column Financial Summary */}
-                  <div className="grid grid-cols-3 gap-2 py-2 px-3 bg-[#111D32] rounded-xl border border-[#29374D] text-center">
+                  <div className="grid grid-cols-3 gap-2 py-2 px-3 bg-[#F7F8F5] rounded-xl border border-[#DCE4E5] text-center">
                     <div>
-                      <span className="text-[10px] uppercase font-semibold text-[#A8B7CC] block">Amount</span>
-                      <span className="text-xs font-bold text-[#F8FAFC] font-mono tabular-nums block mt-0.5">
+                      <span className="text-[10px] uppercase font-semibold text-[#526572] block">Amount</span>
+                      <span className="text-xs font-bold text-[#172A35] font-mono tabular-nums block mt-0.5">
                         {formatCurrency(doc.amount, doc.currency)}
                       </span>
                     </div>
-                    <div className="border-x border-[#29374D]">
-                      <span className="text-[10px] uppercase font-semibold text-[#A8B7CC] block">Invoice #</span>
-                      <span className="text-xs font-mono text-[#F8FAFC] truncate block mt-0.5" title={doc.invoice_number || '—'}>
+                    <div className="border-x border-[#DCE4E5]">
+                      <span className="text-[10px] uppercase font-semibold text-[#526572] block">Invoice #</span>
+                      <span className="text-xs font-mono text-[#172A35] truncate block mt-0.5" title={doc.invoice_number || '—'}>
                         {doc.invoice_number || '—'}
                       </span>
                     </div>
                     <div>
-                      <span className="text-[10px] uppercase font-semibold text-[#A8B7CC] block">Due Date</span>
-                      <span className="text-[11px] font-semibold text-[#F8FAFC] tabular-nums block mt-0.5 truncate">
+                      <span className="text-[10px] uppercase font-semibold text-[#526572] block">Due Date</span>
+                      <span className="text-[11px] font-semibold text-[#172A35] tabular-nums block mt-0.5 truncate">
                         {doc.due_date || 'No Date'}
                       </span>
                     </div>
@@ -383,7 +383,7 @@ export const DocumentsView: React.FC<DocumentsViewProps> = ({
                       {computed !== 'paid' && (
                         <button
                           onClick={() => onQuickMarkPaid(doc)}
-                          className="px-2 py-1 rounded-lg text-[11px] font-semibold bg-[#34D399]/20 text-[#34D399] border border-[#34D399]/40 hover:bg-[#34D399] hover:text-[#0B1220]"
+                          className="px-2 py-1 rounded-lg text-[11px] font-semibold bg-[#DDF7EF] text-[#087F5B] border border-[#087F5B]/30 hover:bg-[#087F5B] hover:text-white"
                         >
                           Mark Paid
                         </button>
@@ -391,14 +391,14 @@ export const DocumentsView: React.FC<DocumentsViewProps> = ({
                       <button
                         onClick={() => onPrepareReminder(doc)}
                         aria-label="Prepare Reminder"
-                        className="p-1.5 text-[#A8B7CC] hover:text-[#22D3EE] rounded-lg hover:bg-[#111D32]"
+                        className="p-1.5 text-[#526572] hover:text-[#087F8C] rounded-lg hover:bg-[#F7F8F5]"
                       >
                         <BellRing className="w-4 h-4" />
                       </button>
                       <button
                         onClick={() => onOpenReview(doc)}
                         aria-label="Review Details"
-                        className="p-1.5 text-[#A8B7CC] hover:text-[#F8FAFC] rounded-lg hover:bg-[#111D32]"
+                        className="p-1.5 text-[#526572] hover:text-[#172A35] rounded-lg hover:bg-[#F7F8F5]"
                       >
                         <Eye className="w-4 h-4" />
                       </button>
@@ -413,7 +413,7 @@ export const DocumentsView: React.FC<DocumentsViewProps> = ({
           <div className="financial-card overflow-hidden hidden sm:block">
             <div className="overflow-x-auto">
               <table className="w-full text-left text-xs">
-                <thead className="bg-[#111D32] text-[#A8B7CC] border-b border-[#29374D] font-semibold uppercase tracking-wider text-[11px]">
+                <thead className="bg-[#F7F8F5] text-[#526572] border-b border-[#DCE4E5] font-semibold uppercase tracking-wider text-[11px]">
                   <tr>
                     <th className="py-3 px-4">Status</th>
                     <th className="py-3 px-4">Vendor & Document</th>
@@ -424,14 +424,14 @@ export const DocumentsView: React.FC<DocumentsViewProps> = ({
                     <th className="py-3 px-4 text-right">Actions</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-[#29374D]">
+                <tbody className="divide-y divide-[#DCE4E5]">
                   {filteredDocuments.map((doc) => {
                     const computed = doc.computed_status || doc.status;
                     const vendorStyle = getVendorColor(doc.vendor || '');
                     return (
                       <tr
                         key={doc.id}
-                        className="hover:bg-[#1C2B46] transition-colors group cursor-pointer"
+                        className="hover:bg-[#F7F8F5] transition-colors group cursor-pointer"
                         onClick={() => onOpenReview(doc)}
                       >
                         {/* Status */}
@@ -449,7 +449,7 @@ export const DocumentsView: React.FC<DocumentsViewProps> = ({
                             </div>
                             <div>
                               <div className="flex items-center gap-2 flex-wrap">
-                                <span className="font-bold text-[#F8FAFC] text-sm group-hover:text-[#22D3EE] transition-colors">
+                                <span className="font-bold text-[#172A35] text-sm group-hover:text-[#087F8C] transition-colors">
                                   {doc.vendor || '<Unknown Vendor>'}
                                 </span>
                                 {doc.is_sample === 1 && <SampleDataBadge />}
@@ -459,7 +459,7 @@ export const DocumentsView: React.FC<DocumentsViewProps> = ({
                                   size="xs"
                                 />
                               </div>
-                              <div className="text-[11px] text-[#A8B7CC] font-mono truncate max-w-xs mt-0.5">
+                              <div className="text-[11px] text-[#526572] font-mono truncate max-w-xs mt-0.5">
                                 {doc.invoice_number ? `#${doc.invoice_number} • ` : ''}
                                 {doc.original_name}
                               </div>
@@ -469,7 +469,7 @@ export const DocumentsView: React.FC<DocumentsViewProps> = ({
 
                         {/* Category */}
                         <td className="py-3.5 px-4 whitespace-nowrap">
-                          <span className="px-2.5 py-0.5 rounded-lg text-[11px] font-medium bg-[#111D32] text-[#A8B7CC] border border-[#29374D]">
+                          <span className="px-2.5 py-0.5 rounded-lg text-[11px] font-medium bg-[#F7F8F5] text-[#526572] border border-[#DCE4E5]">
                             {doc.category}
                           </span>
                         </td>
@@ -481,10 +481,10 @@ export const DocumentsView: React.FC<DocumentsViewProps> = ({
 
                         {/* Amount */}
                         <td className="py-3.5 px-4 text-right whitespace-nowrap">
-                          <div className="font-bold text-sm text-[#F8FAFC] font-mono tabular-nums">
+                          <div className="font-bold text-sm text-[#172A35] font-mono tabular-nums">
                             {formatCurrency(doc.amount, doc.currency)}
                           </div>
-                          <span className="text-[10px] text-[#A8B7CC] font-mono">{doc.currency}</span>
+                          <span className="text-[10px] text-[#526572] font-mono">{doc.currency}</span>
                         </td>
 
                         {/* Verified Badge */}
@@ -499,7 +499,7 @@ export const DocumentsView: React.FC<DocumentsViewProps> = ({
                               <button
                                 onClick={() => onQuickMarkPaid(doc)}
                                 title="Mark as Paid"
-                                className="px-2.5 py-1 rounded-lg text-[11px] font-semibold bg-[#34D399]/20 text-[#34D399] border border-[#34D399]/40 hover:bg-[#34D399] hover:text-[#0B1220] transition-colors focus-visible:ring-2 focus-visible:ring-[#22D3EE] focus-visible:outline-none"
+                                className="px-2.5 py-1 rounded-lg text-[11px] font-semibold bg-[#DDF7EF] text-[#087F5B] border border-[#087F5B]/30 hover:bg-[#087F5B] hover:text-white transition-colors focus-visible:ring-2 focus-visible:ring-[#087F8C] focus-visible:outline-none"
                               >
                                 Mark Paid
                               </button>
@@ -508,7 +508,7 @@ export const DocumentsView: React.FC<DocumentsViewProps> = ({
                               onClick={() => onPrepareReminder(doc)}
                               title="Prepare Reminder"
                               aria-label="Prepare Reminder"
-                              className="p-1.5 text-[#A8B7CC] hover:text-[#22D3EE] rounded-lg hover:bg-[#111D32] focus-visible:ring-2 focus-visible:ring-[#22D3EE] focus-visible:outline-none"
+                              className="p-1.5 text-[#526572] hover:text-[#087F8C] rounded-lg hover:bg-white focus-visible:ring-2 focus-visible:ring-[#087F8C] focus-visible:outline-none"
                             >
                               <BellRing className="w-3.5 h-3.5" />
                             </button>
@@ -516,7 +516,7 @@ export const DocumentsView: React.FC<DocumentsViewProps> = ({
                               onClick={() => onOpenReview(doc)}
                               title="Review Details"
                               aria-label="Review Details"
-                              className="p-1.5 text-[#A8B7CC] hover:text-[#F8FAFC] rounded-lg hover:bg-[#111D32] focus-visible:ring-2 focus-visible:ring-[#22D3EE] focus-visible:outline-none"
+                              className="p-1.5 text-[#526572] hover:text-[#172A35] rounded-lg hover:bg-white focus-visible:ring-2 focus-visible:ring-[#087F8C] focus-visible:outline-none"
                             >
                               <Eye className="w-3.5 h-3.5" />
                             </button>
@@ -529,7 +529,7 @@ export const DocumentsView: React.FC<DocumentsViewProps> = ({
                               }}
                               title="Archive Record"
                               aria-label="Archive Record"
-                              className="p-1.5 text-[#A8B7CC] hover:text-[#FB7185] rounded-lg hover:bg-[#FB7185]/15 focus-visible:ring-2 focus-visible:ring-[#22D3EE] focus-visible:outline-none"
+                              className="p-1.5 text-[#526572] hover:text-[#BE123C] rounded-lg hover:bg-[#FFE4E6] focus-visible:ring-2 focus-visible:ring-[#087F8C] focus-visible:outline-none"
                             >
                               <Trash2 className="w-3.5 h-3.5" />
                             </button>

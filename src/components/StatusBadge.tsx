@@ -30,7 +30,7 @@ export const StatusBadge: React.FC<StatusBadgeProps> = ({
     case 'overdue':
       return (
         <span
-          className={`inline-flex items-center gap-1.5 rounded-full border border-[#FB7185]/35 bg-[#FB7185]/15 text-[#FB7185] font-semibold ${sizeClasses}`}
+          className={`inline-flex items-center gap-1.5 rounded-full border border-[#BE123C]/30 bg-[#FFE4E6] text-[#BE123C] font-semibold ${sizeClasses}`}
         >
           {showIcon && <AlertCircle className={isSm ? 'w-3 h-3' : 'w-3.5 h-3.5'} />}
           <span>Overdue</span>
@@ -40,7 +40,7 @@ export const StatusBadge: React.FC<StatusBadgeProps> = ({
     case 'due_soon':
       return (
         <span
-          className={`inline-flex items-center gap-1.5 rounded-full border border-[#FBBF24]/35 bg-[#FBBF24]/15 text-[#FBBF24] font-semibold ${sizeClasses}`}
+          className={`inline-flex items-center gap-1.5 rounded-full border border-[#854D0E]/30 bg-[#FFF0CC] text-[#854D0E] font-semibold ${sizeClasses}`}
         >
           {showIcon && <Clock className={isSm ? 'w-3 h-3' : 'w-3.5 h-3.5'} />}
           <span>Due Soon</span>
@@ -50,7 +50,7 @@ export const StatusBadge: React.FC<StatusBadgeProps> = ({
     case 'needs_review':
       return (
         <span
-          className={`inline-flex items-center gap-1.5 rounded-full border border-[#FBBF24]/35 bg-[#FBBF24]/15 text-[#FBBF24] font-semibold ${sizeClasses}`}
+          className={`inline-flex items-center gap-1.5 rounded-full border border-[#DCE4E5] bg-[#F1F5F9] text-[#526572] font-semibold ${sizeClasses}`}
         >
           {showIcon && <Eye className={isSm ? 'w-3 h-3' : 'w-3.5 h-3.5'} />}
           <span>Needs Review</span>
@@ -60,7 +60,7 @@ export const StatusBadge: React.FC<StatusBadgeProps> = ({
     case 'paid':
       return (
         <span
-          className={`inline-flex items-center gap-1.5 rounded-full border border-[#34D399]/35 bg-[#34D399]/15 text-[#34D399] font-semibold ${sizeClasses}`}
+          className={`inline-flex items-center gap-1.5 rounded-full border border-[#087F5B]/30 bg-[#DDF7EF] text-[#087F5B] font-semibold ${sizeClasses}`}
         >
           {showIcon && <CheckCircle2 className={isSm ? 'w-3 h-3' : 'w-3.5 h-3.5'} />}
           <span>Paid</span>
@@ -70,7 +70,7 @@ export const StatusBadge: React.FC<StatusBadgeProps> = ({
     case 'approved':
       return (
         <span
-          className={`inline-flex items-center gap-1.5 rounded-full border border-[#22D3EE]/35 bg-[#22D3EE]/15 text-[#22D3EE] font-semibold ${sizeClasses}`}
+          className={`inline-flex items-center gap-1.5 rounded-full border border-[#087F8C]/30 bg-[#DDF5F6] text-[#087F8C] font-semibold ${sizeClasses}`}
         >
           {showIcon && <CheckCircle2 className={isSm ? 'w-3 h-3' : 'w-3.5 h-3.5'} />}
           <span>Approved</span>
@@ -80,7 +80,7 @@ export const StatusBadge: React.FC<StatusBadgeProps> = ({
     default:
       return (
         <span
-          className={`inline-flex items-center gap-1.5 rounded-full border border-[#29374D] bg-[#162238] text-[#A8B7CC] ${sizeClasses}`}
+          className={`inline-flex items-center gap-1.5 rounded-full border border-[#DCE4E5] bg-[#F7F8F5] text-[#526572] ${sizeClasses}`}
         >
           <span>{status}</span>
         </span>
@@ -93,13 +93,13 @@ export const VerifiedBadge: React.FC<{ isVerified: boolean | number; size?: 'sm'
   size = 'md',
 }) => {
   const isSm = size === 'sm';
-  const sizeClasses = isSm ? 'text-[11px] px-2 py-0.5' : 'text-xs px-2.5 py-1';
+  const sizeClasses = isSm ? 'text-[11px] px-2 py-0.5' : 'text-xs px-2.5 py-1 font-semibold';
 
   if (isVerified) {
     return (
       <span
         title="Human verified and approved"
-        className={`inline-flex items-center gap-1 rounded-full border border-[#34D399]/35 bg-[#34D399]/15 text-[#34D399] font-semibold ${sizeClasses}`}
+        className={`inline-flex items-center gap-1 rounded-full border border-[#087F5B]/30 bg-[#DDF7EF] text-[#087F5B] ${sizeClasses}`}
       >
         <CheckCircle2 className={isSm ? 'w-3 h-3' : 'w-3.5 h-3.5'} />
         <span>Verified</span>
@@ -110,7 +110,7 @@ export const VerifiedBadge: React.FC<{ isVerified: boolean | number; size?: 'sm'
   return (
     <span
       title="Field extracted or pending human review. Treat as unverified."
-      className={`inline-flex items-center gap-1 rounded-full border border-[#FBBF24]/35 bg-[#FBBF24]/15 text-[#FBBF24] font-medium ${sizeClasses}`}
+      className={`inline-flex items-center gap-1 rounded-full border border-[#854D0E]/30 bg-[#FFF0CC] text-[#854D0E] ${sizeClasses}`}
     >
       <ShieldAlert className={isSm ? 'w-3 h-3' : 'w-3.5 h-3.5'} />
       <span>Unverified</span>
@@ -122,9 +122,9 @@ export const SampleDataBadge: React.FC = () => {
   return (
     <span
       title="This is illustrative sample data for evaluation. You can clear or edit it anytime."
-      className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-semibold uppercase tracking-wider bg-[#111D32] text-[#A8B7CC] border border-[#29374D]"
+      className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-semibold uppercase tracking-wider bg-[#DDF5F6] text-[#087F8C] border border-[#087F8C]/30"
     >
-      <Sparkles className="w-2.5 h-2.5 text-[#22D3EE]" />
+      <Sparkles className="w-2.5 h-2.5 text-[#087F8C]" />
       <span>Sample</span>
     </span>
   );
@@ -157,12 +157,12 @@ export const ExtractionTelemetryBadge: React.FC<ExtractionTelemetryBadgeProps> =
       {method === 'local_ocr' && (
         <span
           title={`Extracted locally with Tesseract OCR (Measured confidence: ${ocrConfidence || 0}%)`}
-          className={`inline-flex items-center gap-1 rounded-md border border-[#29374D] bg-[#162238] text-[#A8B7CC] font-medium ${sizeClasses}`}
+          className={`inline-flex items-center gap-1 rounded-md border border-[#DCE4E5] bg-[#F7F8F5] text-[#526572] font-medium ${sizeClasses}`}
         >
-          <Scan className={isXs ? 'w-2.5 h-2.5 text-[#22D3EE]' : 'w-3 h-3 text-[#22D3EE]'} />
+          <Scan className={isXs ? 'w-2.5 h-2.5 text-[#087F8C]' : 'w-3 h-3 text-[#087F8C]'} />
           <span>Local OCR</span>
           {ocrConfidence !== null && ocrConfidence !== undefined && (
-            <span className="font-mono text-[#F8FAFC] tabular-nums font-semibold">
+            <span className="font-mono text-[#172A35] tabular-nums font-semibold">
               {ocrConfidence}%
             </span>
           )}
@@ -172,11 +172,11 @@ export const ExtractionTelemetryBadge: React.FC<ExtractionTelemetryBadgeProps> =
       {method === 'pdf_text' && (
         <span
           title="Extracted locally from embedded PDF text stream (95% advisory confidence)"
-          className={`inline-flex items-center gap-1 rounded-md border border-[#29374D] bg-[#162238] text-[#A8B7CC] font-medium ${sizeClasses}`}
+          className={`inline-flex items-center gap-1 rounded-md border border-[#DCE4E5] bg-[#F7F8F5] text-[#526572] font-medium ${sizeClasses}`}
         >
-          <FileText className={isXs ? 'w-2.5 h-2.5 text-[#22D3EE]' : 'w-3 h-3 text-[#22D3EE]'} />
+          <FileText className={isXs ? 'w-2.5 h-2.5 text-[#087F8C]' : 'w-3 h-3 text-[#087F8C]'} />
           <span>PDF Text</span>
-          <span className="font-mono text-[#F8FAFC] tabular-nums">95%</span>
+          <span className="font-mono text-[#172A35] tabular-nums">95%</span>
         </span>
       )}
 
@@ -184,9 +184,9 @@ export const ExtractionTelemetryBadge: React.FC<ExtractionTelemetryBadgeProps> =
       {modelUsed && (
         <span
           title={`Structured locally with ${modelUsed} on your device`}
-          className={`inline-flex items-center gap-1 rounded-md border border-[#22D3EE]/35 bg-[#22D3EE]/15 text-[#22D3EE] font-medium ${sizeClasses}`}
+          className={`inline-flex items-center gap-1 rounded-md border border-[#087F8C]/30 bg-[#DDF5F6] text-[#087F8C] font-medium ${sizeClasses}`}
         >
-          <Cpu className={isXs ? 'w-2.5 h-2.5' : 'w-3 h-3'} />
+          <Cpu className={isXs ? 'w-2.5 h-2.5 text-[#087F8C]' : 'w-3 h-3 text-[#087F8C]'} />
           <span>{isGemma || /gemma/i.test(modelUsed) ? 'Gemma 2' : modelUsed}</span>
         </span>
       )}

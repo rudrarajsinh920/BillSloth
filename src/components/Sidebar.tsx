@@ -100,54 +100,52 @@ export const Sidebar: React.FC<SidebarProps> = ({
   };
 
   const sidebarContent = (
-    <div className="flex flex-col h-full bg-[#111D32] border-r border-[#29374D] select-none text-[#F8FAFC]">
+    <div className="flex flex-col h-full bg-white border-r border-[#DCE4E5] select-none text-[#172A35]">
       {/* Brand Header */}
-      <div className="p-5 border-b border-[#29374D] flex items-center justify-between">
+      <div className="p-5 border-b border-[#DCE4E5] flex items-center justify-between">
         <button
           onClick={() => handleNavClick('dashboard')}
           className="flex items-center gap-3 text-left group focus:outline-none"
         >
-          {/* Glowing Animated Sloth Emblem */}
+          {/* Animated Sloth Emblem */}
           <div className="relative">
-            <div className="w-11 h-11 rounded-2xl bg-gradient-to-tr from-[#22D3EE] to-[#34D399] p-[1.5px] shadow-lg shadow-[#22D3EE]/15 group-hover:shadow-[#22D3EE]/30 transition-all">
-              <div className="w-full h-full bg-[#0B1220] rounded-[14px] flex items-center justify-center text-xl text-white">
-                <span className="animate-float-gentle inline-block">🦥</span>
-              </div>
+            <div className="w-10 h-10 rounded-2xl bg-[#DDF5F6] border border-[#087F8C]/30 flex items-center justify-center text-xl shadow-xs group-hover:scale-105 transition-transform">
+              <span className="animate-float-gentle inline-block">🦥</span>
             </div>
-            {/* Pulsing online beacon */}
-            <span className="absolute -bottom-0.5 -right-0.5 flex h-3 w-3">
-              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#34D399] opacity-75"></span>
-              <span className="relative inline-flex rounded-full h-3 w-3 bg-[#34D399] border-2 border-[#111D32]"></span>
+            {/* Online beacon */}
+            <span className="absolute -bottom-0.5 -right-0.5 flex h-2.5 w-2.5">
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#087F5B] opacity-75"></span>
+              <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-[#087F5B] border-2 border-white"></span>
             </span>
           </div>
 
           <div>
             <div className="flex items-center gap-1.5">
-              <span className="font-extrabold text-base tracking-tight text-[#F8FAFC]">
+              <span className="font-extrabold text-base tracking-tight text-[#172A35]">
                 BillSloth
               </span>
-              <span className="text-[10px] font-bold px-1.5 py-0.2 rounded-md bg-[#22D3EE]/15 text-[#22D3EE] border border-[#22D3EE]/30">
+              <span className="text-[10px] font-bold px-1.5 py-0.2 rounded-md bg-[#DDF5F6] text-[#087F8C] border border-[#087F8C]/30">
                 Local
               </span>
             </div>
-            <p className="text-[11px] text-[#A8B7CC] font-medium">Private Financial Vault</p>
+            <p className="text-[11px] text-[#526572] font-medium">Private Financial Vault</p>
           </div>
         </button>
 
         {/* Mobile close button */}
         <button
           onClick={onCloseMobile}
-          className="lg:hidden p-1.5 rounded-lg text-[#A8B7CC] hover:text-[#F8FAFC] hover:bg-[#162238]"
+          className="lg:hidden p-1.5 rounded-lg text-[#526572] hover:text-[#172A35] hover:bg-[#F7F8F5]"
           aria-label="Close navigation sidebar"
         >
           <X className="w-5 h-5" />
         </button>
       </div>
 
-      {/* Navigation Links (Midnight Emerald + Electric Cyan design system) */}
+      {/* Navigation Links */}
       <div className="flex-1 overflow-y-auto px-3.5 py-4 space-y-6">
         <div>
-          <span className="text-[10px] font-extrabold text-[#A8B7CC]/70 uppercase tracking-widest px-3 mb-2.5 block">
+          <span className="text-[10px] font-extrabold text-[#71828D] uppercase tracking-widest px-3 mb-2.5 block">
             Navigation
           </span>
           <nav className="space-y-1.5">
@@ -160,27 +158,27 @@ export const Sidebar: React.FC<SidebarProps> = ({
                   onClick={() => handleNavClick(item.id)}
                   className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-semibold transition-all relative overflow-hidden group ${
                     isActive
-                      ? 'bg-[#162238] text-[#22D3EE] border border-[#29374D] shadow-sm shadow-[#22D3EE]/5'
-                      : 'text-[#A8B7CC] hover:text-[#F8FAFC] hover:bg-[#162238]/60'
+                      ? 'bg-[#DDF5F6] text-[#087F8C] font-bold border border-[#087F8C]/25 shadow-xs'
+                      : 'text-[#526572] hover:text-[#172A35] hover:bg-[#F7F8F5]'
                   }`}
                 >
-                  {/* Cyan neon left accent indicator on active */}
+                  {/* Teal left accent indicator on active */}
                   {isActive && (
-                    <span className="absolute left-0 top-1.5 bottom-1.5 w-1 rounded-r-full bg-[#22D3EE] shadow-sm shadow-[#22D3EE]/80" />
+                    <span className="absolute left-0 top-1.5 bottom-1.5 w-1 rounded-r-full bg-[#087F8C]" />
                   )}
 
                   <div className="flex items-center gap-3">
                     <Icon
                       className={`w-4 h-4 shrink-0 transition-transform group-hover:scale-110 ${
-                        isActive ? 'text-[#22D3EE]' : item.iconColor
+                        isActive ? 'text-[#087F8C]' : 'text-[#526572]'
                       }`}
                     />
-                    <span className={isActive ? 'font-bold text-[#F8FAFC]' : 'font-medium'}>{item.label}</span>
+                    <span className={isActive ? 'font-bold text-[#172A35]' : 'font-medium'}>{item.label}</span>
                   </div>
                   {item.badge !== undefined && (
                     <span
                       className={`text-[10px] font-bold px-2 py-0.5 rounded-full font-mono tabular-nums ${
-                        isActive ? 'bg-[#22D3EE]/20 text-[#22D3EE] border border-[#22D3EE]/30' : item.badgeColor
+                        isActive ? 'bg-[#087F8C] text-white' : item.badgeColor
                       }`}
                     >
                       {item.badge}
@@ -194,27 +192,27 @@ export const Sidebar: React.FC<SidebarProps> = ({
 
         {/* AI & Operations */}
         <div>
-          <span className="text-[10px] font-extrabold text-[#A8B7CC]/70 uppercase tracking-widest px-3 mb-2.5 block">
+          <span className="text-[10px] font-extrabold text-[#71828D] uppercase tracking-widest px-3 mb-2.5 block">
             AI Operations
           </span>
           <div className="space-y-2">
-            {/* Ask Sloth AI Portal */}
+            {/* Ask BillSloth Portal */}
             <button
               onClick={() => {
                 onOpenAskModal();
                 onCloseMobile();
               }}
-              className="w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl bg-[#162238] hover:bg-[#1C2B46] border border-[#29374D] hover:border-[#22D3EE]/50 text-xs font-bold text-[#F8FAFC] transition-all group"
+              className="w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl bg-[#F7F8F5] hover:bg-white border border-[#DCE4E5] hover:border-[#087F8C]/50 text-xs font-bold text-[#172A35] transition-all group"
             >
               <div className="flex items-center gap-2.5">
-                <div className="p-1 rounded-md bg-[#22D3EE]/15 text-[#22D3EE]">
-                  <Sparkles className="w-3.5 h-3.5 animate-pulse-glow" />
+                <div className="p-1 rounded-md bg-[#DDF5F6] text-[#087F8C]">
+                  <Sparkles className="w-3.5 h-3.5" />
                 </div>
-                <span className="text-[#F8FAFC] group-hover:text-[#22D3EE] transition-colors">
-                  Ask Sloth AI
+                <span className="text-[#172A35] group-hover:text-[#087F8C] transition-colors">
+                  Ask BillSloth
                 </span>
               </div>
-              <span className="text-[10px] font-mono px-1.5 py-0.5 rounded-md bg-[#0B1220] text-[#22D3EE] border border-[#29374D] font-bold">
+              <span className="text-[10px] font-mono px-1.5 py-0.5 rounded-md bg-white text-[#526572] border border-[#DCE4E5] font-bold">
                 ⌘K
               </span>
             </button>
@@ -223,60 +221,60 @@ export const Sidebar: React.FC<SidebarProps> = ({
               onClick={() => handleNavClick('import')}
               className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-semibold transition-colors ${
                 activeTab === 'import'
-                  ? 'bg-[#162238] text-[#22D3EE] border border-[#29374D]'
-                  : 'text-[#A8B7CC] hover:text-[#F8FAFC] hover:bg-[#162238]/60'
+                  ? 'bg-[#DDF5F6] text-[#087F8C] border border-[#087F8C]/25'
+                  : 'text-[#526572] hover:text-[#172A35] hover:bg-[#F7F8F5]'
               }`}
             >
-              <UploadCloud className={`w-4 h-4 ${activeTab === 'import' ? 'text-[#22D3EE]' : 'text-[#34D399]'}`} />
+              <UploadCloud className={`w-4 h-4 ${activeTab === 'import' ? 'text-[#087F8C]' : 'text-[#087F5B]'}`} />
               <span>Import New Bill</span>
             </button>
           </div>
         </div>
       </div>
 
-      {/* Bottom Area: Futuristic Local AI Engine Card & Privacy Guarantee */}
-      <div className="p-4 border-t border-[#29374D] space-y-3 shrink-0">
+      {/* Bottom Area: Assistant & Demo Controls */}
+      <div className="p-4 border-t border-[#DCE4E5] space-y-3 shrink-0 bg-white">
         {/* Assistant Quick Access & Configuration Card */}
         <div
           onClick={onOpenOllamaModal}
-          className="p-3.5 rounded-xl border border-[#29374D] bg-[#162238] hover:border-[#22D3EE]/50 hover:shadow-md hover:shadow-[#22D3EE]/10 cursor-pointer transition-all relative overflow-hidden group"
+          className="p-3.5 rounded-xl border border-[#DCE4E5] bg-[#F7F8F5] hover:border-[#087F8C]/50 hover:bg-white hover:shadow-xs cursor-pointer transition-all relative overflow-hidden group"
           title={ollamaStatus?.available ? "BillSloth Assistant (Local Engine Connected)" : "Assistant Settings & Model Configuration"}
         >
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2.5">
-              <div className="p-2 rounded-xl bg-[#22D3EE]/15 text-[#22D3EE] border border-[#22D3EE]/30">
-                <Sparkles className="w-4 h-4 text-[#22D3EE]" />
+              <div className="p-2 rounded-xl bg-[#DDF5F6] text-[#087F8C] border border-[#087F8C]/20">
+                <Sparkles className="w-4 h-4 text-[#087F8C]" />
               </div>
               <div>
-                <span className="text-xs font-bold text-[#F8FAFC] block leading-tight">
+                <span className="text-xs font-bold text-[#172A35] block leading-tight">
                   BillSloth Assistant
                 </span>
-                <span className="text-[10px] text-[#34D399] font-medium flex items-center gap-1">
-                  <span className="w-1.5 h-1.5 rounded-full bg-[#34D399] inline-block animate-pulse"></span>
+                <span className="text-[10px] text-[#087F5B] font-medium flex items-center gap-1">
+                  <span className="w-1.5 h-1.5 rounded-full bg-[#087F5B] inline-block animate-pulse"></span>
                   Ledger Intelligence Ready
                 </span>
               </div>
             </div>
 
-            <Settings className="w-4 h-4 text-[#A8B7CC] group-hover:text-[#22D3EE] transition-colors" />
+            <Settings className="w-4 h-4 text-[#526572] group-hover:text-[#087F8C] transition-colors" />
           </div>
 
-          <div className="mt-2.5 pt-2 border-t border-[#29374D] flex items-center justify-between text-[10px]">
-            <span className="flex items-center gap-1 font-bold text-[#A8B7CC]">
-              <Lock className="w-2.5 h-2.5 text-[#34D399]" /> On-Device Privacy
+          <div className="mt-2.5 pt-2 border-t border-[#DCE4E5] flex items-center justify-between text-[10px]">
+            <span className="flex items-center gap-1 font-bold text-[#526572]">
+              <Lock className="w-2.5 h-2.5 text-[#087F5B]" /> On-Device Privacy
             </span>
-            <span className="font-semibold text-[#22D3EE] group-hover:underline">Settings →</span>
+            <span className="font-semibold text-[#087F8C] group-hover:underline">Settings →</span>
           </div>
         </div>
 
         {/* Sample Data Toggle Action */}
-        <div className="flex items-center justify-between text-xs px-1 text-[#A8B7CC]">
+        <div className="flex items-center justify-between text-xs px-1 text-[#526572]">
           <span className="text-[11px] font-medium">Interactive Demo:</span>
           {hasSampleData ? (
             <button
               onClick={onClearSample}
               disabled={loadingSample}
-              className="text-[11px] font-bold text-[#FB7185] hover:text-[#FB7185]/80 hover:underline inline-flex items-center gap-1 disabled:opacity-50"
+              className="text-[11px] font-bold text-[#BE123C] hover:underline inline-flex items-center gap-1 disabled:opacity-50"
             >
               <Trash2 className="w-3 h-3" />
               <span>Clear Sample</span>
@@ -285,9 +283,9 @@ export const Sidebar: React.FC<SidebarProps> = ({
             <button
               onClick={onLoadSample}
               disabled={loadingSample}
-              className="text-[11px] font-bold text-[#22D3EE] hover:text-[#22D3EE]/80 hover:underline inline-flex items-center gap-1 disabled:opacity-50"
+              className="text-[11px] font-bold text-[#087F8C] hover:underline inline-flex items-center gap-1 disabled:opacity-50"
             >
-              <Bot className="w-3 h-3 text-[#34D399]" />
+              <Bot className="w-3 h-3 text-[#087F5B]" />
               <span>Load Sample</span>
             </button>
           )}
@@ -295,11 +293,11 @@ export const Sidebar: React.FC<SidebarProps> = ({
 
         {/* Replay Calm Sloth Intro */}
         {onReplayIntro && (
-          <div className="flex items-center justify-between text-xs px-1 text-[#A8B7CC] pt-1.5 border-t border-[#29374D]">
+          <div className="flex items-center justify-between text-xs px-1 text-[#526572] pt-1.5 border-t border-[#DCE4E5]">
             <span className="text-[11px] font-medium">Calm Sloth Intro:</span>
             <button
               onClick={onReplayIntro}
-              className="text-[11px] font-bold text-[#22D3EE] hover:underline inline-flex items-center gap-1"
+              className="text-[11px] font-bold text-[#087F8C] hover:underline inline-flex items-center gap-1"
             >
               <span>Play Intro ↺</span>
             </button>
