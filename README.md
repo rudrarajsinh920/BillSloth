@@ -18,17 +18,24 @@ BillSloth imports invoices, utility bills, receipts, and payment reminders; extr
 
 ## 🎨 Design System
 
-Polished, calm finance productivity application using the Hacktoberfest "Slow and Steady" design specifications:
+Polished, calm fintech interface combining a **Light-First application experience** with a signature **Cinematic Dark Mascot Intro**:
 
-- **Deep navy**: `#111827` (Text, high-contrast dark accents)
-- **Electric blue**: `#2563EB` (Primary buttons, active states, key focal points)
-- **Cool background**: `#F3F6FA` (Application backdrop)
-- **White cards**: `#FFFFFF` (Restrained elevation surfaces)
-- **Slate borders**: `#E2E8F0` (Subtle boundary dividers)
-- **Amber warnings**: `#D97706` (Due soon, unverified fields, needs review)
-- **Red overdue indicators**: `#DC2626` (Overdue bills, urgent alerts)
-- **Green paid indicators**: `#15803D` (Paid invoices, confirmed verifications)
-- **Typography**: Inter / Geist font with monospace tabular numerals for amounts and dates.
+### Light-First Application Theme
+- **Main page background**: `#F7F8F5` (warm, calm off-white)
+- **Elevated cards**: `#FFFFFF` with `#DCE4E5` subtle borders
+- **Primary typography**: `#172A35` (deep navy headings and key metrics)
+- **Secondary typography**: `#526572` (calm readable slate)
+- **Primary action teal**: `#087F8C` with `#066873` hover and `#DDF5F6` soft surfaces
+- **Status indicators**:
+  - **Success / Verified**: `#087F5B` text on `#DDF7EF`
+  - **Upcoming Deadlines**: `#854D0E` text on `#FFF0CC`
+  - **Critical Overdue**: `#BE123C` text on `#FFE4E6`
+  - **Secondary AI accent**: `#6D5CE8`
+
+### Cinematic Dark Intro (The Teddy Sloth Walk)
+- **Deep navy backdrop**: `#0B1724`
+- **Dark glass panels**: `#142536` with `#35D6C3` teal highlight
+- **Warm text**: `#F5F8FA` and `#AABBC9`
 
 ---
 
