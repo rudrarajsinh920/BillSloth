@@ -11,6 +11,12 @@ import {
   DEMO_AUDIT_LOGS,
   DEMO_WEEKLY_DIGEST,
 } from './demoData';
+import {
+  askGeminiAssistant,
+  extractInvoiceWithGemini,
+  getActiveAiEngine,
+  getGeminiApiKey,
+} from './gemini';
 
 const API_BASE = '/api';
 
@@ -137,6 +143,60 @@ export async function extractDocumentFields(id: string, rawText?: string): Promi
   reason?: string;
   message?: string;
 }> {
+  const geminiKey = getGeminiApiKey();
+  const engine = getActiveAiEngine();
+
+  // If Gemini key is available and selected
+  if ((engine === 'gemini' || geminiKey) && geminiKey) {
+    const doc = localDocsStore.find((d) => d.id === id);
+    const textToExtract = rawText || doc?.raw_text || doc?.original_name || '';
+    const geminiRes = await extractInvoiceWithGemini(textToExtract);
+    if (geminiRes.success && geminiRes.fields) {
+      const baseDoc: DocumentItem = doc || {
+        id,
+        filename: 'document.pdf',
+        original_name: 'document.pdf',
+        mime_type: 'application/pdf',
+        file_size: 100000,
+        file_path: 'document.pdf',
+        vendor: null,
+        invoice_number: null,
+        amount: null,
+        currency: 'USD',
+        issue_date: null,
+        due_date: null,
+        category: 'Other',
+        status: 'needs_review',
+        is_verified: 0,
+        verified_at: null,
+        is_sample: 0,
+        raw_text: textToExtract,
+        extraction_metadata: null,
+        payment_reference: null,
+        notes: null,
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
+      };
+      const updated: DocumentItem = {
+        ...baseDoc,
+        vendor: geminiRes.fields.vendor || baseDoc.vendor || 'Extracted Vendor',
+        invoice_number: geminiRes.fields.invoice_number || baseDoc.invoice_number || null,
+        amount: geminiRes.fields.amount !== undefined ? geminiRes.fields.amount : baseDoc.amount || null,
+        currency: geminiRes.fields.currency || baseDoc.currency || 'USD',
+        due_date: geminiRes.fields.due_date || baseDoc.due_date || null,
+        category: (geminiRes.fields.category as any) || baseDoc.category || 'Other',
+        is_verified: 0,
+        extraction_method: 'gemini-flash',
+      };
+      localDocsStore = localDocsStore.map((d) => (d.id === id ? updated : d));
+      return {
+        success: true,
+        data: updated,
+        message: 'Successfully extracted invoice details via Gemini Flash!',
+      };
+    }
+  }
+
   try {
     const res = await fetch(`${API_BASE}/documents/${id}/extract`, {
       method: 'POST',
@@ -565,6 +625,18 @@ function synthesizeAssistantResponse(query: string, docs: DocumentItem[]): strin
 }
 
 export async function askAiAssistant(query: string): Promise<{ answer: string; model?: string }> {
+  const engine = getActiveAiEngine();
+  const geminiKey = getGeminiApiKey();
+
+  // 1. If Gemini engine is active or key is configured
+  if ((engine === 'gemini' || geminiKey) && geminiKey) {
+    const geminiRes = await askGeminiAssistant(query, localDocsStore);
+    if (geminiRes.success) {
+      return { answer: geminiRes.answer, model: `${geminiRes.model} (Cloud AI)` };
+    }
+  }
+
+  // 2. If Ollama engine is active (or default local dev server)
   try {
     const res = await fetch(`${API_BASE}/ai/ask`, {
       method: 'POST',
@@ -572,14 +644,18 @@ export async function askAiAssistant(query: string): Promise<{ answer: string; m
       body: JSON.stringify({ query }),
     });
     const json = await res.json();
-    if (!res.ok) throw new Error(json.error || 'AI query failed');
-    return json;
+    if (res.ok && json.success) {
+      return json;
+    }
   } catch {
-    return {
-      answer: synthesizeAssistantResponse(query, localDocsStore),
-      model: 'gemma2:2b (on-device local preview)',
-    };
+    // Backend offline / Vercel demo environment
   }
+
+  // 3. In-Browser Smart Engine fallback
+  return {
+    answer: synthesizeAssistantResponse(query, localDocsStore),
+    model: 'Smart In-Browser Engine (Zero-install)',
+  };
 }
 
 export const CSV_EXPORT_URL = `${API_BASE}/documents/export/csv`;

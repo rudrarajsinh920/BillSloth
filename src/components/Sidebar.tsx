@@ -13,8 +13,10 @@ import {
   Bot,
   X,
   Lock,
+  Zap,
 } from 'lucide-react';
 import { OllamaStatus } from '../types';
+import { getActiveAiEngine, getGeminiApiKey } from '../api/gemini';
 
 export type NavTab = 'dashboard' | 'documents' | 'calendar' | 'import' | 'reminders' | 'digest' | 'audit';
 
@@ -237,52 +239,60 @@ export const Sidebar: React.FC<SidebarProps> = ({
       {/* Bottom Area: Futuristic Local AI Engine Card & Privacy Guarantee */}
       <div className="p-4 border-t border-[#29374D] space-y-3 shrink-0">
         {/* On-Device AI Status Card */}
-        <div
-          onClick={onOpenOllamaModal}
-          className="p-3.5 rounded-xl border border-[#29374D] bg-[#162238] hover:border-[#22D3EE]/60 hover:shadow-md hover:shadow-[#22D3EE]/10 cursor-pointer transition-all relative overflow-hidden group"
-          title="Click to view local model status & Ollama connection"
-        >
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2.5">
-              <div
-                className={`p-2 rounded-xl transition-colors ${
-                  ollamaStatus?.available
-                    ? 'bg-[#34D399]/20 text-[#34D399] border border-[#34D399]/30'
-                    : 'bg-[#29374D] text-[#A8B7CC]'
-                }`}
-              >
-                <Cpu className="w-4 h-4" />
+        {(() => {
+          const engine = getActiveAiEngine();
+          const hasGeminiKey = Boolean(getGeminiApiKey());
+          const isGemini = engine === 'gemini' && hasGeminiKey;
+          const isOllamaOnline = engine === 'ollama' && Boolean(ollamaStatus?.available);
+
+          return (
+            <div
+              onClick={onOpenOllamaModal}
+              className="p-3.5 rounded-xl border border-[#29374D] bg-[#162238] hover:border-[#22D3EE]/60 hover:shadow-md hover:shadow-[#22D3EE]/10 cursor-pointer transition-all relative overflow-hidden group"
+              title="Click to configure AI Engine (Gemini Cloud or Local Ollama)"
+            >
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2.5">
+                  <div
+                    className={`p-2 rounded-xl transition-colors ${
+                      isGemini
+                        ? 'bg-[#22D3EE]/20 text-[#22D3EE] border border-[#22D3EE]/30'
+                        : isOllamaOnline
+                        ? 'bg-[#34D399]/20 text-[#34D399] border border-[#34D399]/30'
+                        : 'bg-[#818CF8]/15 text-[#818CF8] border border-[#818CF8]/30'
+                    }`}
+                  >
+                    {isGemini ? <Zap className="w-4 h-4" /> : isOllamaOnline ? <Cpu className="w-4 h-4" /> : <Bot className="w-4 h-4" />}
+                  </div>
+                  <div>
+                    <span className="text-xs font-bold text-[#F8FAFC] block leading-tight">
+                      {isGemini ? 'Gemini 2.5 Flash' : isOllamaOnline ? 'Local Gemma 2B' : 'In-Browser AI'}
+                    </span>
+                    <span className="text-[10px] text-[#A8B7CC] font-medium">
+                      {isGemini ? 'Cloud AI Active' : isOllamaOnline ? 'On-Device Online' : 'Zero-Setup Ready'}
+                    </span>
+                  </div>
+                </div>
+
+                {/* Glowing status orb */}
+                <span className="relative flex h-2.5 w-2.5">
+                  <span
+                    className={`relative inline-flex rounded-full h-2.5 w-2.5 ${
+                      isGemini ? 'bg-[#22D3EE]' : isOllamaOnline ? 'bg-[#34D399]' : 'bg-[#818CF8]'
+                    }`}
+                  ></span>
+                </span>
               </div>
-              <div>
-                <span className="text-xs font-bold text-[#F8FAFC] block leading-tight">
-                  Local Gemma 2B
+
+              <div className="mt-2.5 pt-2 border-t border-[#29374D] flex items-center justify-between text-[10px]">
+                <span className="flex items-center gap-1 font-bold text-[#34D399]">
+                  <Lock className="w-2.5 h-2.5 text-[#34D399]" /> {isGemini ? 'API Key Guarded' : '100% Zero Cloud'}
                 </span>
-                <span className="text-[10px] text-[#A8B7CC] font-medium">
-                  {ollamaStatus?.available ? 'Engine Connected' : 'Engine Standby'}
-                </span>
+                <span className="font-semibold text-[#22D3EE] group-hover:underline">Settings →</span>
               </div>
             </div>
-
-            {/* Glowing status orb */}
-            <span className="relative flex h-2.5 w-2.5">
-              {ollamaStatus?.available && (
-                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#34D399] opacity-75"></span>
-              )}
-              <span
-                className={`relative inline-flex rounded-full h-2.5 w-2.5 ${
-                  ollamaStatus?.available ? 'bg-[#34D399]' : 'bg-[#64748B]'
-                }`}
-              ></span>
-            </span>
-          </div>
-
-          <div className="mt-2.5 pt-2 border-t border-[#29374D] flex items-center justify-between text-[10px]">
-            <span className="flex items-center gap-1 font-bold text-[#34D399]">
-              <Lock className="w-2.5 h-2.5 text-[#34D399]" /> 100% Zero Cloud
-            </span>
-            <span className="font-semibold text-[#22D3EE] group-hover:underline">Guide →</span>
-          </div>
-        </div>
+          );
+        })()}
 
         {/* Sample Data Toggle Action */}
         <div className="flex items-center justify-between text-xs px-1 text-[#A8B7CC]">

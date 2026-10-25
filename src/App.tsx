@@ -198,6 +198,7 @@ export function App() {
           onNavigateToImport={() => setActiveTab('import')}
           onNavigateToReminders={() => setActiveTab('reminders')}
           pendingRemindersCount={pendingRemindersCount}
+          onOpenAiSettings={() => setIsOllamaModalOpen(true)}
         />
 
         {/* Content Body */}

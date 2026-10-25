@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Sparkles, X, Send, Bot, User } from 'lucide-react';
+import { Sparkles, X, Send, Bot, User, Settings2, Zap } from 'lucide-react';
 import { askAiAssistant } from '../api/client';
+import { getActiveAiEngine, getGeminiApiKey } from '../api/gemini';
 
 interface AskAssistantModalProps {
   isOpen: boolean;
@@ -21,8 +22,9 @@ const PRESET_QUESTIONS = [
   'What is my total outstanding balance?',
   'Which invoices are currently overdue?',
   'What bills are due within the next 7 days?',
+  'How does BillSloth work?',
   'Summarize my monthly SaaS and software costs',
-  'Which bills are still unverified by a human?',
+  'Draft an email to Metro Grid asking for an extension',
 ];
 
 export const AskAssistantModal: React.FC<AskAssistantModalProps> = ({
@@ -33,12 +35,25 @@ export const AskAssistantModal: React.FC<AskAssistantModalProps> = ({
 }) => {
   const [query, setQuery] = useState('');
   const [loading, setLoading] = useState(false);
+  const engine = getActiveAiEngine();
+  const hasGeminiKey = Boolean(getGeminiApiKey());
+
+  const getWelcomeText = () => {
+    if (engine === 'gemini' && hasGeminiKey) {
+      return 'Hello! I am your BillSloth Assistant powered by Google Gemini 2.5 Flash. Ask me any question about your bills, spending, due dates, or ask me to draft emails to vendors. Real-time conversational AI is active!';
+    }
+    if (engine === 'ollama' && ollamaAvailable) {
+      return 'Hello! I am your local BillSloth assistant powered by on-device Gemma 2 2B. Everything runs 100% on your local hardware with zero cloud transmission.';
+    }
+    return 'Hello! I am your BillSloth Assistant. Ask me anything about your bills, upcoming deadlines, categories, or how BillSloth works. You can also connect a Gemini API Key in Settings for live cloud generative chat!';
+  };
+
   const [messages, setMessages] = useState<ChatMessage[]>([
     {
       id: 'welcome',
       role: 'assistant',
-      text: 'Hello! I am your local BillSloth assistant powered by Gemma 2 2B. Ask me anything about your recorded bills, due dates, vendors, or cash flow obligations. Everything runs 100% on your device.',
-      model: 'gemma2:2b',
+      text: getWelcomeText(),
+      model: engine === 'gemini' && hasGeminiKey ? 'gemini-2.5-flash' : engine === 'ollama' ? 'gemma2:2b' : 'In-Browser AI',
       timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
     },
   ]);
@@ -84,7 +99,7 @@ export const AskAssistantModal: React.FC<AskAssistantModalProps> = ({
         id: 'res-' + Date.now(),
         role: 'assistant',
         text: res.answer,
-        model: res.model || 'gemma2:2b',
+        model: res.model,
         timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
       };
       setMessages((prev) => [...prev, assistantMsg]);
@@ -102,6 +117,8 @@ export const AskAssistantModal: React.FC<AskAssistantModalProps> = ({
     }
   };
 
+  const currentEngine = getActiveAiEngine();
+
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#0B1220]/80 backdrop-blur-md p-4 animate-in fade-in duration-150">
       <div className="bg-[#162238] rounded-2xl shadow-2xl border border-[#29374D] max-w-2xl w-full h-[85vh] flex flex-col overflow-hidden">
@@ -114,40 +131,65 @@ export const AskAssistantModal: React.FC<AskAssistantModalProps> = ({
             <div>
               <div className="flex items-center gap-2">
                 <h3 className="font-bold text-[#F8FAFC] text-base">Ask BillSloth Assistant</h3>
-                <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-[#22D3EE]/15 text-[#22D3EE] border border-[#22D3EE]/30">
-                  Gemma 2 2B
-                </span>
-                <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-[#34D399]/15 text-[#34D399] border border-[#34D399]/30">
-                  100% Local
-                </span>
+                {currentEngine === 'gemini' && hasGeminiKey ? (
+                  <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-[#22D3EE]/15 text-[#22D3EE] border border-[#22D3EE]/30 inline-flex items-center gap-1">
+                    <Zap className="w-3 h-3 text-[#22D3EE]" />
+                    <span>Gemini 2.5 Flash</span>
+                  </span>
+                ) : currentEngine === 'ollama' && ollamaAvailable ? (
+                  <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-[#34D399]/15 text-[#34D399] border border-[#34D399]/30">
+                    Gemma 2 2B (Local)
+                  </span>
+                ) : (
+                  <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-[#818CF8]/15 text-[#818CF8] border border-[#818CF8]/30">
+                    In-Browser Engine
+                  </span>
+                )}
               </div>
               <p className="text-xs text-[#A8B7CC] mt-0.5">
-                Zero-cloud natural language Q&A over your financial ledger
+                Financial intelligence & factual analysis over your ledger
               </p>
             </div>
           </div>
 
-          <button
-            onClick={onClose}
-            aria-label="Close assistant dialog"
-            className="text-[#A8B7CC] hover:text-[#F8FAFC] p-1.5 rounded-lg hover:bg-[#1C2B46] transition-colors focus-visible:ring-2 focus-visible:ring-[#22D3EE] focus-visible:outline-none"
-          >
-            <X className="w-5 h-5" />
-          </button>
+          <div className="flex items-center gap-1.5">
+            <button
+              onClick={onOpenOllamaModal}
+              title="Open AI Engine Settings (Switch between Gemini Flash, Ollama, and In-Browser)"
+              className="p-1.5 rounded-lg border border-[#29374D] bg-[#162238] hover:bg-[#1C2B46] text-[#A8B7CC] hover:text-[#22D3EE] text-xs font-semibold inline-flex items-center gap-1 transition-colors"
+            >
+              <Settings2 className="w-4 h-4" />
+              <span className="hidden sm:inline">AI Settings</span>
+            </button>
+            <button
+              onClick={onClose}
+              aria-label="Close assistant dialog"
+              className="text-[#A8B7CC] hover:text-[#F8FAFC] p-1.5 rounded-lg hover:bg-[#1C2B46] transition-colors focus-visible:ring-2 focus-visible:ring-[#22D3EE] focus-visible:outline-none"
+            >
+              <X className="w-5 h-5" />
+            </button>
+          </div>
         </div>
 
-        {/* Preview notice if Ollama is on standby */}
-        {!ollamaAvailable && (
+        {/* Status notice banner */}
+        {currentEngine === 'gemini' && hasGeminiKey ? (
+          <div className="px-6 py-2 bg-[#22D3EE]/10 border-b border-[#29374D] flex items-center justify-between text-xs text-[#22D3EE] shrink-0">
+            <div className="flex items-center gap-2">
+              <Zap className="w-3.5 h-3.5" />
+              <span>Gemini Flash Active: Full generative answering, budgeting advice, and email drafting enabled.</span>
+            </div>
+          </div>
+        ) : (
           <div className="px-6 py-2 bg-[#111D32] border-b border-[#29374D] flex items-center justify-between text-xs text-[#A8B7CC] shrink-0">
             <div className="flex items-center gap-2">
-              <Bot className="w-4 h-4 text-[#22D3EE] shrink-0" />
-              <span>Preview Mode: Ledger queries active. Run Ollama locally for live on-device LLM inference.</span>
+              <Bot className="w-3.5 h-3.5 text-[#22D3EE]" />
+              <span>In-Browser Engine active. For live cloud generative chat, connect a free Gemini API key in Settings.</span>
             </div>
             <button
               onClick={onOpenOllamaModal}
               className="font-semibold text-[#22D3EE] hover:underline"
             >
-              Connect Guide →
+              Connect Gemini →
             </button>
           </div>
         )}
@@ -197,7 +239,7 @@ export const AskAssistantModal: React.FC<AskAssistantModalProps> = ({
               </div>
               <div className="p-3.5 rounded-xl bg-[#162238] border border-[#29374D] text-xs text-[#A8B7CC] shadow-md rounded-tl-none flex items-center gap-2">
                 <div className="w-3.5 h-3.5 border-2 border-[#22D3EE] border-t-transparent rounded-full animate-spin" />
-                <span>Gemma 2 2B is reviewing your ledger factually on-device...</span>
+                <span>Reviewing your ledger and generating answer...</span>
               </div>
             </div>
           )}
@@ -236,7 +278,7 @@ export const AskAssistantModal: React.FC<AskAssistantModalProps> = ({
             type="text"
             value={query}
             onChange={(e) => setQuery(e.target.value)}
-            placeholder="Ask about vendors, due dates, cash flow, or spending..."
+            placeholder="Ask about vendors, due dates, cash flow, or drafting payment emails..."
             disabled={loading}
             className="flex-1 px-4 py-2.5 text-xs rounded-xl border border-[#29374D] bg-[#162238] text-[#F8FAFC] placeholder:text-[#64748B] focus:border-[#22D3EE] focus:outline-none"
           />
