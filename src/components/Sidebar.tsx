@@ -12,7 +12,6 @@ import {
   Bot,
   X,
   Lock,
-  Settings,
 } from 'lucide-react';
 
 export type NavTab =
@@ -29,7 +28,6 @@ interface SidebarProps {
   onTabChange: (tab: NavTab) => void;
   isOpenMobile: boolean;
   onCloseMobile: () => void;
-  onOpenAiSettings?: () => void;
   onOpenAskModal: () => void;
   pendingRemindersCount: number;
   needsReviewCount: number;
@@ -45,7 +43,6 @@ export const Sidebar: React.FC<SidebarProps> = ({
   onTabChange,
   isOpenMobile,
   onCloseMobile,
-  onOpenAiSettings,
   onOpenAskModal,
   pendingRemindersCount,
   needsReviewCount,
@@ -238,15 +235,15 @@ export const Sidebar: React.FC<SidebarProps> = ({
 
       {/* Bottom Area: Assistant & Demo Controls */}
       <div className="p-4 border-t border-[#DCE4E5] space-y-3 shrink-0 bg-white">
-        {/* Assistant Quick Access & Configuration Card */}
+        {/* Assistant Quick Access Card */}
         <div
-          onClick={onOpenAiSettings}
+          onClick={onOpenAskModal}
           className="p-3.5 rounded-xl border border-[#DCE4E5] bg-[#F7F8F5] hover:border-[#087F8C]/50 hover:bg-white hover:shadow-xs cursor-pointer transition-all relative overflow-hidden group"
-          title="Assistant Settings & Model Configuration"
+          title="Open Ask BillSloth AI Assistant (⌘K)"
         >
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2.5">
-              <div className="p-2 rounded-xl bg-[#DDF5F6] text-[#087F8C] border border-[#087F8C]/20">
+              <div className="p-2 rounded-xl bg-[#DDF5F6] text-[#087F8C] border border-[#087F8C]/20 group-hover:scale-105 transition-transform">
                 <Sparkles className="w-4 h-4 text-[#087F8C]" />
               </div>
               <div>
@@ -255,19 +252,19 @@ export const Sidebar: React.FC<SidebarProps> = ({
                 </span>
                 <span className="text-[10px] text-[#087F5B] font-medium flex items-center gap-1">
                   <span className="w-1.5 h-1.5 rounded-full bg-[#087F5B] inline-block animate-pulse"></span>
-                  Ledger Intelligence Ready
+                  Gemini 3.8 Flash Active
                 </span>
               </div>
             </div>
 
-            <Settings className="w-4 h-4 text-[#526572] group-hover:text-[#087F8C] transition-colors" />
+            <Sparkles className="w-4 h-4 text-[#526572] group-hover:text-[#087F8C] transition-colors" />
           </div>
 
           <div className="mt-2.5 pt-2 border-t border-[#DCE4E5] flex items-center justify-between text-[10px]">
             <span className="flex items-center gap-1 font-bold text-[#526572]">
-              <Lock className="w-2.5 h-2.5 text-[#087F5B]" /> On-Device Privacy
+              <Lock className="w-2.5 h-2.5 text-[#087F5B]" /> Safe Ledger Grounding
             </span>
-            <span className="font-semibold text-[#087F8C] group-hover:underline">Settings →</span>
+            <span className="font-semibold text-[#087F8C] group-hover:underline">Ask (⌘K) →</span>
           </div>
         </div>
 

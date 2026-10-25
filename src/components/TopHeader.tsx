@@ -1,14 +1,12 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import {
   Menu,
   Sparkles,
   UploadCloud,
   ShieldCheck,
   BellRing,
-  Zap,
 } from 'lucide-react';
 import { NavTab } from './Sidebar';
-import { getActiveAiEngine } from '../api/gemini';
 
 interface TopHeaderProps {
   activeTab: NavTab;
@@ -17,7 +15,6 @@ interface TopHeaderProps {
   onNavigateToImport: () => void;
   onNavigateToReminders: () => void;
   pendingRemindersCount: number;
-  onOpenAiSettings?: () => void;
 }
 
 export const TopHeader: React.FC<TopHeaderProps> = ({
@@ -27,32 +24,7 @@ export const TopHeader: React.FC<TopHeaderProps> = ({
   onNavigateToImport,
   onNavigateToReminders,
   pendingRemindersCount,
-  onOpenAiSettings,
 }) => {
-  const [engineLabel, setEngineLabel] = useState<string>('Local AI');
-
-  useEffect(() => {
-    const syncEngine = () => {
-      try {
-        const eng = getActiveAiEngine();
-        if (eng === 'gemini') {
-          setEngineLabel('Gemini');
-        } else {
-          setEngineLabel('Smart AI');
-        }
-      } catch {
-        setEngineLabel('Local AI');
-      }
-    };
-    syncEngine();
-    window.addEventListener('storage', syncEngine);
-    window.addEventListener('focus', syncEngine);
-    return () => {
-      window.removeEventListener('storage', syncEngine);
-      window.removeEventListener('focus', syncEngine);
-    };
-  }, []);
-
   const titles: Record<NavTab, { title: string; subtitle: string; tag: string }> = {
     dashboard: {
       title: 'Financial Command Center',
@@ -161,15 +133,14 @@ export const TopHeader: React.FC<TopHeaderProps> = ({
             <Sparkles className="w-4 h-4 text-[#087F8C]" />
           </button>
 
-          {/* AI Engine Status Pill (Interactive, visible on xl) */}
-          <button
-            onClick={onOpenAiSettings || onOpenAskModal}
-            className="hidden xl:inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full border border-[#DCE4E5] bg-[#F7F8F5] hover:bg-white hover:border-[#087F8C]/40 text-[#526572] hover:text-[#172A35] text-[11px] font-bold transition-all shadow-2xs hover:shadow-xs group cursor-pointer"
-            title="Configure AI Assistant Engine (Gemini Flash or Smart In-Browser)"
+          {/* AI Engine Status Badge: Unclickable Indicator */}
+          <div
+            className="hidden xl:inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full border border-[#087F5B]/30 bg-[#DDF7EF] text-[#087F5B] text-[11px] font-bold shadow-2xs select-none pointer-events-none"
+            title="Gemini 3.8 Flash AI Intelligence Active"
           >
-            <Zap className="w-3 h-3 text-[#087F8C] group-hover:scale-110 transition-transform" />
-            <span className="font-mono text-[10px] uppercase tracking-wider">{engineLabel}</span>
-          </button>
+            <span className="w-1.5 h-1.5 rounded-full bg-[#087F5B] animate-pulse" />
+            <span className="font-mono text-[10px] uppercase tracking-wider font-extrabold">Gemini 3.8 Flash</span>
+          </div>
 
           {/* Pending Reminders / Notifications Bell */}
           <button
@@ -198,9 +169,9 @@ export const TopHeader: React.FC<TopHeaderProps> = ({
             <span className="hidden sm:inline">Import Bill</span>
           </button>
 
-          {/* Signature Air-Gapped Vault Security Seal (Single-line horizontal pill on tablet/desktop) */}
+          {/* Signature Air-Gapped Vault Security Seal (Unclickable Indicator) */}
           <div
-            className="hidden sm:flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl bg-[#DDF7EF] border border-[#087F5B]/25 text-[#087F5B] shadow-2xs shrink-0 select-none whitespace-nowrap"
+            className="hidden sm:flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl bg-[#F7F8F5] border border-[#DCE4E5] text-[#172A35] shadow-2xs shrink-0 select-none pointer-events-none whitespace-nowrap"
             title="100% On-Device Financial Ledger — Air-Gapped & Encrypted"
           >
             <span className="text-xs select-none">🦥</span>
@@ -210,9 +181,9 @@ export const TopHeader: React.FC<TopHeaderProps> = ({
             </span>
           </div>
 
-          {/* Compact Sloth Badge on mobile screens (<640px) */}
+          {/* Compact Sloth Badge on mobile screens (<640px): Unclickable Indicator */}
           <div
-            className="sm:hidden flex items-center justify-center w-8 h-8 rounded-xl bg-[#DDF7EF] border border-[#087F5B]/25 text-xs shadow-2xs shrink-0"
+            className="sm:hidden flex items-center justify-center w-8 h-8 rounded-xl bg-[#F7F8F5] border border-[#DCE4E5] text-xs shadow-2xs shrink-0 select-none pointer-events-none"
             title="Local Vault — 100% Air-Gapped"
           >
             <span className="select-none text-xs">🦥</span>

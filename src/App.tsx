@@ -9,14 +9,12 @@ import { RemindersView } from './components/RemindersView';
 import { WeeklyDigestView } from './components/WeeklyDigestView';
 import { AuditLogView } from './components/AuditLogView';
 import { ReviewModal } from './components/ReviewModal';
-import { AiSettingsModal } from './components/AiSettingsModal';
 import { AskAssistantModal } from './components/AskAssistantModal';
 import { CalmSlothIntro } from './components/CalmSlothIntro';
-import { DocumentItem, ReminderItem, AiEngineStatus } from './types';
+import { DocumentItem, ReminderItem } from './types';
 import {
   fetchDocuments,
   fetchReminders,
-  fetchAiEngineStatus,
   updateDocument,
   createReminder,
   loadSampleData,
@@ -29,8 +27,6 @@ export function App() {
   const [activeTab, setActiveTab] = useState<NavTab>('dashboard');
   const [documents, setDocuments] = useState<DocumentItem[]>([]);
   const [reminders, setReminders] = useState<ReminderItem[]>([]);
-  const [aiEngineStatus, setAiEngineStatus] = useState<AiEngineStatus | null>(null);
-  const [isAiSettingsModalOpen, setIsAiSettingsModalOpen] = useState(false);
   const [isAskModalOpen, setIsAskModalOpen] = useState(false);
   const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
 
@@ -53,14 +49,12 @@ export function App() {
 
   const refreshAll = useCallback(async () => {
     try {
-      const [docs, rems, aiStatus] = await Promise.all([
+      const [docs, rems] = await Promise.all([
         fetchDocuments(),
         fetchReminders(),
-        fetchAiEngineStatus(),
       ]);
       setDocuments(docs);
       setReminders(rems);
-      setAiEngineStatus(aiStatus);
     } catch (err: unknown) {
       console.error('Failed to load BillSloth data:', err);
     } finally {
@@ -181,7 +175,6 @@ export function App() {
         onTabChange={navigateToTab}
         isOpenMobile={isMobileSidebarOpen}
         onCloseMobile={() => setIsMobileSidebarOpen(false)}
-        onOpenAiSettings={() => setIsAiSettingsModalOpen(true)}
         onOpenAskModal={() => setIsAskModalOpen(true)}
         pendingRemindersCount={pendingRemindersCount}
         needsReviewCount={needsReviewCount}
@@ -202,7 +195,6 @@ export function App() {
           onNavigateToImport={() => navigateToTab('import')}
           onNavigateToReminders={() => navigateToTab('reminders')}
           pendingRemindersCount={pendingRemindersCount}
-          onOpenAiSettings={() => setIsAiSettingsModalOpen(true)}
         />
 
         {/* Content Body */}
@@ -307,25 +299,10 @@ export function App() {
         onDocumentDeleted={handleDocumentDeleted}
       />
 
-      {/* AI Settings Modal */}
-      <AiSettingsModal
-        isOpen={isAiSettingsModalOpen}
-        onClose={() => setIsAiSettingsModalOpen(false)}
-        status={aiEngineStatus}
-        onRefresh={async () => {
-          const s = await fetchAiEngineStatus();
-          setAiEngineStatus(s);
-        }}
-      />
-
       {/* Ask BillSloth AI Assistant Modal */}
       <AskAssistantModal
         isOpen={isAskModalOpen}
         onClose={() => setIsAskModalOpen(false)}
-        onOpenAiSettings={() => {
-          setIsAskModalOpen(false);
-          setIsAiSettingsModalOpen(true);
-        }}
       />
 
       {/* The Calm Sloth Premium Welcome Intro (replays on every page load/refresh) */}
