@@ -277,11 +277,11 @@ export function App() {
               <span className="text-[#526572]">Local-First Financial Intelligence</span>
             </div>
             <div className="flex items-center gap-3 text-[11px] text-[#526572]">
-              <span>100% Local Ledger</span>
+              <span>Local SQLite Ledger</span>
               <span className="text-[#DCE4E5]">•</span>
-              <span>Cloud Gemini Flash</span>
+              <span>Google Gemma 4</span>
               <span className="text-[#DCE4E5]">•</span>
-              <span>Zero-Setup In-Browser AI</span>
+              <span>Privacy-Grounded Financial Intelligence</span>
             </div>
           </div>
         </footer>

@@ -17,6 +17,7 @@ data/uploads/*
 # Environment & Secrets
 .env
 .env.*
+!.env.example
 *.local
 
 # Logs

@@ -304,15 +304,21 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
               </span>
 
               {/* Intelligent AI Engine badge */}
-              <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-[#DDF5F6] text-[#087F8C] border border-[#087F8C]/30">
+              <span
+                title="Hosted open-weight Gemma 4 model via secure backend proxy."
+                className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-[#DDF5F6] text-[#087F8C] border border-[#087F8C]/30"
+              >
                 <Cpu className="w-3.5 h-3.5 text-[#087F8C]" />
-                <span>Gemini 3.8 Flash AI</span>
+                <span>Google Gemma 4 AI</span>
               </span>
 
-              {/* Zero cloud guarantee */}
-              <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-[#DDF7EF] text-[#087F5B] border border-[#087F5B]/30">
+              {/* Local storage badge */}
+              <span
+                title="Bills and financial records stored strictly in local SQLite database."
+                className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-[#DDF7EF] text-[#087F5B] border border-[#087F5B]/30"
+              >
                 <Lock className="w-3 h-3 text-[#087F5B]" />
-                <span>Zero Cloud Leaks</span>
+                <span>Local SQLite Ledger</span>
               </span>
             </div>
 

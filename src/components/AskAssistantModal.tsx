@@ -37,7 +37,7 @@ export const AskAssistantModal: React.FC<AskAssistantModalProps> = ({
     {
       id: 'welcome',
       role: 'assistant',
-      text: 'Hi! I am powered by Gemini 3.8 Flash with full local ledger awareness. Ask me about your bills, upcoming cash flow, vendor breakdown, or let me draft vendor emails for you.',
+      text: 'Hi! I am powered by Google Gemma 4 with verified SQLite ledger intelligence. Ask me about your bills, upcoming cash flow commitments, overdue items, or let me draft vendor emails for you.',
       timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
     },
   ]);
@@ -229,9 +229,12 @@ export const AskAssistantModal: React.FC<AskAssistantModalProps> = ({
             <div className="min-w-0">
               <div className="flex items-center gap-2">
                 <h3 className="font-black text-[#172A35] text-base leading-tight">Ask BillSloth</h3>
-                <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-[#DDF7EF] border border-[#087F5B]/25 text-[#087F5B] text-[10px] font-extrabold tracking-tight shrink-0">
+                <span
+                  title="Hosted inference via Google API proxy; financial records remain grounded in local SQLite."
+                  className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-[#DDF7EF] border border-[#087F5B]/25 text-[#087F5B] text-[10px] font-extrabold tracking-tight shrink-0"
+                >
                   <span className="w-1.5 h-1.5 rounded-full bg-[#087F5B] animate-pulse" />
-                  Gemini 3.8 Flash
+                  Gemma 4 (Hosted)
                 </span>
               </div>
               <p className="text-xs text-[#526572] mt-0.5 truncate">
@@ -324,7 +327,7 @@ export const AskAssistantModal: React.FC<AskAssistantModalProps> = ({
               </div>
               <div className="p-3.5 rounded-2xl bg-white border border-[#DCE4E5] text-xs text-[#526572] shadow-xs rounded-tl-none flex items-center gap-2.5">
                 <div className="w-3.5 h-3.5 border-2 border-[#087F8C] border-t-transparent rounded-full animate-spin" />
-                <span className="font-medium text-[#172A35]">Analyzing ledger with Gemini 3.8 Flash...</span>
+                <span className="font-medium text-[#172A35]">Analyzing ledger with Google Gemma...</span>
               </div>
             </div>
           )}

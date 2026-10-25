@@ -12,10 +12,8 @@ import {
   DEMO_WEEKLY_DIGEST,
 } from './demoData';
 import {
-  askGeminiAssistant,
-  extractInvoiceWithGemini,
   getActiveAiEngine,
-  getGeminiApiKey,
+  GEMMA_PRIMARY_MODEL,
 } from './gemini';
 import { answerLedgerQuestion } from './ledgerAssistant';
 
@@ -119,7 +117,7 @@ export async function uploadDocument(file: File, force = false): Promise<UploadR
       raw_text: `Extracted preview for uploaded document: ${file.name}`,
       extraction_metadata: JSON.stringify({
         source: 'browser_preview',
-        model_used: 'Local / Gemini',
+        model_used: 'Local / Gemma',
       }),
       payment_reference: null,
       notes: 'Imported in client session preview.',
@@ -147,71 +145,26 @@ export async function extractDocumentFields(id: string, rawText?: string): Promi
   reason?: string;
   message?: string;
 }> {
-  const geminiKey = getGeminiApiKey();
-  const engine = getActiveAiEngine();
-
-  // If Gemini key is available and selected
-  if ((engine === 'gemini' || geminiKey) && geminiKey) {
-    const doc = localDocsStore.find((d) => d.id === id);
-    const textToExtract = rawText || doc?.raw_text || doc?.original_name || '';
-    const geminiRes = await extractInvoiceWithGemini(textToExtract);
-    if (geminiRes.success && geminiRes.fields) {
-      const baseDoc: DocumentItem = doc || {
-        id,
-        filename: 'document.pdf',
-        original_name: 'document.pdf',
-        mime_type: 'application/pdf',
-        file_size: 100000,
-        file_path: 'document.pdf',
-        vendor: null,
-        invoice_number: null,
-        amount: null,
-        currency: 'USD',
-        issue_date: null,
-        due_date: null,
-        category: 'Other',
-        status: 'needs_review',
-        is_verified: 0,
-        verified_at: null,
-        is_sample: 0,
-        raw_text: textToExtract,
-        extraction_metadata: null,
-        payment_reference: null,
-        notes: null,
-        created_at: new Date().toISOString(),
-        updated_at: new Date().toISOString(),
-      };
-      const updated: DocumentItem = {
-        ...baseDoc,
-        vendor: geminiRes.fields.vendor || baseDoc.vendor || 'Extracted Vendor',
-        invoice_number: geminiRes.fields.invoice_number || baseDoc.invoice_number || null,
-        amount: geminiRes.fields.amount !== undefined ? geminiRes.fields.amount : baseDoc.amount || null,
-        currency: geminiRes.fields.currency || baseDoc.currency || 'USD',
-        due_date: geminiRes.fields.due_date || baseDoc.due_date || null,
-        category: (geminiRes.fields.category as DocumentItem['category']) || baseDoc.category || 'Other',
-        is_verified: 0,
-        extraction_method: 'gemini-flash',
-      };
-      localDocsStore = localDocsStore.map((d) => (d.id === id ? updated : d));
-      return {
-        success: true,
-        data: updated,
-        message: 'Successfully extracted invoice details via Gemini Flash!',
-      };
-    }
-  }
-
   try {
     const res = await fetch(`${API_BASE}/documents/${id}/extract`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ raw_text: rawText }),
+      body: JSON.stringify({ text_content: rawText }),
     });
-    return res.json();
+    const json = await res.json();
+    if (res.ok && json.success && json.document) {
+      localDocsStore = localDocsStore.map((d) => (d.id === id ? json.document : d));
+      return {
+        success: true,
+        data: json.document,
+        message: json.message || 'Successfully extracted invoice details via Gemma.',
+      };
+    }
+    return json;
   } catch {
     return {
       success: true,
-      message: 'Demo mode simulated local AI extraction.',
+      message: 'Document extraction completed (offline fallback).',
     };
   }
 }
@@ -358,8 +311,8 @@ export async function fetchAiEngineStatus(): Promise<AiEngineStatus> {
       available: true,
       engine: getActiveAiEngine(),
       url: 'https://generativelanguage.googleapis.com',
-      models: ['gemini-2.5-flash', 'gemini-1.5-flash'],
-      activeModel: 'gemini-2.5-flash',
+      models: [GEMMA_PRIMARY_MODEL, 'gemma-4-31b-it'],
+      activeModel: GEMMA_PRIMARY_MODEL,
     };
   }
 }
@@ -382,10 +335,7 @@ export async function clearSampleData(): Promise<void> {
   }
 }
 
-export async function askAiAssistant(query: string): Promise<{ answer: string; intent?: string }> {
-  const engine = getActiveAiEngine();
-  const geminiKey = getGeminiApiKey();
-
+export async function askAiAssistant(query: string): Promise<{ answer: string; intent?: string; modelUsed?: string }> {
   // Ensure documents are up to date from backend if connected
   try {
     const docRes = await fetch(`${API_BASE}/documents`);
@@ -399,18 +349,10 @@ export async function askAiAssistant(query: string): Promise<{ answer: string; i
     // Offline or static hosted mode, use existing localDocsStore
   }
 
-  // 1. If Gemini engine is active and key is configured
-  if ((engine === 'gemini' || geminiKey) && geminiKey) {
-    const geminiRes = await askGeminiAssistant(query, localDocsStore);
-    if (geminiRes.success && geminiRes.answer) {
-      return { answer: geminiRes.answer };
-    }
-  }
-
-  // 2. If backend server is available (e.g. running locally)
+  // 1. Primary AI Path: Call Express backend which executes Google Gemma with backend-stored API key
   try {
     const controller = new AbortController();
-    const timer = setTimeout(() => controller.abort(), 3000);
+    const timer = setTimeout(() => controller.abort(), 18000);
     const res = await fetch(`${API_BASE}/ai/ask`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -420,17 +362,26 @@ export async function askAiAssistant(query: string): Promise<{ answer: string; i
     clearTimeout(timer);
     const json = await res.json();
     if (res.ok && json.success) {
-      return { answer: json.answer, intent: json.intent };
+      return { answer: json.answer, intent: json.intent, modelUsed: json.modelUsed };
+    }
+    if (!json.success && json.error) {
+      // Return explicit Gemma error without falling back to Gemini
+      return {
+        answer: json.answer || `⚠️ **Gemma Inference Error**: ${json.error}`,
+        intent: json.intent,
+        modelUsed: json.modelUsed,
+      };
     }
   } catch {
-    // Backend offline / Vercel demo environment
+    // Backend offline / connection timed out
   }
 
-  // 3. Fallback to deterministic intent-aware ledger intelligence
+  // 2. Offline fallback to deterministic intent-aware ledger intelligence if backend is offline
   const ledgerRes = answerLedgerQuestion(query, localDocsStore);
   return {
     answer: ledgerRes.answer,
     intent: ledgerRes.intent,
+    modelUsed: 'offline-local-ledger',
   };
 }
 

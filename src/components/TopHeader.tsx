@@ -43,7 +43,7 @@ export const TopHeader: React.FC<TopHeaderProps> = ({
     },
     import: {
       title: 'Document Ingestion Portal',
-      subtitle: 'Import PDF or image statements with local OCR & Gemini Flash',
+      subtitle: 'Import PDF or image statements with local OCR & Google Gemma',
       tag: 'Ingestion',
     },
     reminders: {
@@ -136,10 +136,10 @@ export const TopHeader: React.FC<TopHeaderProps> = ({
           {/* AI Engine Status Badge: Unclickable Indicator */}
           <div
             className="hidden xl:inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full border border-[#087F5B]/30 bg-[#DDF7EF] text-[#087F5B] text-[11px] font-bold shadow-2xs select-none pointer-events-none"
-            title="Gemini 3.8 Flash AI Intelligence Active"
+            title="Google Gemma 4 Hosted AI Model Active via Secure Backend"
           >
             <span className="w-1.5 h-1.5 rounded-full bg-[#087F5B] animate-pulse" />
-            <span className="font-mono text-[10px] uppercase tracking-wider font-extrabold">Gemini 3.8 Flash</span>
+            <span className="font-mono text-[10px] uppercase tracking-wider font-extrabold">Google Gemma 4</span>
           </div>
 
           {/* Pending Reminders / Notifications Bell */}

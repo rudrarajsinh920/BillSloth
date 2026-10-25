@@ -5,6 +5,8 @@ import { db, logAudit, UPLOADS_DIR } from './db.js';
 import { seedSampleData, clearSampleData } from './sampleData.js';
 import { answerLedgerQuestion, LedgerBill } from '../src/api/ledgerAssistant.js';
 import { format, isPast, isToday, differenceInDays } from 'date-fns';
+import { CONFIG } from './config.js';
+import { askGemmaAssistant, extractInvoiceWithGemma } from './gemma.js';
 
 
 function extractFieldsFromText(text: string) {
@@ -146,12 +148,15 @@ router.get('/health', (_req: Request, res: Response) => {
 });
 
 router.get('/ai/status', async (_req: Request, res: Response) => {
+  const hasKey = !!CONFIG.GEMINI_API_KEY;
   res.json({
-    available: true,
-    engine: 'gemini',
+    available: hasKey,
+    engine: 'gemma',
     url: 'https://generativelanguage.googleapis.com',
-    models: ['gemini-3.8-flash', 'gemini-2.5-flash'],
-    activeModel: 'gemini-3.8-flash',
+    models: [CONFIG.AI_MODEL, 'gemma-4-31b-it'],
+    activeModel: CONFIG.AI_MODEL,
+    hosted: true,
+    privacyNotice: 'Hosted inference via Google API; prompt data sent to external Google endpoint. Financial totals remain 100% grounded in local SQLite.',
   });
 });
 
@@ -337,7 +342,34 @@ router.post('/documents/:id/extract', async (req: Request, res: Response) => {
     }
 
     const textToExtract = text_content || doc.raw_text || doc.original_name;
-    const d = extractFieldsFromText(textToExtract);
+    let d = extractFieldsFromText(textToExtract);
+    let modelUsed = typeof model === 'string' && model ? model : 'local-heuristic';
+
+    // If Gemma is configured on backend, interpret fields using Gemma
+    if (CONFIG.GEMINI_API_KEY && textToExtract && textToExtract.length > 20) {
+      try {
+        const gemmaExtracted = await extractInvoiceWithGemma(textToExtract);
+        if (gemmaExtracted.success && gemmaExtracted.fields) {
+          d = {
+            vendor: gemmaExtracted.fields.vendor || d.vendor,
+            invoice_number: gemmaExtracted.fields.invoice_number || d.invoice_number,
+            amount: gemmaExtracted.fields.amount !== null ? gemmaExtracted.fields.amount : d.amount,
+            currency: gemmaExtracted.fields.currency || d.currency,
+            issue_date: gemmaExtracted.fields.issue_date || d.issue_date,
+            due_date: gemmaExtracted.fields.due_date || d.due_date,
+            category: gemmaExtracted.fields.category || d.category,
+            payment_status: 'needs_review' as const,
+            field_confidences: { vendor: 0.95, amount: 0.95, due_date: 0.9 },
+            unverified_fields: ['vendor', 'amount', 'due_date'],
+            raw_notes: `Interpreted by ${gemmaExtracted.modelUsed}. Pending human review.`,
+          };
+          modelUsed = gemmaExtracted.modelUsed;
+        }
+      } catch {
+        // Fallback to local heuristic
+      }
+    }
+
     const now = new Date().toISOString();
 
     const updateStmt = db.prepare(`
@@ -357,7 +389,6 @@ router.post('/documents/:id/extract', async (req: Request, res: Response) => {
       WHERE id = ?
     `);
 
-    const modelUsed = typeof model === 'string' && model ? model : 'in-browser-heuristic';
     const metadata = JSON.stringify({
       extracted_at: now,
       model_used: modelUsed,
@@ -884,13 +915,64 @@ router.post('/ai/ask', async (req: Request, res: Response) => {
     // Compute deterministic, intent-aware ledger answer
     const ledgerResult = answerLedgerQuestion(query.trim(), enrichedBills);
 
-    let finalAnswer = ledgerResult.answer;
+    // Precompute grounded SQLite metrics for financial accuracy
+    const unpaid = enrichedBills.filter((b) => b.computed_status !== 'paid');
+    const totalUnpaid = unpaid.reduce((s, b) => s + (b.amount || 0), 0);
+    const overdueCount = unpaid.filter((b) => b.computed_status === 'overdue').length;
+    const dueSoonCount = unpaid.filter((b) => b.computed_status === 'due_soon').length;
 
-    logAudit('AI_ASSISTANT_QUERY', null, { query: query.trim(), intent: ledgerResult.intent });
+    const billsSummary = enrichedBills
+      .map(
+        (b) =>
+          `- Vendor: ${b.vendor || 'Unknown'}, Amount: $${(b.amount || 0).toFixed(2)} ${b.currency}, Due: ${
+            b.due_date || 'None'
+          }, Status: ${b.computed_status || b.status}, Category: ${b.category || 'Other'}, Verified: ${
+            b.is_verified === 1 ? 'Yes' : 'Pending Review'
+          }, Invoice: ${b.invoice_number || 'N/A'}${b.notes ? `, Notes: ${b.notes}` : ''}`
+      )
+      .join('\n');
+
+    // If Google API key is configured on backend, call Gemma
+    if (CONFIG.GEMINI_API_KEY) {
+      const gemmaRes = await askGemmaAssistant(query.trim(), billsSummary, {
+        totalUnpaid,
+        overdueCount,
+        dueSoonCount,
+        totalBills: enrichedBills.length,
+      });
+
+      logAudit('AI_ASSISTANT_QUERY', null, {
+        query: query.trim(),
+        model: gemmaRes.modelUsed,
+        success: gemmaRes.success,
+        intent: ledgerResult.intent,
+      });
+
+      if (!gemmaRes.success) {
+        // STRICT REQUIREMENT: Do not silently fallback to Gemini if Gemma fails. Return explicit error message.
+        return res.status(502).json({
+          success: false,
+          answer: gemmaRes.answer,
+          error: gemmaRes.error,
+          modelUsed: gemmaRes.modelUsed,
+          intent: ledgerResult.intent,
+        });
+      }
+
+      return res.json({
+        success: true,
+        answer: gemmaRes.answer,
+        modelUsed: gemmaRes.modelUsed,
+        intent: ledgerResult.intent,
+      });
+    }
+
+    logAudit('AI_ASSISTANT_QUERY', null, { query: query.trim(), model: 'offline-local-ledger', intent: ledgerResult.intent });
 
     res.json({
       success: true,
-      answer: finalAnswer,
+      answer: ledgerResult.answer,
+      modelUsed: 'offline-local-ledger',
       intent: ledgerResult.intent,
     });
   } catch (err: unknown) {

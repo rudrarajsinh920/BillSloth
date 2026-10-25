@@ -252,7 +252,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                 </span>
                 <span className="text-[10px] text-[#087F5B] font-medium flex items-center gap-1">
                   <span className="w-1.5 h-1.5 rounded-full bg-[#087F5B] inline-block animate-pulse"></span>
-                  Gemini 3.8 Flash Active
+                  Google Gemma Active
                 </span>
               </div>
             </div>
