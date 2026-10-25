@@ -140,6 +140,64 @@
   animation: gradientShift 6s ease infinite;
 }
 
+/* Signature Walking Sloth Intro Animations */
+@keyframes slothWalkEntrance {
+  0% {
+    transform: translateX(-120px) translateY(0px) rotate(0deg);
+    opacity: 0;
+  }
+  15% {
+    opacity: 1;
+  }
+  25% {
+    transform: translateX(-90px) translateY(-5px) rotate(-1.8deg);
+  }
+  50% {
+    transform: translateX(-60px) translateY(0px) rotate(0deg);
+  }
+  75% {
+    transform: translateX(-30px) translateY(-5px) rotate(1.8deg);
+  }
+  90% {
+    transform: translateX(-8px) translateY(-1.5px) rotate(-0.5deg);
+  }
+  100% {
+    transform: translateX(0px) translateY(0px) rotate(0deg);
+    opacity: 1;
+  }
+}
+
+@keyframes slothShadowWalk {
+  0% {
+    transform: translateX(-120px) scale(0.85);
+    opacity: 0.15;
+  }
+  25% {
+    transform: translateX(-90px) scale(0.7);
+    opacity: 0.12;
+  }
+  50% {
+    transform: translateX(-60px) scale(1);
+    opacity: 0.4;
+  }
+  75% {
+    transform: translateX(-30px) scale(0.7);
+    opacity: 0.12;
+  }
+  100% {
+    transform: translateX(0px) scale(1);
+    opacity: 0.4;
+  }
+}
+
+.animate-sloth-walk {
+  animation: slothWalkEntrance 1.1s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+.animate-sloth-shadow-walk {
+  animation: slothShadowWalk 1.1s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
 /* Grid blueprint backdrop */
 .blueprint-grid {
   background-image: 
