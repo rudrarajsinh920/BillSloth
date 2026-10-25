@@ -13,7 +13,7 @@ interface CalmSlothIntroProps {
 const FallbackSlothSvg: React.FC = () => (
   <svg
     viewBox="0 0 160 160"
-    className="w-32 h-32 sm:w-36 sm:h-36 drop-shadow-2xl mx-auto"
+    className="w-28 h-28 sm:w-36 sm:h-36 drop-shadow-2xl mx-auto"
     fill="none"
     xmlns="http://www.w3.org/2000/svg"
     aria-label="BillSloth mascot"
@@ -38,12 +38,12 @@ const FallbackSlothSvg: React.FC = () => (
 
 export const CalmSlothIntro: React.FC<CalmSlothIntroProps> = ({ onComplete, onSkip }) => {
   // Animation stages:
-  // 0 (0.0s - 0.05s): Midnight background & ambient lighting appear
-  // 1 (0.05s - 1.1s): Sloth walks in from the left carrying a small bill (stepping bob & rotation)
-  // 2 (1.1s - 1.7s):  Sloth stops at center; presents bill; bill settles into organized card (Due in 5d, ✓ Organized)
-  // 3 (1.7s - 2.2s):  BillSloth wordmark & "SLOW AND STEADY" fade in
-  // 4 (2.2s - 2.8s):  "Bills handled. Peace of mind." + on-device privacy guarantee
-  // 5 (2.8s - 3.2s):  Smooth 400ms crossfade into live dashboard
+  // 0 (0.00s - 0.05s): Midnight background & ambient lighting fade in
+  // 1 (0.05s - 1.35s): Sloth walks in from outside left edge to center carrying small invoice
+  // 2 (1.35s - 1.85s): Sloth stops beside card; invoice card settles into position with Due in 5d & ✓ Organized
+  // 3 (1.85s - 2.35s): BillSloth wordmark, "SLOW AND STEADY", and headline reveal
+  // 4 (2.35s - 2.85s): Supporting copy & privacy shield animation
+  // 5 (2.85s - 3.25s): Smooth crossfade into working dashboard
   const [stage, setStage] = useState(0);
   const [isExiting, setIsExiting] = useState(false);
   const [imgLoaded, setImgLoaded] = useState(false);
@@ -81,33 +81,37 @@ export const CalmSlothIntro: React.FC<CalmSlothIntroProps> = ({ onComplete, onSk
     return () => window.removeEventListener('keydown', onKeyDown);
   }, [handleSkip]);
 
-  // Staged timeline sequencing
+  // Staged timeline sequencing with strict cleanup
   useEffect(() => {
     if (prefersReducedMotion) {
-      const t = setTimeout(handleFinish, 250);
+      const t = setTimeout(handleFinish, 200);
       return () => clearTimeout(t);
     }
 
-    // 0.05s: Sloth enters slowly from the left, carrying bill
-    const t0 = setTimeout(() => setStage(1), 50);
-    // 1.1s: Sloth stops at center and presents the invoice; invoice settles
-    const t1 = setTimeout(() => setStage(2), 1100);
-    // 1.75s: BillSloth wordmark & "SLOW AND STEADY"
-    const t2 = setTimeout(() => setStage(3), 1750);
-    // 2.25s: Headline, supporting copy, and local privacy indicator
-    const t3 = setTimeout(() => setStage(4), 2250);
+    const timers: NodeJS.Timeout[] = [];
+
+    // 0.05s: Sloth begins walking in from outside the left edge carrying invoice
+    timers.push(setTimeout(() => setStage(1), 50));
+
+    // 1.35s: Sloth reaches center, halts beside card; invoice card settles with Due in 5d & Organized
+    timers.push(setTimeout(() => setStage(2), 1350));
+
+    // 1.85s: Wordmark "BillSloth" & tagline "SLOW AND STEADY" reveal
+    timers.push(setTimeout(() => setStage(3), 1850));
+
+    // 2.35s: Headline, supporting copy, and local privacy shield reveal
+    timers.push(setTimeout(() => setStage(4), 2350));
+
     // 2.85s: Begin seamless crossfade into dashboard
-    const t4 = setTimeout(() => {
-      setStage(5);
-      handleFinish();
-    }, 2850);
+    timers.push(
+      setTimeout(() => {
+        setStage(5);
+        handleFinish();
+      }, 2850)
+    );
 
     return () => {
-      clearTimeout(t0);
-      clearTimeout(t1);
-      clearTimeout(t2);
-      clearTimeout(t3);
-      clearTimeout(t4);
+      timers.forEach(clearTimeout);
     };
   }, [handleFinish, prefersReducedMotion]);
 
@@ -121,7 +125,7 @@ export const CalmSlothIntro: React.FC<CalmSlothIntroProps> = ({ onComplete, onSk
       }`}
     >
       {/* 1. Cinematic Environment: Midnight Navy with Deep Ambient Halos */}
-      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_50%_40%,rgba(14,165,233,0.15)_0%,rgba(37,99,235,0.12)_35%,rgba(9,13,22,0.98)_80%)] pointer-events-none" />
+      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_50%_35%,rgba(14,165,233,0.14)_0%,rgba(37,99,235,0.10)_35%,rgba(9,13,22,0.98)_80%)] pointer-events-none" />
       <div className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[520px] h-[520px] rounded-full bg-gradient-to-tr from-blue-600/15 via-cyan-500/10 to-transparent blur-3xl pointer-events-none" />
 
       {/* Sparse, drifting ambient light specks */}
@@ -145,18 +149,18 @@ export const CalmSlothIntro: React.FC<CalmSlothIntroProps> = ({ onComplete, onSk
       </div>
 
       {/* Central Story Composition */}
-      <div className="relative z-10 max-w-lg w-full mx-auto px-6 py-6 text-center flex flex-col items-center">
-        {/* Layered Composition: Mascot + Carried Bill + Settling Invoice */}
-        <div className="relative flex flex-col items-center">
-          {/* Mascot Container: Walking Entrance -> Center Float */}
+      <div className="relative z-10 max-w-xl w-full mx-auto px-4 sm:px-6 py-6 text-center flex flex-col items-center">
+        {/* Hero Presentation Stage: Sloth Mascot & Settled Invoice Card Side-by-Side */}
+        <div className="relative flex flex-col sm:flex-row items-center justify-center gap-4 sm:gap-6 min-h-[160px] sm:min-h-[175px] w-full">
+          {/* Walking Mascot Container: Walks across screen from outside left edge to center */}
           <div
-            className={`relative transition-all duration-700 ease-out ${
+            className={`relative transition-all duration-500 ease-out z-20 ${
               stage >= 1 ? 'opacity-100' : 'opacity-0'
-            } ${stage === 1 ? 'animate-sloth-walk' : 'animate-float-gentle'}`}
+            } ${stage === 1 ? 'animate-teddy-entrance' : ''}`}
           >
-            {/* Mascot Avatar Ring */}
-            <div className="relative group">
-              <div className="w-36 h-36 sm:w-44 sm:h-44 rounded-full p-[2.5px] bg-gradient-to-b from-cyan-400/35 via-blue-500/25 to-transparent shadow-2xl shadow-blue-950/70 relative overflow-hidden bg-[#0F172A]">
+            <div className={`relative ${stage === 1 ? 'animate-teddy-step' : 'animate-float-gentle'}`}>
+              {/* Mascot Avatar Ring with Electric-Cyan Edge */}
+              <div className="w-28 h-28 sm:w-36 sm:h-36 rounded-full p-[2.5px] bg-gradient-to-b from-cyan-400/35 via-blue-500/25 to-transparent shadow-2xl shadow-blue-950/70 relative overflow-hidden bg-[#0F172A] mx-auto">
                 {!imgError ? (
                   <img
                     src="/sloth-avatar.png"
@@ -174,28 +178,28 @@ export const CalmSlothIntro: React.FC<CalmSlothIntroProps> = ({ onComplete, onSk
 
               {/* Natural soft shadow beneath sloth (moves in sync with walking cadence) */}
               <div
-                className={`w-32 sm:w-40 h-3.5 rounded-full bg-black/45 blur-md mx-auto -mt-1.5 transition-all duration-500 ${
-                  stage === 1 ? 'animate-sloth-shadow-walk' : 'opacity-40'
+                className={`w-24 sm:w-32 h-3 rounded-full bg-black/45 blur-md mx-auto -mt-1.5 transition-all duration-300 ${
+                  stage === 1 ? 'animate-teddy-shadow-step' : 'opacity-40'
                 }`}
               />
 
-              {/* Mini Carried Bill (Held in front of sloth during walk) */}
+              {/* Small Carried Bill held in paws during walk */}
               <div
-                className={`absolute -bottom-2 left-1/2 -translate-x-1/2 z-20 transition-all duration-500 ease-out ${
+                className={`absolute -bottom-1 -right-1 sm:right-1 z-30 transition-all duration-400 ease-out ${
                   stage === 1
-                    ? 'opacity-100 scale-90 translate-y-0 rotate-[-3deg]'
-                    : 'opacity-0 scale-75 translate-y-4 pointer-events-none'
+                    ? 'opacity-100 scale-100 rotate-[-4deg]'
+                    : 'opacity-0 scale-75 pointer-events-none'
                 }`}
               >
-                <div className="bg-white/95 text-navy-900 rounded-xl px-3 py-1.5 shadow-xl border border-slate-200/90 flex items-center gap-2 backdrop-blur-md">
-                  <div className="w-5 h-5 rounded-md bg-blue-100 text-blue-600 flex items-center justify-center shrink-0">
-                    <FileText className="w-3 h-3" />
+                <div className="bg-white/95 text-navy-900 rounded-xl px-2.5 py-1.5 shadow-xl border border-slate-200/90 flex items-center gap-1.5 backdrop-blur-md">
+                  <div className="w-4 h-4 rounded-md bg-blue-100 text-blue-600 flex items-center justify-center shrink-0">
+                    <FileText className="w-2.5 h-2.5" />
                   </div>
                   <div className="text-left">
-                    <span className="text-[10px] font-black text-navy-900 block leading-tight">
-                      Broadband Bill
+                    <span className="text-[9px] font-black text-navy-900 block leading-tight">
+                      Bill
                     </span>
-                    <span className="text-[9px] font-bold text-amber-700 font-mono block">
+                    <span className="text-[8px] font-bold text-amber-700 font-mono block">
                       $128.50
                     </span>
                   </div>
@@ -204,44 +208,42 @@ export const CalmSlothIntro: React.FC<CalmSlothIntroProps> = ({ onComplete, onSk
             </div>
           </div>
 
-          {/* Settled, Organized Card (Sloth hands off and presents the invoice) */}
-          <div className="relative mt-2 z-20 h-16 flex items-center justify-center">
-            <div
-              className={`w-72 sm:w-80 transition-all duration-600 ease-out ${
-                stage >= 2
-                  ? 'opacity-100 translate-y-0 scale-100'
-                  : 'opacity-0 translate-y-4 scale-90 pointer-events-none'
-              }`}
-            >
-              <div className="bg-white/95 text-navy-900 rounded-2xl p-3 sm:p-3.5 shadow-2xl border border-slate-200 text-left ring-2 ring-cyan-400/80 shadow-cyan-500/20 backdrop-blur-md">
-                <div className="flex items-center justify-between gap-2.5">
-                  <div className="flex items-center gap-2.5 truncate">
-                    <div className="w-7 h-7 rounded-lg bg-blue-50 text-blue-600 border border-blue-200/70 flex items-center justify-center shrink-0">
-                      <FileText className="w-3.5 h-3.5" />
-                    </div>
-                    <div className="truncate">
-                      <span className="text-[11px] font-bold text-navy-900 block truncate">
-                        Broadband & Utilities
-                      </span>
-                      <span className="text-[9px] text-slate-400 font-medium block">
-                        Sample Illustrative Bill
-                      </span>
-                    </div>
+          {/* Settled, Organized Card (Sloth brings bill into order right beside him) */}
+          <div
+            className={`w-full max-w-xs sm:w-80 transition-all duration-500 ease-out z-10 ${
+              stage >= 2
+                ? 'opacity-100 translate-x-0 scale-100 animate-card-settle'
+                : 'opacity-0 -translate-x-6 scale-90 pointer-events-none'
+            }`}
+          >
+            <div className="bg-white/95 text-navy-900 rounded-2xl p-3.5 sm:p-4 shadow-2xl border border-slate-200 text-left ring-2 ring-cyan-400/80 shadow-cyan-500/20 backdrop-blur-md">
+              <div className="flex items-center justify-between gap-2.5">
+                <div className="flex items-center gap-2.5 truncate">
+                  <div className="w-8 h-8 rounded-xl bg-blue-50 text-blue-600 border border-blue-200/70 flex items-center justify-center shrink-0 shadow-2xs">
+                    <FileText className="w-4 h-4" />
                   </div>
-
-                  {/* Due Date & Organized Status */}
-                  <div className="text-right shrink-0">
-                    <span className="text-xs font-black text-navy-900 font-mono block tabular-nums">
-                      $128.50
+                  <div className="truncate">
+                    <span className="text-xs font-bold text-navy-900 block truncate">
+                      Broadband & Utilities
                     </span>
-                    <div className="flex items-center gap-1 justify-end mt-0.5">
-                      <span className="text-[9px] font-bold px-1.5 py-0.2 rounded bg-amber-100 text-amber-900">
-                        Due in 5d
-                      </span>
-                      <span className="text-[9px] font-bold px-1.5 py-0.2 rounded bg-emerald-100 text-emerald-800 flex items-center gap-0.5">
-                        <CheckCircle2 className="w-2.5 h-2.5" /> Organized
-                      </span>
-                    </div>
+                    <span className="text-[10px] text-slate-400 font-medium block">
+                      Sample Illustrative Bill
+                    </span>
+                  </div>
+                </div>
+
+                {/* Due Date & Organized Status */}
+                <div className="text-right shrink-0">
+                  <span className="text-sm font-black text-navy-900 font-mono block tabular-nums">
+                    $128.50
+                  </span>
+                  <div className="flex items-center gap-1 justify-end mt-0.5">
+                    <span className="text-[9px] font-bold px-1.5 py-0.5 rounded bg-amber-100 text-amber-900">
+                      Due in 5d
+                    </span>
+                    <span className="text-[9px] font-bold px-1.5 py-0.5 rounded bg-emerald-100 text-emerald-800 flex items-center gap-0.5 shadow-2xs">
+                      <CheckCircle2 className="w-2.5 h-2.5" /> Organized
+                    </span>
                   </div>
                 </div>
               </div>
@@ -249,9 +251,9 @@ export const CalmSlothIntro: React.FC<CalmSlothIntroProps> = ({ onComplete, onSk
           </div>
         </div>
 
-        {/* 3. Brand & Wordmark Reveal (1.75s) */}
+        {/* 3. Brand & Wordmark Reveal (1.85s) */}
         <div
-          className={`mt-3 space-y-1 transition-all duration-600 ease-out ${
+          className={`mt-4 space-y-1 transition-all duration-500 ease-out ${
             stage >= 3 ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-3'
           }`}
         >
@@ -264,13 +266,13 @@ export const CalmSlothIntro: React.FC<CalmSlothIntroProps> = ({ onComplete, onSk
             </span>
           </div>
           <p className="text-xs font-bold uppercase tracking-widest text-slate-400">
-            Slow and Steady
+            SLOW AND STEADY
           </p>
         </div>
 
-        {/* 4. Headline, Supporting Copy, and Privacy Shield (2.25s) */}
+        {/* 4. Headline, Supporting Copy, and Privacy Shield (2.35s) */}
         <div
-          className={`mt-3.5 space-y-2.5 transition-all duration-600 ease-out ${
+          className={`mt-3.5 space-y-2.5 transition-all duration-500 ease-out ${
             stage >= 4 ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-3'
           }`}
         >
@@ -281,9 +283,9 @@ export const CalmSlothIntro: React.FC<CalmSlothIntroProps> = ({ onComplete, onSk
             Your bills, organized. Your documents, on your device.
           </p>
 
-          {/* Privacy Shield with Device Outline */}
+          {/* Privacy Shield with Device Outline & Subtle Pulsing Glow */}
           <div className="pt-1 flex items-center justify-center">
-            <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-emerald-500/15 border border-emerald-400/30 text-emerald-300 text-xs font-semibold shadow-sm">
+            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-emerald-500/15 border border-emerald-400/35 text-emerald-300 text-xs font-semibold shadow-sm animate-shield-glow">
               <Laptop className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
               <span>On-Device Storage</span>
               <span className="text-emerald-400/60">•</span>
